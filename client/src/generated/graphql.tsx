@@ -139,7 +139,7 @@ export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
 export type GetUsersQuery = (
   { __typename?: 'Query' }
   & { getUsers?: Maybe<Array<(
-    { __typename: 'User' }
+    { __typename?: 'User' }
     & Pick<User, 'id' | 'username' | 'email'>
   )>> }
 );
@@ -149,7 +149,6 @@ export const GetUsersDocument = gql`
     query GetUsers {
   getUsers {
     id
-    __typename
     username
     email
   }
