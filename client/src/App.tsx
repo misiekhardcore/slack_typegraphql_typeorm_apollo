@@ -5,7 +5,6 @@ import {
   InMemoryCache,
 } from "@apollo/client";
 import React from "react";
-import "./App.css";
 import Routes from "./routes";
 
 const client = new ApolloClient({
