@@ -34,7 +34,12 @@ export interface Context {
     context: ({ req, res }): Context => ({ req, res, user: { id: 1 } }),
   });
 
-  apolloServer.applyMiddleware({ app, cors: false });
+  const corsOptions = {
+    origin: "http://localhost:3000",
+    credentials: true,
+  };
+
+  apolloServer.applyMiddleware({ app, cors: corsOptions });
   const port = process.env.PORT || 4000;
   app.listen(port, () => {
     console.log(`server started at http://localhost:${port}/graphql`);
