@@ -50,6 +50,8 @@
     "@graphql-codegen/introspection": "1.18.2",
     "@graphql-codegen/typescript": "^1.22.1",
     "@graphql-codegen/typescript-operations": "^1.18.0",
-    "@graphql-codegen/typescript-react-apollo": "^2.2.5"
+    "@graphql-codegen/typescript-react-apollo": "^2.2.5",
+    "@types/react-router": "^5.1.14",
+    "@types/react-router-dom": "^5.1.7"
   }
 }
