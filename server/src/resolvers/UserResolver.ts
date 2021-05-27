@@ -8,6 +8,7 @@ import {
   ResolverInterface,
   Root,
 } from "type-graphql";
+import argon2 from "argon2";
 import { User } from "../entity/User";
 import { CreateUserInput, UpdateUserInput } from "../inputs/UserInputs";
 
@@ -24,13 +25,18 @@ export class UserResolver implements ResolverInterface<User> {
   }
 
   @Mutation(() => User)
-  async createUser(
-    @Arg("userInput", { nullable: false })
-    userInput: CreateUserInput
+  async register(
+    @Arg("userInput")
+    { password, ...restArgs }: CreateUserInput
   ) {
-    const user = User.create({ ...userInput });
-    await user.save();
-    return user;
+    try {
+      const hashPassword = await argon2.hash(password);
+      const user = User.create({ password: hashPassword, ...restArgs });
+      await user.save();
+      return user;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
   @Mutation(() => User)
