@@ -1,6 +1,5 @@
 import {
   Arg,
-  Ctx,
   FieldResolver,
   Mutation,
   Query,
@@ -9,54 +8,57 @@ import {
   Root,
 } from "type-graphql";
 import { Channel } from "../entity/Channel";
+import { Message } from "../entity/Message";
 import { Team } from "../entity/Team";
-import { Context } from "../index";
+import { User } from "../entity/User";
+import { CreateChannelInput } from "../inputs/ChannelInputs";
+import { ChannelService } from "../services/channel.service";
 
 @Resolver(() => Channel)
 export class ChannelResolver implements ResolverInterface<Channel> {
+  private readonly channelService: ChannelService;
+  constructor() {
+    this.channelService = new ChannelService();
+  }
+
   @Query(() => [Channel], { nullable: true })
   async getChannels() {
-    return await Channel.find({});
+    return await this.channelService.getMany();
   }
 
   @Query(() => Channel, { nullable: true })
   async getChannel(@Arg("channelId") channelId: number) {
-    return await Channel.findOne(channelId);
+    return await this.channelService.getOne(channelId);
   }
 
   @Mutation(() => Channel)
   async createChannel(
-    @Arg("teamId") teamId: number,
-    @Arg("name") name: string,
-    @Arg("public", { defaultValue: false }) isPublic: boolean,
-    @Ctx() { user }: Context
+    @Arg("channelInput") createChannelInput: CreateChannelInput
   ): Promise<Channel> {
-    const channel = Channel.create({
-      public: isPublic,
-      team: { id: teamId },
-      name,
-      users: [user],
-    });
-    await channel.save();
-    return channel;
+    return await this.channelService.create(createChannelInput);
   }
 
   @FieldResolver()
-  async users(@Root() { id }: Channel) {
-    return (await Channel.findOne(id, { relations: ["users"] }))?.users || [];
+  async users(@Root() channel: Channel) {
+    const users = await this.channelService.populateMany<User>(
+      channel,
+      "users"
+    );
+    return users;
   }
-
   @FieldResolver()
-  async team(@Root() { id }: Channel) {
+  async team(@Root() channel: Channel) {
     return (
-      (await Channel.findOne(id, { relations: ["team"] }))?.team || new Team()
+      (await this.channelService.populateOne<Team>(channel, "team")) ||
+      new Team()
     );
   }
 
   @FieldResolver()
-  async messages(@Root() { id }: Channel) {
-    return (
-      (await Channel.findOne(id, { relations: ["messages"] }))?.messages || null
+  async messages(@Root() channel: Channel) {
+    return await this.channelService.populateMany<Message>(
+      channel,
+      "messages"
     );
   }
 }
