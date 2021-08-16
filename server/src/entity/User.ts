@@ -14,7 +14,7 @@ import {
 import { Channel } from "./Channel";
 import { Team } from "./Team";
 
-@Entity()
+@Entity({ name: "users" })
 @ObjectType()
 export class User extends BaseEntity {
   @Field(() => ID)
@@ -24,7 +24,9 @@ export class User extends BaseEntity {
   @Field(() => String)
   @Column()
   @MinLength(6, { message: "Username should have at least 6 letters" })
-  @MaxLength(30, { message: "Username should have maximum of 30 letters" })
+  @MaxLength(30, {
+    message: "Username should have maximum of 30 letters",
+  })
   username: string;
 
   @Field(() => String)
