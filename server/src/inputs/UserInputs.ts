@@ -5,7 +5,9 @@ import { Field, InputType } from "type-graphql";
 export class CreateUserInput {
   @Field(() => String)
   @MinLength(6, { message: "Username should have at least 6 letters" })
-  @MaxLength(30, { message: "Username should have maximum of 30 letters" })
+  @MaxLength(30, {
+    message: "Username should have maximum of 30 letters",
+  })
   username: string;
 
   @Field(() => String)
@@ -19,6 +21,9 @@ export class CreateUserInput {
 
 @InputType()
 export class UpdateUserInput {
+  @Field(() => Number)
+  id: number;
+
   @Field(() => String, { nullable: true })
   username?: string;
 
