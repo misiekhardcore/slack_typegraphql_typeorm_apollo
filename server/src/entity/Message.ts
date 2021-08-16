@@ -12,7 +12,7 @@ import {
 import { Channel } from "./Channel";
 import { User } from "./User";
 
-@Entity()
+@Entity({ name: "messages" })
 @ObjectType()
 export class Message extends BaseEntity {
   @Field(() => ID)
@@ -23,6 +23,22 @@ export class Message extends BaseEntity {
   @Column()
   text: string;
 
+  @Column()
+  channelId: number;
+  @Field(() => Channel)
+  @ManyToOne(() => Channel, (chanel) => chanel.id, {
+    onDelete: "CASCADE",
+  })
+  @JoinColumn({ name: "channel_id" })
+  channel: Channel;
+
+  @Column()
+  userId: number;
+  @Field(() => User)
+  @ManyToOne(() => User, (user) => user.id)
+  @JoinColumn({ name: "user_id" })
+  user: User;
+
   @Field(() => String)
   @CreateDateColumn()
   createdAt: Date;
@@ -30,14 +46,4 @@ export class Message extends BaseEntity {
   @Field(() => String)
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @Field(() => Channel)
-  @ManyToOne(() => Channel, (chanel) => chanel.id, { onDelete: "CASCADE" })
-  @JoinColumn({ name: "channel_id" })
-  channel: Channel;
-
-  @Field(() => User)
-  @ManyToOne(() => User, (user) => user.id)
-  @JoinColumn({ name: "user_id" })
-  user: User;
 }
