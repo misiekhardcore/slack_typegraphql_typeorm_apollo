@@ -1,4 +1,4 @@
-import { UserInputError } from "apollo-server-errors";
+import argon2 from "argon2";
 import {
   Arg,
   FieldResolver,
@@ -8,20 +8,26 @@ import {
   ResolverInterface,
   Root,
 } from "type-graphql";
-import argon2 from "argon2";
+import { Channel } from "../entity/Channel";
+import { Team } from "../entity/Team";
 import { User } from "../entity/User";
 import { CreateUserInput, UpdateUserInput } from "../inputs/UserInputs";
+import { UserService } from "../services/user.service";
 
 @Resolver(() => User)
 export class UserResolver implements ResolverInterface<User> {
+  private readonly userService;
+  constructor() {
+    this.userService = new UserService();
+  }
   @Query(() => [User], { nullable: true })
   async getUsers() {
-    return await User.find({});
+    return await this.userService.getMany();
   }
 
   @Query(() => User, { nullable: true })
   async getUser(@Arg("id") id: number) {
-    return await User.findOne(id);
+    return await this.userService.getOne(id);
   }
 
   @Mutation(() => User)
@@ -31,9 +37,10 @@ export class UserResolver implements ResolverInterface<User> {
   ) {
     try {
       const hashPassword = await argon2.hash(password);
-      const user = User.create({ password: hashPassword, ...restArgs });
-      await user.save();
-      return user;
+      return await this.userService.create({
+        ...restArgs,
+        password: hashPassword,
+      });
     } catch (error) {
       throw new Error(error);
     }
@@ -41,23 +48,21 @@ export class UserResolver implements ResolverInterface<User> {
 
   @Mutation(() => User)
   async updateUser(
-    @Arg("id") id: number,
     @Arg("userInput", { nullable: false }) userInput: UpdateUserInput
   ) {
-    const user = await User.findOne({ id });
-    if (!user) throw new UserInputError("User not found");
-    Object.assign(user, userInput);
-    await user.save();
-    return user;
+    return await this.userService.update(userInput);
   }
 
   @FieldResolver()
-  async teams(@Root() { id }: User) {
-    return (await User.findOne(id, { relations: ["teams"] }))?.teams || [];
+  async teams(@Root() user: User) {
+    return await this.userService.populateMany<Team>(user, "teams");
   }
 
   @FieldResolver()
-  async channels(@Root() { id }: User) {
-    return (await User.findOne(id, { relations: ["teams"] }))?.channels || [];
+  async channels(@Root() user: User) {
+    return await this.userService.populateMany<Channel>(
+      user,
+      "channels"
+    );
   }
 }
