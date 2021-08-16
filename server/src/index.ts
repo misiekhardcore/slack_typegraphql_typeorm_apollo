@@ -1,13 +1,13 @@
-import "reflect-metadata";
-import { createConnection, getConnectionOptions } from "typeorm";
-import express from "express";
 import { ApolloServer } from "apollo-server-express";
+import express from "express";
+import "reflect-metadata";
 import { buildSchema } from "type-graphql";
-import { UserResolver } from "./resolvers/UserResolver";
-import { TeamResolver } from "./resolvers/TeamResolver";
+import { createConnection, getConnectionOptions } from "typeorm";
+import { SnakeNamingStrategy } from "typeorm-naming-strategies";
 import { ChannelResolver } from "./resolvers/ChannelResolver";
 import { MessageResolver } from "./resolvers/MessageResolver";
-import { SnakeNamingStrategy } from "typeorm-naming-strategies";
+import { TeamResolver } from "./resolvers/TeamResolver";
+import { UserResolver } from "./resolvers/UserResolver";
 
 export interface Context {
   req: any;
@@ -28,16 +28,23 @@ export interface Context {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [UserResolver, TeamResolver, ChannelResolver, MessageResolver],
+      resolvers: [
+        UserResolver,
+        TeamResolver,
+        ChannelResolver,
+        MessageResolver,
+      ],
       validate: true,
     }),
     context: ({ req, res }): Context => ({ req, res, user: { id: 1 } }),
   });
 
   const corsOptions = {
-    origin: "http://localhost:3000",
-    credentials: true,
+    origin: "*",
+    credentials: false,
   };
+
+  await apolloServer.start();
 
   apolloServer.applyMiddleware({ app, cors: corsOptions });
   const port = process.env.PORT || 4000;
