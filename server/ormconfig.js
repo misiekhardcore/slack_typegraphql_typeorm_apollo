@@ -17,7 +17,7 @@ module.exports = [
   {
     name: "production",
     type: "postgres",
-    url: "postgres://postgres:1234@localhost:5432/slack",
+    url: "postgres://postgres:postgres@localhost:5432/slack",
     synchronize: true, // switch this to false once you have the initial tables created and use migrations instead
     logging: false,
     // entities: ["dist/entity/**/*.js"],
