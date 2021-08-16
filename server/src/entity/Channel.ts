@@ -15,20 +15,20 @@ import { Message } from "./Message";
 import { Team } from "./Team";
 import { User } from "./User";
 
-@Entity()
+@Entity({ name: "channels" })
 @ObjectType()
 export class Channel extends BaseEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: false })
   @Column()
   name: string;
 
   @Field(() => Boolean)
   @Column()
-  public: boolean;
+  isPublic: boolean;
 
   @Field(() => String)
   @CreateDateColumn()
@@ -38,16 +38,22 @@ export class Channel extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @Column()
+  teamId: number;
   @Field(() => Team)
-  @ManyToOne(() => Team)
-  @JoinColumn()
+  @ManyToOne(() => Team, { nullable: false })
+  @JoinColumn({ name: "team_id" })
   team: Team;
 
   @Field(() => [Message], { nullable: true })
-  @OneToMany(() => Message, (message) => message.channel)
+  @OneToMany(() => Message, (message) => message.channel, {
+    onDelete: "CASCADE",
+  })
   messages: Message[] | null;
 
   @Field(() => [User])
-  @ManyToMany(() => User, (user) => user.channels, { onDelete: "CASCADE" })
+  @ManyToMany(() => User, (user) => user.channels, {
+    onDelete: "CASCADE",
+  })
   users: User[];
 }
