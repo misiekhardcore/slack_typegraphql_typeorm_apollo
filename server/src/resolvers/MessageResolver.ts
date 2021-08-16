@@ -8,45 +8,53 @@ import {
   ResolverInterface,
   Root,
 } from "type-graphql";
-import { Message } from "../entity/Message";
 import { Channel } from "../entity/Channel";
-import { Context } from "../index";
+import { Message } from "../entity/Message";
 import { User } from "../entity/User";
+import { Context } from "../index";
+import { CreateMessageInput } from "../inputs/MessageInput";
+import { MessageService } from "../services/message.service";
 
 @Resolver(() => Message)
 export class MessageResolver implements ResolverInterface<Message> {
+  private readonly messageService: MessageService;
+  constructor() {
+    this.messageService = new MessageService();
+  }
+
   @Query(() => [Message])
   async getMessages() {
-    return await Message.find({});
+    return await this.messageService.getMany();
+  }
+
+  @Query(() => Message)
+  async getMessage(messageId: number) {
+    return await this.messageService.getOne(messageId);
   }
 
   @Mutation(() => Message)
   async createMessage(
-    @Arg("channelId") channelId: number,
-    @Arg("text") text: string,
+    @Arg("messageInput") createMessageInput: CreateMessageInput,
     @Ctx() { user }: Context
   ): Promise<Message> {
-    const message = Message.create<Message>({
-      channel: { id: channelId },
-      text,
-      user,
-    });
-    await message.save();
-    return message;
+    return this.messageService.create(createMessageInput, user.id);
   }
 
   @FieldResolver()
-  async channel(@Root() { id }: Message) {
+  async channel(@Root() message: Message) {
     return (
-      (await Message.findOne(id, { relations: ["channel"] }))?.channel ||
-      new Channel()
+      (await this.messageService.populateOne<Channel>(
+        message,
+        "channel"
+      )) || new Channel()
     );
   }
 
   @FieldResolver()
-  async user(@Root() { id }: Message) {
+  async user(@Root() message: Message) {
     return (
-      (await Message.findOne(id, { relations: ["user"] }))?.user || new User()
+      (await this.messageService.populateOne<User>(message, "user")) ||
+      new User()
     );
   }
 }
