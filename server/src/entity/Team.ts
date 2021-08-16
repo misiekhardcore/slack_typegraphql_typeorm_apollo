@@ -12,7 +12,7 @@ import {
 } from "typeorm";
 import { User } from "./User";
 
-@Entity()
+@Entity({ name: "teams" })
 @ObjectType()
 export class Team extends BaseEntity {
   @Field(() => ID)
@@ -23,6 +23,20 @@ export class Team extends BaseEntity {
   @Column()
   name: string;
 
+  @Field(() => [User])
+  @ManyToMany<User>(() => User, (user) => user.teams, {
+    nullable: false,
+    onDelete: "CASCADE",
+  })
+  members: User[];
+
+  @Column()
+  ownerId: number;
+  @Field(() => User)
+  @ManyToOne<User>(() => User, { onDelete: "CASCADE", nullable: false })
+  @JoinColumn({ name: "owner_id" })
+  owner: User;
+
   @Field(() => String)
   @CreateDateColumn()
   createdAt: Date;
@@ -30,13 +44,4 @@ export class Team extends BaseEntity {
   @Field(() => String)
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @Field(() => [User])
-  @ManyToMany<User>(() => User, (user) => user.teams)
-  members: User[];
-
-  @Field(() => User)
-  @ManyToOne<User>(() => User, { onDelete: "CASCADE" })
-  @JoinColumn({ name: "owner_id" })
-  owner: User;
 }
