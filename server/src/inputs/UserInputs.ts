@@ -33,3 +33,14 @@ export class UpdateUserInput {
   @Field(() => String, { nullable: true })
   password?: string;
 }
+
+@InputType()
+export class LoginUserInput {
+  @Field(() => String)
+  @IsEmail({}, { message: "Email not valid" })
+  email: string;
+
+  @Field(() => String)
+  @MinLength(1, { message: "Password cannot be empty" })
+  password: string;
+}
