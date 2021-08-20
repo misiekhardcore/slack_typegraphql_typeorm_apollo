@@ -26,7 +26,6 @@ export class Team extends BaseEntity {
   @Field(() => [User])
   @ManyToMany<User>(() => User, (user) => user.teams, {
     nullable: false,
-    onDelete: "CASCADE",
   })
   members: User[];
 

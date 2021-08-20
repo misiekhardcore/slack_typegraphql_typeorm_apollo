@@ -41,14 +41,12 @@ export class Channel extends BaseEntity {
   @Column()
   teamId: number;
   @Field(() => Team)
-  @ManyToOne(() => Team, { nullable: false })
+  @ManyToOne(() => Team, { nullable: false, onDelete: "CASCADE" })
   @JoinColumn({ name: "team_id" })
   team: Team;
 
   @Field(() => [Message], { nullable: true })
-  @OneToMany(() => Message, (message) => message.channel, {
-    onDelete: "CASCADE",
-  })
+  @OneToMany(() => Message, (message) => message.channel)
   messages: Message[] | null;
 
   @Field(() => [User])
