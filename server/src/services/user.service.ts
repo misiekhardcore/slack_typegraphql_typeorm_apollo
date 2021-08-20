@@ -12,7 +12,9 @@ export class UserService {
     return await this.userRepository.create(createUserInput).save();
   }
 
-  public async update(updateUserInput: UpdateUserInput) {
+  public async update(
+    updateUserInput: UpdateUserInput
+  ): Promise<User | undefined> {
     const { id, ...rest } = updateUserInput;
     this.userRepository.update({ id }, rest);
     return await this.userRepository.findOne(id);
@@ -26,7 +28,7 @@ export class UserService {
     return await this.userRepository.findOne({ email });
   }
 
-  public async getMany() {
+  public async getMany(): Promise<User[]> {
     return await this.userRepository.find();
   }
 
