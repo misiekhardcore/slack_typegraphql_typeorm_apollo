@@ -8,11 +8,16 @@ import { ChannelResolver } from "./resolvers/ChannelResolver";
 import { MessageResolver } from "./resolvers/MessageResolver";
 import { TeamResolver } from "./resolvers/TeamResolver";
 import { UserResolver } from "./resolvers/UserResolver";
+import { config } from "dotenv";
+
+config();
 
 export interface Context {
   req: any;
   res: any;
   user: { id: number };
+  jwtSecret1: string;
+  jwtSecret2: string;
 }
 (async () => {
   const app = express();
@@ -36,7 +41,13 @@ export interface Context {
       ],
       validate: true,
     }),
-    context: ({ req, res }): Context => ({ req, res, user: { id: 1 } }),
+    context: ({ req, res }): Context => ({
+      req,
+      res,
+      user: { id: 1 },
+      jwtSecret1: process.env.SECRET1 || "supersecret",
+      jwtSecret2: process.env.SECRET2 || "supersecret",
+    }),
   });
 
   const corsOptions = {
