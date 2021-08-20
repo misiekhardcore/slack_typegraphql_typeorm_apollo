@@ -15,12 +15,10 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-function App() {
-  return (
-    <ApolloProvider client={client}>
-      <Routes />
-    </ApolloProvider>
-  );
-}
+const App = (): JSX.Element => (
+  <ApolloProvider client={client}>
+    <Routes />
+  </ApolloProvider>
+);
 
 export default App;
