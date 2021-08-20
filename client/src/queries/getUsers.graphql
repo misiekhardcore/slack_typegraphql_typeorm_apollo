@@ -3,5 +3,7 @@ query GetUsers {
     id
     username
     email
+    createdAt
+    updatedAt
   }
 }

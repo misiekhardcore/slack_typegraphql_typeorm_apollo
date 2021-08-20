@@ -18,12 +18,27 @@ export type Channel = {
   __typename?: 'Channel';
   id: Scalars['ID'];
   name: Scalars['String'];
-  public: Scalars['Boolean'];
+  isPublic: Scalars['Boolean'];
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
   team: Team;
   messages?: Maybe<Array<Message>>;
   users: Array<User>;
+};
+
+export type CreateChannelInput = {
+  name: Scalars['String'];
+  teamId: Scalars['Float'];
+  isPublic?: Maybe<Scalars['Boolean']>;
+};
+
+export type CreateMessageInput = {
+  channelId: Scalars['Float'];
+  text: Scalars['String'];
+};
+
+export type CreateTeamInput = {
+  name: Scalars['String'];
 };
 
 export type CreateUserInput = {
@@ -32,23 +47,65 @@ export type CreateUserInput = {
   password: Scalars['String'];
 };
 
+export type CreateUserResponse = {
+  __typename?: 'CreateUserResponse';
+  ok: Scalars['Boolean'];
+  user?: Maybe<User>;
+  errors?: Maybe<Array<ListError>>;
+};
+
+export type ListError = {
+  __typename?: 'ListError';
+  path: Scalars['String'];
+  msg: Scalars['String'];
+};
+
+export type LoginResponse = {
+  __typename?: 'LoginResponse';
+  ok: Scalars['Boolean'];
+  token?: Maybe<Scalars['String']>;
+  refreshToken?: Maybe<Scalars['String']>;
+  errors?: Maybe<Array<ListError>>;
+};
+
+export type LoginUserInput = {
+  email: Scalars['String'];
+  password: Scalars['String'];
+};
+
 export type Message = {
   __typename?: 'Message';
   id: Scalars['ID'];
   text: Scalars['String'];
-  createdAt: Scalars['String'];
-  updatedAt: Scalars['String'];
   channel: Channel;
   user: User;
+  createdAt: Scalars['String'];
+  updatedAt: Scalars['String'];
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
-  register: User;
-  updateUser: User;
-  createTeam: Team;
   createChannel: Channel;
   createMessage: Message;
+  createTeam: Team;
+  register: CreateUserResponse;
+  login: LoginResponse;
+  updateUser: User;
+};
+
+
+export type MutationCreateChannelArgs = {
+  channelInput: CreateChannelInput;
+};
+
+
+export type MutationCreateMessageArgs = {
+  messageInput: CreateMessageInput;
+};
+
+
+export type MutationCreateTeamArgs = {
+  createTeamInput: CreateTeamInput;
 };
 
 
@@ -57,43 +114,30 @@ export type MutationRegisterArgs = {
 };
 
 
+export type MutationLoginArgs = {
+  userInput: LoginUserInput;
+};
+
+
 export type MutationUpdateUserArgs = {
   userInput: UpdateUserInput;
-  id: Scalars['Float'];
-};
-
-
-export type MutationCreateTeamArgs = {
-  name: Scalars['String'];
-};
-
-
-export type MutationCreateChannelArgs = {
-  public?: Maybe<Scalars['Boolean']>;
-  name: Scalars['String'];
-  teamId: Scalars['Float'];
-};
-
-
-export type MutationCreateMessageArgs = {
-  text: Scalars['String'];
-  channelId: Scalars['Float'];
 };
 
 export type Query = {
   __typename?: 'Query';
-  getUsers?: Maybe<Array<User>>;
-  getUser?: Maybe<User>;
-  getTeams?: Maybe<Array<Team>>;
-  getTeam?: Maybe<Team>;
   getChannels?: Maybe<Array<Channel>>;
   getChannel?: Maybe<Channel>;
   getMessages: Array<Message>;
+  getMessage: Message;
+  getTeams?: Maybe<Array<Team>>;
+  getTeam?: Maybe<Team>;
+  getUsers?: Maybe<Array<User>>;
+  getUser?: Maybe<User>;
 };
 
 
-export type QueryGetUserArgs = {
-  id: Scalars['Float'];
+export type QueryGetChannelArgs = {
+  channelId: Scalars['Float'];
 };
 
 
@@ -102,21 +146,22 @@ export type QueryGetTeamArgs = {
 };
 
 
-export type QueryGetChannelArgs = {
-  channelId: Scalars['Float'];
+export type QueryGetUserArgs = {
+  id: Scalars['Float'];
 };
 
 export type Team = {
   __typename?: 'Team';
   id: Scalars['ID'];
   name: Scalars['String'];
-  createdAt: Scalars['String'];
-  updatedAt: Scalars['String'];
   members: Array<User>;
   owner: User;
+  createdAt: Scalars['String'];
+  updatedAt: Scalars['String'];
 };
 
 export type UpdateUserInput = {
+  id: Scalars['Float'];
   username?: Maybe<Scalars['String']>;
   email?: Maybe<Scalars['String']>;
   password?: Maybe<Scalars['String']>;
@@ -131,39 +176,76 @@ export type User = {
   updatedAt: Scalars['String'];
   teams?: Maybe<Array<Team>>;
   channels?: Maybe<Array<Channel>>;
+  isAdmin?: Maybe<Scalars['Boolean']>;
 };
+
+export type LoginMutationVariables = Exact<{
+  loginUserInput: LoginUserInput;
+}>;
+
+
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'LoginResponse', ok: boolean, token?: Maybe<string>, refreshToken?: Maybe<string>, errors?: Maybe<Array<{ __typename?: 'ListError', msg: string, path: string }>> } };
 
 export type RegisterMutationVariables = Exact<{
   userInput: CreateUserInput;
 }>;
 
 
-export type RegisterMutation = (
-  { __typename?: 'Mutation' }
-  & { register: (
-    { __typename?: 'User' }
-    & Pick<User, 'id' | 'username' | 'email'>
-  ) }
-);
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'CreateUserResponse', ok: boolean, errors?: Maybe<Array<{ __typename?: 'ListError', path: string, msg: string }>> } };
 
 export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetUsersQuery = (
-  { __typename?: 'Query' }
-  & { getUsers?: Maybe<Array<(
-    { __typename?: 'User' }
-    & Pick<User, 'id' | 'username' | 'email'>
-  )>> }
-);
+export type GetUsersQuery = { __typename?: 'Query', getUsers?: Maybe<Array<{ __typename?: 'User', id: string, username: string, email: string, createdAt: string, updatedAt: string }>> };
 
 
+export const LoginDocument = gql`
+    mutation login($loginUserInput: LoginUserInput!) {
+  login(userInput: $loginUserInput) {
+    ok
+    token
+    refreshToken
+    errors {
+      msg
+      path
+    }
+  }
+}
+    `;
+export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
+
+/**
+ * __useLoginMutation__
+ *
+ * To run a mutation, you first call `useLoginMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLoginMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [loginMutation, { data, loading, error }] = useLoginMutation({
+ *   variables: {
+ *      loginUserInput: // value for 'loginUserInput'
+ *   },
+ * });
+ */
+export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginMutation, LoginMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, options);
+      }
+export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
+export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
+export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
 export const RegisterDocument = gql`
     mutation register($userInput: CreateUserInput!) {
   register(userInput: $userInput) {
-    id
-    username
-    email
+    ok
+    errors {
+      path
+      msg
+    }
   }
 }
     `;
@@ -199,6 +281,8 @@ export const GetUsersDocument = gql`
     id
     username
     email
+    createdAt
+    updatedAt
   }
 }
     `;

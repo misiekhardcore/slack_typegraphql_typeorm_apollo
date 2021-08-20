@@ -1,0 +1,11 @@
+mutation login($loginUserInput: LoginUserInput!) {
+  login(userInput: $loginUserInput) {
+    ok
+    token
+    refreshToken
+    errors {
+      msg
+      path
+    }
+  }
+}
