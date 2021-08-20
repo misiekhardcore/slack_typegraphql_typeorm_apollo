@@ -10,14 +10,17 @@ import {
 } from "semantic-ui-react";
 import { useRegisterMutation } from "../generated/graphql";
 import { graphqlErrorToObject } from "../utils/graphqlErrorToObject";
+import { isErrorField } from "../utils/isErrorField";
 
-interface RegisterProps {}
-
-export const Register: React.FC<RegisterProps> = () => {
+export const Register: React.FC = () => {
   const history = useHistory();
-  const [state, setState] = useState({ username: "", email: "", password: "" });
+  const [state, setState] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
   const [register, { data, loading, error }] = useRegisterMutation({
-    onError: (e) => {},
+    errorPolicy: "all",
   });
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,16 +34,7 @@ export const Register: React.FC<RegisterProps> = () => {
       variables: { userInput: state },
     });
   };
-  if (data) history.push("/");
-  // if (loading) return <p>loading...</p>;
-  // if (error) {
-  //   return <pre>{JSON.stringify(graphqlErrorToObject(error), null, 2)}</pre>;
-  // }
-  const isFieldError = (name: string): boolean => {
-    return graphqlErrorToObject(error)?.find((a: any) => a.path === name)
-      ? true
-      : false;
-  };
+  if (data?.register.ok) history.push("/");
 
   return (
     <Container>
@@ -49,15 +43,14 @@ export const Register: React.FC<RegisterProps> = () => {
         <>
           <Message
             error
-            list={graphqlErrorToObject(error)?.map((e: any) => e.message)}
+            list={graphqlErrorToObject(error)?.map((e) => e.message)}
             header="You have errors in your form"
           />
-          <pre>{JSON.stringify(error, null, 2)}</pre>
         </>
       )}
       <Form onSubmit={onSubmit} loading={loading}>
         <FormInput
-          error={isFieldError("username")}
+          error={isErrorField(error, "username")}
           label="Username"
           onChange={onChange}
           name="username"
@@ -66,7 +59,7 @@ export const Register: React.FC<RegisterProps> = () => {
           placeholder="Username..."
         />
         <FormInput
-          error={isFieldError("email")}
+          error={isErrorField(error, "email")}
           label="Email"
           onChange={onChange}
           name="email"
@@ -76,7 +69,7 @@ export const Register: React.FC<RegisterProps> = () => {
           type="email"
         />
         <FormInput
-          error={isFieldError("password")}
+          error={isErrorField(error, "password")}
           label="Password"
           onChange={onChange}
           value={state.password}
