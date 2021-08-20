@@ -8,7 +8,7 @@ export class UserService {
     this.userRepository = getRepository(User);
   }
 
-  public async create(createUserInput: CreateUserInput) {
+  public async create(createUserInput: CreateUserInput): Promise<User> {
     return await this.userRepository.create(createUserInput).save();
   }
 
@@ -18,8 +18,12 @@ export class UserService {
     return await this.userRepository.findOne(id);
   }
 
-  public async getOne(id: number) {
+  public async getOneById(id: number) {
     return await this.userRepository.findOne(id);
+  }
+
+  public async getOneByEmail(email: string): Promise<User | undefined> {
+    return await this.userRepository.findOne({ email });
   }
 
   public async getMany() {
