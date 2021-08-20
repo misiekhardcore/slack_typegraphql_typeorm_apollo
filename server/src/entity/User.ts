@@ -2,6 +2,7 @@ import { IsEmail, MaxLength, MinLength } from "class-validator";
 import { Field, ID, ObjectType } from "type-graphql";
 import {
   BaseEntity,
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -13,6 +14,8 @@ import {
 } from "typeorm";
 import { Channel } from "./Channel";
 import { Team } from "./Team";
+import argon2 from "argon2";
+import jwt from "jsonwebtoken";
 
 @Entity({ name: "users" })
 @ObjectType()
@@ -58,4 +61,48 @@ export class User extends BaseEntity {
   @ManyToMany(() => Channel, (channel) => channel.users)
   @JoinTable({ name: "channel_member" })
   channels: Channel[] | null;
+
+  @Field(() => Boolean, { defaultValue: false })
+  @Column({ default: false })
+  isAdmin: boolean;
+
+  @BeforeInsert()
+  async hashPassword() {
+    this.password = await argon2.hash(this.password);
+  }
+
+  async validatePassword(password: string): Promise<boolean> {
+    try {
+      return await argon2.verify(this.password, password);
+    } catch (error) {
+      return false;
+    }
+  }
+
+  createTokens(
+    secret1: string,
+    secret2: string
+  ): [createToken: string, createRefreshToken: string] {
+    const createToken = jwt.sign(
+      {
+        user: {
+          id: this.id,
+          isAdmin: this.isAdmin,
+        },
+      },
+      secret1,
+      { expiresIn: "20m" }
+    );
+
+    const createRefreshToken = jwt.sign(
+      {
+        user: {
+          id: this.id,
+        },
+      },
+      secret2,
+      { expiresIn: "7d" }
+    );
+    return [createToken, createRefreshToken];
+  }
 }
