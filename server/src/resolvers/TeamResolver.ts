@@ -1,3 +1,4 @@
+import { CreateTeamResponse } from "../entity/Outputs";
 import {
   Arg,
   Ctx,
@@ -7,12 +8,14 @@ import {
   Resolver,
   ResolverInterface,
   Root,
+  UseMiddleware,
 } from "type-graphql";
 import { Team } from "../entity/Team";
 import { User } from "../entity/User";
 import { Context } from "../index";
 import { CreateTeamInput } from "../inputs/TeamInputs";
 import { TeamService } from "../services/team.service";
+import { isAuth } from "../permissions";
 
 /**
  * Resolver for all Team related operations
@@ -38,12 +41,34 @@ export class TeamResolver implements ResolverInterface<Team> {
     return await this.teamService.getOne(teamId);
   }
 
-  @Mutation(() => Team)
+  @Mutation(() => CreateTeamResponse)
+  @UseMiddleware(isAuth)
   async createTeam(
     @Arg("createTeamInput") createTeamInput: CreateTeamInput,
     @Ctx() { user }: Context
-  ) {
-    return await this.teamService.create(createTeamInput, user.id);
+  ): Promise<CreateTeamResponse> {
+    try {
+      const team = await this.teamService.create(
+        createTeamInput,
+        user?.id || 0
+      );
+
+      if (!team)
+        return {
+          ok: false,
+          errors: [{ path: "name", msg: "" }],
+        };
+
+      return {
+        ok: true,
+        team,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        errors: error,
+      };
+    }
   }
 
   @FieldResolver()
