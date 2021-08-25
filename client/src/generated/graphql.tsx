@@ -41,6 +41,13 @@ export type CreateTeamInput = {
   name: Scalars['String'];
 };
 
+export type CreateTeamResponse = {
+  __typename?: 'CreateTeamResponse';
+  ok: Scalars['Boolean'];
+  team?: Maybe<Team>;
+  errors?: Maybe<Array<ListError>>;
+};
+
 export type CreateUserInput = {
   username: Scalars['String'];
   email: Scalars['String'];
@@ -87,7 +94,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   createChannel: Channel;
   createMessage: Message;
-  createTeam: Team;
+  createTeam: CreateTeamResponse;
   register: CreateUserResponse;
   login: LoginResponse;
   updateUser: User;
@@ -179,6 +186,13 @@ export type User = {
   isAdmin?: Maybe<Scalars['Boolean']>;
 };
 
+export type CreateTeamMutationVariables = Exact<{
+  createTeamInput: CreateTeamInput;
+}>;
+
+
+export type CreateTeamMutation = { __typename?: 'Mutation', createTeam: { __typename?: 'CreateTeamResponse', ok: boolean, team?: Maybe<{ __typename?: 'Team', id: string, name: string }>, errors?: Maybe<Array<{ __typename?: 'ListError', msg: string, path: string }>> } };
+
 export type LoginMutationVariables = Exact<{
   loginUserInput: LoginUserInput;
 }>;
@@ -199,6 +213,47 @@ export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
 export type GetUsersQuery = { __typename?: 'Query', getUsers?: Maybe<Array<{ __typename?: 'User', id: string, username: string, email: string, createdAt: string, updatedAt: string }>> };
 
 
+export const CreateTeamDocument = gql`
+    mutation createTeam($createTeamInput: CreateTeamInput!) {
+  createTeam(createTeamInput: $createTeamInput) {
+    ok
+    team {
+      id
+      name
+    }
+    errors {
+      msg
+      path
+    }
+  }
+}
+    `;
+export type CreateTeamMutationFn = Apollo.MutationFunction<CreateTeamMutation, CreateTeamMutationVariables>;
+
+/**
+ * __useCreateTeamMutation__
+ *
+ * To run a mutation, you first call `useCreateTeamMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateTeamMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createTeamMutation, { data, loading, error }] = useCreateTeamMutation({
+ *   variables: {
+ *      createTeamInput: // value for 'createTeamInput'
+ *   },
+ * });
+ */
+export function useCreateTeamMutation(baseOptions?: Apollo.MutationHookOptions<CreateTeamMutation, CreateTeamMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateTeamMutation, CreateTeamMutationVariables>(CreateTeamDocument, options);
+      }
+export type CreateTeamMutationHookResult = ReturnType<typeof useCreateTeamMutation>;
+export type CreateTeamMutationResult = Apollo.MutationResult<CreateTeamMutation>;
+export type CreateTeamMutationOptions = Apollo.BaseMutationOptions<CreateTeamMutation, CreateTeamMutationVariables>;
 export const LoginDocument = gql`
     mutation login($loginUserInput: LoginUserInput!) {
   login(userInput: $loginUserInput) {
