@@ -1,4 +1,5 @@
 import { Field, ObjectType } from "type-graphql";
+import { Team } from "./Team";
 import { User } from "./User";
 
 @ObjectType()
@@ -32,6 +33,18 @@ export class LoginResponse {
 
   @Field(() => String, { nullable: true })
   refreshToken?: String;
+
+  @Field(() => [ListError], { nullable: true })
+  errors?: ListError[];
+}
+
+@ObjectType()
+export class CreateTeamResponse {
+  @Field()
+  ok: boolean;
+
+  @Field(() => Team, { nullable: true })
+  team?: Team | null;
 
   @Field(() => [ListError], { nullable: true })
   errors?: ListError[];
