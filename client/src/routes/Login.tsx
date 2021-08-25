@@ -1,4 +1,3 @@
-import { observer } from "mobx-react";
 import React, { useState } from "react";
 import { useHistory } from "react-router";
 import {
@@ -13,7 +12,7 @@ import { useLoginMutation } from "../generated/graphql";
 import { graphqlErrorToObject } from "../utils/graphqlErrorToObject";
 import { isErrorField } from "../utils/isErrorField";
 
-export const Login = observer(() => {
+export const Login: React.FC = () => {
   const history = useHistory();
   const [state, setState] = useState({ email: "", password: "" });
   const [login, { loading, data, error }] = useLoginMutation({
@@ -75,4 +74,4 @@ export const Login = observer(() => {
       </Form>
     </Container>
   );
-});
+};
