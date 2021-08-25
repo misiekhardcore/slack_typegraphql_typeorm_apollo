@@ -17,6 +17,24 @@ import { Team } from "./Team";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 
+export interface JWTTokenPayload {
+  user: {
+    id: number;
+    isAdmin: boolean;
+  };
+}
+
+export interface JWTRefreshTokenPayload {
+  user: {
+    id: number;
+  };
+}
+
+export interface RefreshTokensResponse extends JWTTokenPayload {
+  token: string;
+  refreshToken: string;
+}
+
 @Entity({ name: "users" })
 @ObjectType()
 export class User extends BaseEntity {
@@ -83,26 +101,61 @@ export class User extends BaseEntity {
     secret1: string,
     secret2: string
   ): [createToken: string, createRefreshToken: string] {
-    const createToken = jwt.sign(
-      {
-        user: {
-          id: this.id,
-          isAdmin: this.isAdmin,
-        },
-      },
-      secret1,
-      { expiresIn: "20m" }
-    );
+    const jwtTokenPayload: JWTTokenPayload = {
+      user: { id: this.id, isAdmin: this.isAdmin },
+    };
+
+    const createToken = jwt.sign(jwtTokenPayload, secret1, {
+      expiresIn: "20m",
+    });
+
+    const jwtRefreshTokenPayload: JWTRefreshTokenPayload = {
+      user: { id: this.id },
+    };
 
     const createRefreshToken = jwt.sign(
-      {
-        user: {
-          id: this.id,
-        },
-      },
+      jwtRefreshTokenPayload,
       secret2,
       { expiresIn: "7d" }
     );
     return [createToken, createRefreshToken];
+  }
+
+  async refreshTokens(
+    refreshToken: string,
+    secret1: string,
+    secret2: string
+  ): Promise<RefreshTokensResponse | null> {
+    let userId = 0;
+    try {
+      jwt.decode(refreshToken);
+    } catch (error) {
+      return null;
+    }
+
+    const user = await User.findOne(userId);
+
+    if (!user) {
+      return null;
+    }
+
+    const refreshSecret = user.password + secret2;
+
+    try {
+      jwt.verify(refreshToken, refreshSecret);
+    } catch (error) {
+      return null;
+    }
+
+    const [newToken, newRefreshToken] = user.createTokens(
+      secret1,
+      secret2
+    );
+
+    return {
+      token: newToken,
+      refreshToken: newRefreshToken,
+      user: { id: user.id, isAdmin: user.isAdmin },
+    };
   }
 }
