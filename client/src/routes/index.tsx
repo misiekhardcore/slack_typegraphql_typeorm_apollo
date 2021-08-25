@@ -10,6 +10,7 @@ import { CreateTeam } from "./CreateTeam";
 import { Home } from "./Home";
 import { Login } from "./Login";
 import { Register } from "./Register";
+import { ViewTeam } from "./ViewTeam";
 
 const isAuthenticated = (): boolean => {
   const token = localStorage.getItem("token") || "";
@@ -39,6 +40,7 @@ const Routes: React.FC = () => (
       <Route exact path="/" component={Home} />
       <Route exact path="/register" component={Register} />
       <Route exact path="/login" component={Login} />
+      <Route exact path="/view-team" component={ViewTeam} />
       <PrivateRoute exact path="/create-team" component={CreateTeam} />
     </Switch>
   </BrowserRouter>
