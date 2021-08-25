@@ -37,7 +37,10 @@ export class MessageResolver implements ResolverInterface<Message> {
     @Arg("messageInput") createMessageInput: CreateMessageInput,
     @Ctx() { user }: Context
   ): Promise<Message> {
-    return this.messageService.create(createMessageInput, user.id);
+    return this.messageService.create(
+      createMessageInput,
+      user?.id || 0
+    );
   }
 
   @FieldResolver()
