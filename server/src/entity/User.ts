@@ -145,7 +145,7 @@ export class User extends BaseEntity {
       return null;
     }
 
-    const refreshSecret = this.password + secret2;
+    const refreshSecret = user.password + secret2;
 
     try {
       jwt.verify(refreshToken, refreshSecret);
