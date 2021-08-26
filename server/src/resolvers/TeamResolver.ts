@@ -16,7 +16,8 @@ import { Context } from "../index";
 import { CreateTeamInput } from "../inputs/TeamInputs";
 import { TeamService } from "../services/team.service";
 import { isAuth } from "../permissions";
-import { Channel } from "src/entity/Channel";
+import { Channel } from "../entity/Channel";
+import { ChannelService } from "../services/channel.service";
 
 /**
  * Resolver for all Team related operations
@@ -24,8 +25,10 @@ import { Channel } from "src/entity/Channel";
 @Resolver(() => Team)
 export class TeamResolver implements ResolverInterface<Team> {
   private readonly teamService: TeamService;
+  private readonly channelService: ChannelService;
   constructor() {
     this.teamService = new TeamService();
+    this.channelService = new ChannelService();
   }
 
   /**
@@ -57,16 +60,27 @@ export class TeamResolver implements ResolverInterface<Team> {
     @Ctx() { user }: Context
   ): Promise<CreateTeamResponse> {
     try {
+      if (!user)
+        return {
+          ok: false,
+          errors: [{ path: "user", msg: "" }],
+        };
       const team = await this.teamService.create(
         createTeamInput,
-        user?.id || 0
+        user.id
       );
 
       if (!team)
         return {
           ok: false,
-          errors: [{ path: "name", msg: "" }],
+          errors: [{ path: "team", msg: "" }],
         };
+
+      this.channelService.create({
+        name: "general",
+        teamId: team.id,
+        isPublic: true,
+      });
 
       return {
         ok: true,
