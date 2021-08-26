@@ -1,0 +1,11 @@
+query getTeams {
+  getTeams {
+    id
+    name
+    channels {
+      id
+      isPublic
+      name
+    }
+  }
+}
