@@ -9,7 +9,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
+  UpdateDateColumn,
 } from "typeorm";
 import { Message } from "./Message";
 import { Team } from "./Team";
@@ -27,7 +27,7 @@ export class Channel extends BaseEntity {
   name: string;
 
   @Field(() => Boolean)
-  @Column()
+  @Column({ default: false })
   isPublic: boolean;
 
   @Field(() => String)
