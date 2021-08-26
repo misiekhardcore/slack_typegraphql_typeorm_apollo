@@ -35,12 +35,20 @@ export interface Context {
     res: Response<any>
   ) => {
     const token = req.headers["x-token"] as string;
+    const refreshToken = req.headers["x-refresh-token"] as string;
     if (token) {
       try {
         const { user } = jwt.verify(
           token,
           process.env.SECRET1 || ""
         ) as JWTTokenPayload;
+        res.header(
+          "Access-Control-Expose-Headers",
+          "x-token, x-refresh-token"
+        );
+
+        res.header("x-token", token);
+        res.header("x-refresh-token", refreshToken);
         return user;
       } catch (error) {
         const refreshToken =
@@ -55,13 +63,13 @@ export interface Context {
         if (!newTokens) return undefined;
 
         if (newTokens.token && newTokens.refreshToken) {
-          res.setHeader(
+          res.header(
             "Access-Control-Expose-Headers",
             "x-token, x-refresh-token"
           );
 
-          res.setHeader("x-token", newTokens.token);
-          res.setHeader("x-refresh-token", newTokens.refreshToken);
+          res.header("x-token", newTokens.token);
+          res.header("x-refresh-token", newTokens.refreshToken);
         }
         return newTokens.user;
       }
@@ -88,13 +96,19 @@ export interface Context {
       ],
       validate: true,
     }),
-    context: async ({ req, res }): Promise<Context> => {
+    context: async ({
+      req,
+      res,
+    }: {
+      res: Response;
+      req: Request;
+    }): Promise<Context> => {
       return {
         req,
         res,
         user: (await extractTokens(req, res)) || null,
-        jwtSecret1: process.env.SECRET1 || "supersecret",
-        jwtSecret2: process.env.SECRET2 || "supersecret",
+        jwtSecret1: process.env.SECRET1 || "",
+        jwtSecret2: process.env.SECRET2 || "",
       };
     },
   });
