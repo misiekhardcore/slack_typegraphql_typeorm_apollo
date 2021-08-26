@@ -1,5 +1,7 @@
+import argon2 from "argon2";
 import { IsEmail, MaxLength, MinLength } from "class-validator";
-import { Field, ID, ObjectType } from "type-graphql";
+import jwt from "jsonwebtoken";
+import { Field, Int, ObjectType } from "type-graphql";
 import {
   BaseEntity,
   BeforeInsert,
@@ -14,12 +16,11 @@ import {
 } from "typeorm";
 import { Channel } from "./Channel";
 import { Team } from "./Team";
-import argon2 from "argon2";
-import jwt from "jsonwebtoken";
 
 export interface JWTTokenPayload {
   user: {
     id: number;
+    username: string;
     isAdmin: boolean;
   };
 }
@@ -38,7 +39,7 @@ export interface RefreshTokensResponse extends JWTTokenPayload {
 @Entity({ name: "users" })
 @ObjectType()
 export class User extends BaseEntity {
-  @Field(() => ID)
+  @Field(() => Int)
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -102,7 +103,11 @@ export class User extends BaseEntity {
     secret2: string
   ): [createToken: string, createRefreshToken: string] {
     const jwtTokenPayload: JWTTokenPayload = {
-      user: { id: this.id, isAdmin: this.isAdmin },
+      user: {
+        id: this.id,
+        isAdmin: this.isAdmin,
+        username: this.username,
+      },
     };
 
     const createToken = jwt.sign(jwtTokenPayload, secret1, {
@@ -128,7 +133,8 @@ export class User extends BaseEntity {
   ): Promise<RefreshTokensResponse | null> {
     let userId = 0;
     try {
-      jwt.decode(refreshToken);
+      const { user } = jwt.decode(refreshToken) as JWTTokenPayload;
+      userId = user.id;
     } catch (error) {
       return null;
     }
@@ -139,7 +145,7 @@ export class User extends BaseEntity {
       return null;
     }
 
-    const refreshSecret = user.password + secret2;
+    const refreshSecret = this.password + secret2;
 
     try {
       jwt.verify(refreshToken, refreshSecret);
@@ -155,7 +161,11 @@ export class User extends BaseEntity {
     return {
       token: newToken,
       refreshToken: newRefreshToken,
-      user: { id: user.id, isAdmin: user.isAdmin },
+      user: {
+        id: user.id,
+        isAdmin: user.isAdmin,
+        username: user.username,
+      },
     };
   }
 }
