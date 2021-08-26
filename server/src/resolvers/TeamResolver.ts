@@ -35,8 +35,9 @@ export class TeamResolver implements ResolverInterface<Team> {
    */
   @Query(() => [Team])
   // @UseMiddleware(isAuth)
-  async getTeams(): Promise<Team[]> {
-    return await this.teamService.getMany();
+  async getTeams(@Ctx() { user }: Context): Promise<Team[]> {
+    if (user) return await this.teamService.getMany(user.id);
+    return [];
   }
 
   @Query(() => Team, { nullable: true })
