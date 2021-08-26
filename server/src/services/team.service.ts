@@ -23,12 +23,14 @@ export class TeamService {
     return await this.teamRepository.findOne(id);
   }
 
-  public async getOne(id: number) {
-    return await this.teamRepository.findOne(id);
+  public async getOne(ownerId: number, teamId: number) {
+    return await this.teamRepository.findOne({
+      where: { ownerId, id: teamId },
+    });
   }
 
-  public async getMany() {
-    return await this.teamRepository.find();
+  public async getMany(ownerId: number) {
+    return await this.teamRepository.find({ where: { ownerId } });
   }
 
   public async populateMany<T>(
