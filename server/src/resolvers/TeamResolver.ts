@@ -16,6 +16,7 @@ import { Context } from "../index";
 import { CreateTeamInput } from "../inputs/TeamInputs";
 import { TeamService } from "../services/team.service";
 import { isAuth } from "../permissions";
+import { Channel } from "src/entity/Channel";
 
 /**
  * Resolver for all Team related operations
@@ -29,16 +30,23 @@ export class TeamResolver implements ResolverInterface<Team> {
 
   /**
    * Get the list of all teams
-   * @returns All teams
+   * @type query
+   * @returns {Promise<Team[]>} all teams
    */
-  @Query(() => [Team], { nullable: true })
-  async getTeams() {
+  @Query(() => [Team])
+  // @UseMiddleware(isAuth)
+  async getTeams(): Promise<Team[]> {
     return await this.teamService.getMany();
   }
 
   @Query(() => Team, { nullable: true })
-  async getTeam(@Arg("teamId") teamId: number) {
-    return await this.teamService.getOne(teamId);
+  @UseMiddleware(isAuth)
+  async getTeam(
+    @Ctx() { user }: Context,
+    @Arg("teamId") teamId: number
+  ) {
+    if (user) return await this.teamService.getOne(user.id, teamId);
+    return null;
   }
 
   @Mutation(() => CreateTeamResponse)
@@ -81,6 +89,14 @@ export class TeamResolver implements ResolverInterface<Team> {
     return (
       (await this.teamService.populateOne<User>(team, "owner")) ||
       new User()
+    );
+  }
+
+  @FieldResolver()
+  async channels(@Root() team: Team) {
+    return await this.teamService.populateMany<Channel>(
+      team,
+      "channels"
     );
   }
 }
