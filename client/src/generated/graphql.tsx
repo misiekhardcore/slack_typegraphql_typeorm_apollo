@@ -148,6 +148,11 @@ export type QueryGetChannelArgs = {
 };
 
 
+export type QueryGetTeamArgs = {
+  teamId: Scalars['Float'];
+};
+
+
 export type QueryGetUserArgs = {
   id: Scalars['Float'];
 };
