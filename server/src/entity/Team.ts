@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType } from "type-graphql";
+import { Field, Int, ObjectType } from "type-graphql";
 import {
   BaseEntity,
   Column,
@@ -7,15 +7,17 @@ import {
   JoinColumn,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
+  UpdateDateColumn
 } from "typeorm";
+import { Channel } from "./Channel";
 import { User } from "./User";
 
 @Entity({ name: "teams" })
 @ObjectType()
 export class Team extends BaseEntity {
-  @Field(() => ID)
+  @Field(() => Int)
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -35,6 +37,12 @@ export class Team extends BaseEntity {
   @ManyToOne<User>(() => User, { onDelete: "CASCADE", nullable: false })
   @JoinColumn({ name: "owner_id" })
   owner: User;
+
+  @Field(() => [Channel])
+  @OneToMany(() => Channel, (channel) => channel.team, {
+    nullable: true,
+  })
+  channels: Channel[] | null;
 
   @Field(() => String)
   @CreateDateColumn()
