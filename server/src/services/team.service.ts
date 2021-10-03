@@ -1,31 +1,55 @@
-import { getRepository, Repository } from "typeorm";
+import {
+  getRepository,
+  Repository,
+  getConnection,
+  Connection,
+} from "typeorm";
+import { Channel } from "../entity/Channel";
 import { Team } from "../entity/Team";
 import { CreateTeamInput, UpdateTeamInput } from "../inputs/TeamInputs";
 
 export class TeamService {
   private readonly teamRepository: Repository<Team>;
+  private readonly getConnection: Connection;
   constructor() {
     this.teamRepository = getRepository(Team);
+    this.getConnection = getConnection();
   }
 
   public async create(
     createTeamInput: CreateTeamInput,
     ownerId: number
-  ) {
-    return await this.teamRepository
-      .create({ ...createTeamInput, ownerId })
-      .save();
+  ): Promise<Team> {
+    return await this.getConnection.transaction(
+      "SERIALIZABLE",
+      async (transactionEntityManager) => {
+        const team = await transactionEntityManager
+          .create(Team, {
+            ...createTeamInput,
+            ownerId,
+          })
+          .save();
+        await transactionEntityManager
+          .create(Channel, {
+            name: "general",
+            teamId: team.id,
+            isPublic: true,
+          })
+          .save();
+        return team;
+      }
+    );
   }
-
   public async update(updateTeamInput: UpdateTeamInput) {
     const { id, ...rest } = updateTeamInput;
     this.teamRepository.update({ id }, rest);
     return await this.teamRepository.findOne(id);
   }
 
-  public async getOne(ownerId: number, teamId: number) {
+  public async getOne(teamId: number) {
     return await this.teamRepository.findOne({
-      where: { ownerId, id: teamId },
+      where: { id: teamId },
+      relations: ["members"],
     });
   }
 
