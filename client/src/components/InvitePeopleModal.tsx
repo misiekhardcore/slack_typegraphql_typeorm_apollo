@@ -1,4 +1,6 @@
 import { useFormik } from "formik";
+import gql from "graphql-tag";
+import { findIndex } from "lodash";
 import React, { useEffect, useRef } from "react";
 import {
   Button,
@@ -9,7 +11,11 @@ import {
   Message,
   Modal,
 } from "semantic-ui-react";
-import { useAddMemberMutation } from "../generated/graphql";
+import {
+  GetTeamsDocument,
+  GetTeamsQuery,
+  useAddMemberMutation,
+} from "../generated/graphql";
 import errorToFieldError from "../utils/errorToFieldError";
 
 interface InvitePeopleModalProps {
@@ -49,6 +55,32 @@ export const InvitePeopleModal: React.FC<InvitePeopleModalProps> = ({
         const response = await addMember({
           variables: {
             addMemberAddMemberInput: { email: values.email, teamId },
+          },
+          update: (cache, { data: data2 }) => {
+            const { addMember } = data2 || {};
+
+            const data = cache.readQuery<GetTeamsQuery>({
+              query: GetTeamsDocument,
+            });
+
+            const teamIdx = findIndex(data?.getTeams, ["id", teamId]);
+
+            if (data?.getTeams[teamIdx]?.members && addMember?.member) {
+              cache.writeFragment({
+                id: "Team:" + teamId,
+                fragment: gql`
+                  fragment Member on Team {
+                    members
+                  }
+                `,
+                data: {
+                  members: [
+                    ...data.getTeams[teamIdx].members,
+                    addMember,
+                  ],
+                },
+              });
+            }
           },
         });
 
@@ -90,7 +122,6 @@ export const InvitePeopleModal: React.FC<InvitePeopleModalProps> = ({
           {touched.email && errors.email ? (
             <Message negative content={errors.email} />
           ) : null}
-
           <FormGroup widths="equal">
             <FormField>
               <Button
