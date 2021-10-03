@@ -230,7 +230,7 @@ export type CreateTeamMutationVariables = Exact<{
 }>;
 
 
-export type CreateTeamMutation = { __typename?: 'Mutation', createTeam: { __typename?: 'CreateTeamResponse', ok: boolean, team?: Maybe<{ __typename?: 'Team', id: number, name: string }>, errors?: Maybe<Array<{ __typename?: 'ListError', msg: string, path: string }>> } };
+export type CreateTeamMutation = { __typename?: 'Mutation', createTeam: { __typename?: 'CreateTeamResponse', ok: boolean, team?: Maybe<{ __typename?: 'Team', id: number, name: string, owner: { __typename?: 'User', username: string }, channels: Array<{ __typename?: 'Channel', id: number, isPublic: boolean, name: string }> }>, errors?: Maybe<Array<{ __typename?: 'ListError', msg: string, path: string }>> } };
 
 export type LoginMutationVariables = Exact<{
   loginUserInput: LoginUserInput;
@@ -249,7 +249,7 @@ export type RegisterMutation = { __typename?: 'Mutation', register: { __typename
 export type GetTeamsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetTeamsQuery = { __typename?: 'Query', getTeams: Array<{ __typename?: 'Team', id: number, name: string, channels: Array<{ __typename?: 'Channel', id: number, isPublic: boolean, name: string }> }> };
+export type GetTeamsQuery = { __typename?: 'Query', getTeams: Array<{ __typename?: 'Team', id: number, name: string, owner: { __typename?: 'User', username: string }, channels: Array<{ __typename?: 'Channel', id: number, isPublic: boolean, name: string }>, members: Array<{ __typename?: 'User', username: string, id: number }> }> };
 
 export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -343,6 +343,14 @@ export const CreateTeamDocument = gql`
     team {
       id
       name
+      owner {
+        username
+      }
+      channels {
+        id
+        isPublic
+        name
+      }
     }
     errors {
       msg
@@ -458,10 +466,17 @@ export const GetTeamsDocument = gql`
   getTeams {
     id
     name
+    owner {
+      username
+    }
     channels {
       id
       isPublic
       name
+    }
+    members {
+      username
+      id
     }
   }
 }
