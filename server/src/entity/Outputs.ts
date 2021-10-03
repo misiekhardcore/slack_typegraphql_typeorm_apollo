@@ -1,4 +1,5 @@
 import { Field, ObjectType } from "type-graphql";
+import { Channel } from "./Channel";
 import { Team } from "./Team";
 import { User } from "./User";
 
@@ -45,6 +46,27 @@ export class CreateTeamResponse {
 
   @Field(() => Team, { nullable: true })
   team?: Team | null;
+
+  @Field(() => [ListError], { nullable: true })
+  errors?: ListError[];
+}
+
+@ObjectType()
+export class CreateChannelResponse {
+  @Field()
+  ok: boolean;
+
+  @Field(() => Channel, { nullable: true })
+  channel?: Channel | null;
+
+  @Field(() => [ListError], { nullable: true })
+  errors?: ListError[];
+}
+
+@ObjectType()
+export class VoidResponse {
+  @Field()
+  ok: boolean;
 
   @Field(() => [ListError], { nullable: true })
   errors?: ListError[];
