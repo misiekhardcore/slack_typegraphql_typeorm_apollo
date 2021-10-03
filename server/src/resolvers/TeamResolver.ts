@@ -1,4 +1,3 @@
-import { CreateTeamResponse } from "../entity/Outputs";
 import {
   Arg,
   Ctx,
@@ -10,14 +9,17 @@ import {
   Root,
   UseMiddleware,
 } from "type-graphql";
+import { getRepository } from "typeorm";
+import { Channel } from "../entity/Channel";
+import { CreateTeamResponse, VoidResponse } from "../entity/Outputs";
 import { Team } from "../entity/Team";
+import { TeamMember } from "../entity/TeamMember";
 import { User } from "../entity/User";
 import { Context } from "../index";
-import { CreateTeamInput } from "../inputs/TeamInputs";
-import { TeamService } from "../services/team.service";
+import { AddMemberInput, CreateTeamInput } from "../inputs/TeamInputs";
 import { isAuth } from "../permissions";
-import { Channel } from "../entity/Channel";
-import { ChannelService } from "../services/channel.service";
+import { TeamService } from "../services/team.service";
+import { UserService } from "../services/user.service";
 
 /**
  * Resolver for all Team related operations
@@ -25,10 +27,10 @@ import { ChannelService } from "../services/channel.service";
 @Resolver(() => Team)
 export class TeamResolver implements ResolverInterface<Team> {
   private readonly teamService: TeamService;
-  private readonly channelService: ChannelService;
+  private readonly userService: UserService;
   constructor() {
     this.teamService = new TeamService();
-    this.channelService = new ChannelService();
+    this.userService = new UserService();
   }
 
   /**
@@ -49,7 +51,10 @@ export class TeamResolver implements ResolverInterface<Team> {
     @Ctx() { user }: Context,
     @Arg("teamId") teamId: number
   ) {
-    if (user) return await this.teamService.getOne(user.id, teamId);
+    if (user) {
+      const team = await this.teamService.getOne(teamId);
+      if (team?.ownerId == user.id) return team;
+    }
     return null;
   }
 
@@ -65,6 +70,7 @@ export class TeamResolver implements ResolverInterface<Team> {
           ok: false,
           errors: [{ path: "user", msg: "" }],
         };
+
       const team = await this.teamService.create(
         createTeamInput,
         user.id
@@ -75,12 +81,6 @@ export class TeamResolver implements ResolverInterface<Team> {
           ok: false,
           errors: [{ path: "team", msg: "" }],
         };
-
-      this.channelService.create({
-        name: "general",
-        teamId: team.id,
-        isPublic: true,
-      });
 
       return {
         ok: true,
@@ -94,9 +94,68 @@ export class TeamResolver implements ResolverInterface<Team> {
     }
   }
 
-  @FieldResolver()
-  async members(@Root() team: Team) {
-    return await this.teamService.populateMany<User>(team, "members");
+  @Mutation(() => VoidResponse)
+  @UseMiddleware(isAuth)
+  async addMember(
+    @Arg("addMemberInput") { email, teamId }: AddMemberInput,
+    @Ctx() { user }: Context
+  ): Promise<VoidResponse> {
+    try {
+      if (!user)
+        return {
+          ok: false,
+          errors: [{ path: "user", msg: "" }],
+        };
+
+      const teamPromise = this.teamService.getOne(teamId);
+      const userToAddPromise = this.userService.getOneByEmail(email);
+      const [team, userToAdd] = await Promise.all([
+        teamPromise,
+        userToAddPromise,
+      ]);
+
+      if (team?.ownerId !== user.id) {
+        return {
+          ok: false,
+          errors: [
+            {
+              msg: "You cannot add members to the team",
+              path: "email",
+            },
+          ],
+        };
+      }
+
+      if (!userToAdd) {
+        return {
+          ok: false,
+          errors: [
+            {
+              msg: "Could not find user with this email",
+              path: "email",
+            },
+          ],
+        };
+      }
+
+      // team.members.push({ userId: userToAdd.id, teamId: team.id });
+      // team.save();
+      await getRepository(TeamMember)
+        .create({
+          teamId: team.id,
+          userId: userToAdd.id,
+        })
+        .save();
+
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        errors: error,
+      };
+    }
   }
 
   @FieldResolver()
