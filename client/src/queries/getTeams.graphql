@@ -2,10 +2,17 @@ query getTeams {
   getTeams {
     id
     name
+    owner {
+      username
+    }
     channels {
       id
       isPublic
       name
+    }
+    members {
+      username
+      id
     }
   }
 }
