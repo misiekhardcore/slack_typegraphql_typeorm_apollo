@@ -1,5 +1,5 @@
 import { Length } from "class-validator";
-import { Field, InputType } from "type-graphql";
+import { Field, InputType, Int } from "type-graphql";
 
 @InputType()
 export class CreateTeamInput {
@@ -8,6 +8,15 @@ export class CreateTeamInput {
     message: "Team name has to be between 3 and 30 characters",
   })
   name: string;
+}
+
+@InputType()
+export class AddMemberInput {
+  @Field(() => String)
+  email: string;
+
+  @Field(() => Int)
+  teamId: number;
 }
 
 @InputType()
