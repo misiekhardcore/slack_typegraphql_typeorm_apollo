@@ -1,6 +1,6 @@
 import { findIndex } from "lodash";
 import React from "react";
-import { useHistory } from "react-router";
+import { Redirect } from "react-router";
 import { AppLayout } from "../components/AppLayout";
 import { Header } from "../components/Header";
 import { Messages } from "../components/Messages";
@@ -17,22 +17,41 @@ const ViewTeam: React.FC<ViewTeamProps> = ({
     params: { teamId, channelId },
   },
 }) => {
-  const history = useHistory();
   const { loading, error, data } = useGetTeamsQuery();
 
   const { getTeams } = data || {};
+
+  const teamIdInt = parseInt(teamId);
+
+  if (teamId && !teamIdInt) {
+    console.error("invalid teamid!");
+    return <Redirect to="/view-team" />;
+  }
+
+  const channelIdInt = parseInt(channelId);
+
+  if (channelId && !channelIdInt) {
+    console.error("invalid channelid!");
+    return <Redirect to="/view-team" />;
+  }
+
+  if (!(loading || getTeams)) {
+    console.error("no teams!");
+    return <Redirect to="/create-team" />;
+  }
+
   if (!getTeams) return null;
 
-  const teamIdx = teamId ? findIndex(getTeams, ["id", +teamId]) : 0;
+  const teamIdx = teamId ? findIndex(getTeams, ["id", teamIdInt]) : 0;
   const team = getTeams[teamIdx];
 
   if (!team) {
-    history.push("/login");
-    return null;
+    console.error("no team with that id!");
+    return <Redirect to="/create-team" />;
   }
 
   const channelIdx = channelId
-    ? findIndex(team.channels, ["id", +channelId])
+    ? findIndex(team.channels, ["id", channelIdInt])
     : 0;
   const channel = team?.channels[channelIdx] || {};
 
@@ -47,16 +66,20 @@ const ViewTeam: React.FC<ViewTeamProps> = ({
         }))}
         team={team as Team}
       />
-      <Header channelName={channel?.name || "none"} />
-      <Messages>
-        <ul className="message-list">
-          <li></li>
-          <li></li>
-        </ul>
-      </Messages>
-      <SendMessage channelName="general">
-        <input type="text" placeholder="CSS Grid Layout Module" />
-      </SendMessage>
+      {channel && (
+        <>
+          <Header channelName={channel?.name || "none"} />
+          <Messages>
+            <ul className="message-list">
+              <li></li>
+              <li></li>
+            </ul>
+          </Messages>
+          <SendMessage channelName="general">
+            <input type="text" placeholder="CSS Grid Layout Module" />
+          </SendMessage>
+        </>
+      )}
     </AppLayout>
   );
 };
