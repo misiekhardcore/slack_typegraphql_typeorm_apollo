@@ -1,6 +1,6 @@
 import React from "react";
-import styled from "styled-components";
 import { Link } from "react-router-dom";
+import styled from "styled-components";
 
 const TeamsWrapper = styled.div`
   grid-column: 1;
@@ -39,6 +39,13 @@ const team = ({ id, letter }: TTeam): JSX.Element => (
     <TeamListItem>{letter}</TeamListItem>
   </Link>
 );
+
+const addteam = (): JSX.Element => (
+  <Link to={"/create-team"} key={"addTeam"}>
+    <TeamListItem>+</TeamListItem>
+  </Link>
+);
+
 interface TeamsProps {
   teams: TTeam[];
 }
@@ -46,7 +53,10 @@ interface TeamsProps {
 export const Teams: React.FC<TeamsProps> = ({ teams }) => {
   return (
     <TeamsWrapper>
-      <TeamList>{teams.map(team)}</TeamList>
+      <TeamList>
+        {teams.map(team)}
+        {addteam()}
+      </TeamList>
     </TeamsWrapper>
   );
 };
