@@ -1,4 +1,6 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import { Icon } from "semantic-ui-react";
 import styled from "styled-components";
 
 const ChannelsWrapper = styled.div`
@@ -47,8 +49,13 @@ const Bubble = ({ on }: { on: boolean }): JSX.Element =>
 export type TChannel = { id: number; isPublic: boolean; name: string };
 type TUser = { id: number; name: string };
 
-const channel = ({ id, name }: TChannel): JSX.Element => (
-  <SideBarListItem key={`channel-${id}`}>{`# ${name}`}</SideBarListItem>
+const channel = (
+  { id, name }: TChannel,
+  teamId: number
+): JSX.Element => (
+  <Link key={`channel-${id}`} to={`/view-team/${teamId}/${id}`}>
+    <SideBarListItem>{`# ${name}`}</SideBarListItem>
+  </Link>
 );
 
 const user = ({ id, name }: TUser): JSX.Element => (
@@ -59,17 +66,23 @@ const user = ({ id, name }: TUser): JSX.Element => (
 );
 
 interface ChannelsProps {
+  teamId: number;
   teamName: string;
   userName: string;
   channels: TChannel[];
   users: TUser[];
+  onAddChannelClick: () => void;
+  onInvitePeople: () => void;
 }
 
 export const Channels: React.FC<ChannelsProps> = ({
   users,
+  teamId,
   channels,
   userName,
   teamName,
+  onAddChannelClick,
+  onInvitePeople,
 }) => {
   return (
     <ChannelsWrapper>
@@ -79,8 +92,11 @@ export const Channels: React.FC<ChannelsProps> = ({
       </PushLeft>
       <div>
         <SideBarList>
-          <SideBarListHeader>Channels</SideBarListHeader>
-          {channels.map(channel)}
+          <SideBarListHeader>
+            Channels
+            <Icon onClick={onAddChannelClick} name="add circle" />
+          </SideBarListHeader>
+          {channels.map((chan) => channel(chan, teamId))}
         </SideBarList>
       </div>
       <div>
@@ -88,6 +104,11 @@ export const Channels: React.FC<ChannelsProps> = ({
           <SideBarListHeader>Direct Messages</SideBarListHeader>
           {users.map(user)}
         </SideBarList>
+      </div>
+      <div>
+        <a href="#invite-people" onClick={onInvitePeople}>
+          + Invite People
+        </a>
       </div>
     </ChannelsWrapper>
   );
