@@ -1,11 +1,13 @@
 import {
+  Connection,
+  getConnection,
   getRepository,
   Repository,
-  getConnection,
-  Connection,
 } from "typeorm";
 import { Channel } from "../entity/Channel";
 import { Team } from "../entity/Team";
+import { TeamMember } from "../entity/TeamMember";
+import { User } from "../entity/User";
 import { CreateTeamInput, UpdateTeamInput } from "../inputs/TeamInputs";
 
 export class TeamService {
@@ -49,12 +51,28 @@ export class TeamService {
   public async getOne(teamId: number) {
     return await this.teamRepository.findOne({
       where: { id: teamId },
-      relations: ["members"],
     });
   }
 
-  public async getMany(ownerId: number) {
-    return await this.teamRepository.find({ where: { ownerId } });
+  /**
+   *
+   * @param userId
+   * @returns all teams owned by user or where user is member
+   */
+  public async getMany(userId: number) {
+    //SELECT * FROM teams LEFT JOIN team_member  ON team_member.team_id=teams.id LEFT JOIN users ON users.id=team_member.user_id WHERE users.id = $1 OR teams.owner_id = $1
+    return await this.teamRepository
+      .createQueryBuilder("teams")
+      .leftJoinAndSelect(
+        TeamMember,
+        "team_member",
+        "team_member.team_id=teams.id"
+      )
+      .leftJoinAndSelect(User, "users", "users.id=team_member.user_id")
+      .where("users.id = :ownerId OR teams.owner_id = :ownerId", {
+        ownerId: userId,
+      })
+      .getMany();
   }
 
   public async populateMany<T>(
