@@ -1,0 +1,9 @@
+mutation addMember($addMemberAddMemberInput: AddMemberInput!) {
+  addMember(addMemberInput: $addMemberAddMemberInput) {
+    ok
+    errors {
+      msg
+      path
+    }
+  }
+}
