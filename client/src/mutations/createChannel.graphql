@@ -1,0 +1,16 @@
+mutation createChannel(
+  $createChannelChannelInput: CreateChannelInput!
+) {
+  createChannel(channelInput: $createChannelChannelInput) {
+    ok
+    channel {
+      id
+      name
+      isPublic
+    }
+    errors {
+      msg
+      path
+    }
+  }
+}
