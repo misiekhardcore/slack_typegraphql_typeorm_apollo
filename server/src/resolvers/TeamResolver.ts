@@ -11,7 +11,10 @@ import {
 } from "type-graphql";
 import { getRepository } from "typeorm";
 import { Channel } from "../entity/Channel";
-import { CreateTeamResponse, VoidResponse } from "../entity/Outputs";
+import {
+  AddMemberResponse,
+  CreateTeamResponse,
+} from "../entity/Outputs";
 import { Team } from "../entity/Team";
 import { TeamMember } from "../entity/TeamMember";
 import { User } from "../entity/User";
@@ -94,17 +97,17 @@ export class TeamResolver implements ResolverInterface<Team> {
     }
   }
 
-  @Mutation(() => VoidResponse)
+  @Mutation(() => AddMemberResponse)
   @UseMiddleware(isAuth)
   async addMember(
     @Arg("addMemberInput") { email, teamId }: AddMemberInput,
     @Ctx() { user }: Context
-  ): Promise<VoidResponse> {
+  ): Promise<AddMemberResponse> {
     try {
       if (!user)
         return {
           ok: false,
-          errors: [{ path: "user", msg: "" }],
+          errors: [{ path: "user", msg: "You must be logged in" }],
         };
 
       const teamPromise = this.teamService.getOne(teamId);
@@ -149,6 +152,7 @@ export class TeamResolver implements ResolverInterface<Team> {
 
       return {
         ok: true,
+        member: userToAdd,
       };
     } catch (error) {
       return {

@@ -64,6 +64,18 @@ export class CreateChannelResponse {
 }
 
 @ObjectType()
+export class AddMemberResponse {
+  @Field(() => Boolean)
+  ok: boolean;
+
+  @Field(() => User, { nullable: true })
+  member?: User;
+
+  @Field(() => [ListError], { nullable: true })
+  errors?: ListError[];
+}
+
+@ObjectType()
 export class VoidResponse {
   @Field()
   ok: boolean;
