@@ -14,6 +14,11 @@ export type Scalars = {
   Float: number;
 };
 
+export type AddMemberInput = {
+  email: Scalars['String'];
+  teamId: Scalars['Int'];
+};
+
 export type Channel = {
   __typename?: 'Channel';
   id: Scalars['Int'];
@@ -30,6 +35,13 @@ export type CreateChannelInput = {
   name: Scalars['String'];
   teamId: Scalars['Float'];
   isPublic?: Maybe<Scalars['Boolean']>;
+};
+
+export type CreateChannelResponse = {
+  __typename?: 'CreateChannelResponse';
+  ok: Scalars['Boolean'];
+  channel?: Maybe<Channel>;
+  errors?: Maybe<Array<ListError>>;
 };
 
 export type CreateMessageInput = {
@@ -92,9 +104,10 @@ export type Message = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createChannel: Channel;
+  createChannel: CreateChannelResponse;
   createMessage: Message;
   createTeam: CreateTeamResponse;
+  addMember: VoidResponse;
   register: CreateUserResponse;
   login: LoginResponse;
   updateUser: User;
@@ -113,6 +126,11 @@ export type MutationCreateMessageArgs = {
 
 export type MutationCreateTeamArgs = {
   createTeamInput: CreateTeamInput;
+};
+
+
+export type MutationAddMemberArgs = {
+  addMemberInput: AddMemberInput;
 };
 
 
@@ -187,6 +205,26 @@ export type User = {
   isAdmin?: Maybe<Scalars['Boolean']>;
 };
 
+export type VoidResponse = {
+  __typename?: 'VoidResponse';
+  ok: Scalars['Boolean'];
+  errors?: Maybe<Array<ListError>>;
+};
+
+export type AddMemberMutationVariables = Exact<{
+  addMemberAddMemberInput: AddMemberInput;
+}>;
+
+
+export type AddMemberMutation = { __typename?: 'Mutation', addMember: { __typename?: 'VoidResponse', ok: boolean, errors?: Maybe<Array<{ __typename?: 'ListError', msg: string, path: string }>> } };
+
+export type CreateChannelMutationVariables = Exact<{
+  createChannelChannelInput: CreateChannelInput;
+}>;
+
+
+export type CreateChannelMutation = { __typename?: 'Mutation', createChannel: { __typename?: 'CreateChannelResponse', ok: boolean, channel?: Maybe<{ __typename?: 'Channel', id: number, name: string, isPublic: boolean }>, errors?: Maybe<Array<{ __typename?: 'ListError', msg: string, path: string }>> } };
+
 export type CreateTeamMutationVariables = Exact<{
   createTeamInput: CreateTeamInput;
 }>;
@@ -219,6 +257,85 @@ export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
 export type GetUsersQuery = { __typename?: 'Query', getUsers?: Maybe<Array<{ __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string }>> };
 
 
+export const AddMemberDocument = gql`
+    mutation addMember($addMemberAddMemberInput: AddMemberInput!) {
+  addMember(addMemberInput: $addMemberAddMemberInput) {
+    ok
+    errors {
+      msg
+      path
+    }
+  }
+}
+    `;
+export type AddMemberMutationFn = Apollo.MutationFunction<AddMemberMutation, AddMemberMutationVariables>;
+
+/**
+ * __useAddMemberMutation__
+ *
+ * To run a mutation, you first call `useAddMemberMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddMemberMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addMemberMutation, { data, loading, error }] = useAddMemberMutation({
+ *   variables: {
+ *      addMemberAddMemberInput: // value for 'addMemberAddMemberInput'
+ *   },
+ * });
+ */
+export function useAddMemberMutation(baseOptions?: Apollo.MutationHookOptions<AddMemberMutation, AddMemberMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddMemberMutation, AddMemberMutationVariables>(AddMemberDocument, options);
+      }
+export type AddMemberMutationHookResult = ReturnType<typeof useAddMemberMutation>;
+export type AddMemberMutationResult = Apollo.MutationResult<AddMemberMutation>;
+export type AddMemberMutationOptions = Apollo.BaseMutationOptions<AddMemberMutation, AddMemberMutationVariables>;
+export const CreateChannelDocument = gql`
+    mutation createChannel($createChannelChannelInput: CreateChannelInput!) {
+  createChannel(channelInput: $createChannelChannelInput) {
+    ok
+    channel {
+      id
+      name
+      isPublic
+    }
+    errors {
+      msg
+      path
+    }
+  }
+}
+    `;
+export type CreateChannelMutationFn = Apollo.MutationFunction<CreateChannelMutation, CreateChannelMutationVariables>;
+
+/**
+ * __useCreateChannelMutation__
+ *
+ * To run a mutation, you first call `useCreateChannelMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateChannelMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createChannelMutation, { data, loading, error }] = useCreateChannelMutation({
+ *   variables: {
+ *      createChannelChannelInput: // value for 'createChannelChannelInput'
+ *   },
+ * });
+ */
+export function useCreateChannelMutation(baseOptions?: Apollo.MutationHookOptions<CreateChannelMutation, CreateChannelMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateChannelMutation, CreateChannelMutationVariables>(CreateChannelDocument, options);
+      }
+export type CreateChannelMutationHookResult = ReturnType<typeof useCreateChannelMutation>;
+export type CreateChannelMutationResult = Apollo.MutationResult<CreateChannelMutation>;
+export type CreateChannelMutationOptions = Apollo.BaseMutationOptions<CreateChannelMutation, CreateChannelMutationVariables>;
 export const CreateTeamDocument = gql`
     mutation createTeam($createTeamInput: CreateTeamInput!) {
   createTeam(createTeamInput: $createTeamInput) {
