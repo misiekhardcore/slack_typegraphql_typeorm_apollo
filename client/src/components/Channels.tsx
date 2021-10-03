@@ -1,7 +1,10 @@
+import decode from "jwt-decode";
 import React from "react";
 import { Link } from "react-router-dom";
 import { Icon } from "semantic-ui-react";
 import styled from "styled-components";
+import { Channel, Team, User } from "../generated/graphql";
+import { JWTTokenPayload } from "../types";
 
 const ChannelsWrapper = styled.div`
   grid-column: 2;
@@ -46,11 +49,8 @@ const Green = styled.span`
 const Bubble = ({ on }: { on: boolean }): JSX.Element =>
   on ? <Green>● </Green> : <span>○</span>;
 
-export type TChannel = { id: number; isPublic: boolean; name: string };
-type TUser = { id: number; name: string };
-
 const channel = (
-  { id, name }: TChannel,
+  { id, name }: Channel,
   teamId: number
 ): JSX.Element => (
   <Link key={`channel-${id}`} to={`/view-team/${teamId}/${id}`}>
@@ -58,58 +58,57 @@ const channel = (
   </Link>
 );
 
-const user = ({ id, name }: TUser): JSX.Element => (
+const user = ({ id, username }: User): JSX.Element => (
   <SideBarListItem key={`user-${id}`}>
     <Bubble on />
-    {name}
+    {username}
   </SideBarListItem>
 );
 
 interface ChannelsProps {
-  teamId: number;
-  teamName: string;
-  userName: string;
-  channels: TChannel[];
-  users: TUser[];
+  team: Team;
   onAddChannelClick: () => void;
   onInvitePeople: () => void;
 }
 
 export const Channels: React.FC<ChannelsProps> = ({
-  users,
-  teamId,
-  channels,
-  userName,
-  teamName,
+  team,
   onAddChannelClick,
   onInvitePeople,
 }) => {
+  let username = "";
+  try {
+    const token = localStorage.getItem("token") || "";
+    const { user } = decode(token) as JWTTokenPayload;
+    username = user.username;
+  } catch (error) {}
+
+  const { channels, owner, name, id, members } = team || {};
+  const allPeople = [owner, ...(members || [])].filter(
+    (user) => user.username !== username
+  );
   return (
     <ChannelsWrapper>
       <PushLeft>
-        <TeamNameHeader>{teamName}</TeamNameHeader>
-        {userName}
+        <TeamNameHeader>{name}</TeamNameHeader>
+        {owner.username}
       </PushLeft>
-      <div>
-        <SideBarList>
-          <SideBarListHeader>
-            Channels
-            <Icon onClick={onAddChannelClick} name="add circle" />
-          </SideBarListHeader>
-          {channels.map((chan) => channel(chan, teamId))}
-        </SideBarList>
-      </div>
-      <div>
-        <SideBarList>
-          <SideBarListHeader>Direct Messages</SideBarListHeader>
-          {users.map(user)}
-        </SideBarList>
-      </div>
-      <div>
-        <a href="#invite-people" onClick={onInvitePeople}>
-          + Invite People
-        </a>
-      </div>
+      <SideBarList>
+        <SideBarListHeader>
+          Channels
+          <Icon onClick={onAddChannelClick} name="add circle" />
+        </SideBarListHeader>
+        {channels.map((chan) => channel(chan, id))}
+      </SideBarList>
+      <SideBarList>
+        <SideBarListHeader>Direct Messages</SideBarListHeader>
+        {allPeople.map(user)}
+        <SideBarListItem style={{ marginTop: "0.5rem" }}>
+          <a href="#invite-people" onClick={onInvitePeople}>
+            + Invite People
+          </a>
+        </SideBarListItem>
+      </SideBarList>
     </ChannelsWrapper>
   );
 };
