@@ -1,12 +1,10 @@
-import decode from "jwt-decode";
 import React, { useState } from "react";
+import { useHistory } from "react-router";
 import { AddChannelModal } from "../components/AddChannelModal";
-import { InvitePeopleModal } from "../components/InvitePeopleModal";
 import { Channels } from "../components/Channels";
+import { InvitePeopleModal } from "../components/InvitePeopleModal";
 import { Teams } from "../components/Teams";
 import { Team } from "../generated/graphql";
-import { JWTTokenPayload } from "../types";
-import { useHistory } from "react-router";
 
 interface SidebarProps {
   teams: { id: number; letter: string }[];
@@ -24,17 +22,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ teams, team }) => {
     return null;
   }
 
-  const channels = team?.channels || [];
-
-  let username = "";
-  try {
-    const token = localStorage.getItem("token") || "";
-    if (!token) history.push("/login");
-    const { user } = decode(token) as JWTTokenPayload;
-    if (!user) history.push("/login");
-    username = user.username;
-  } catch (error) {}
-
   const handleAddChannelModalClose = () =>
     setState({ ...state, openAddChannelModal: false });
 
@@ -46,20 +33,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ teams, team }) => {
 
   const handleInvitePeopleModalOpen = () =>
     setState({ ...state, openInvitePeopleModal: true });
-
   return (
     <>
       <Teams key="team-sidebar" teams={teams} />
       <Channels
         key="channel-sidebar"
-        teamId={team.id}
-        teamName={team?.name}
-        userName={username}
-        channels={channels}
-        users={[
-          { id: 1, name: "user1" },
-          { id: 2, name: "user2" },
-        ]}
+        team={team}
         onAddChannelClick={handleAddChannelModalOpen}
         onInvitePeople={handleInvitePeopleModalOpen}
       />
