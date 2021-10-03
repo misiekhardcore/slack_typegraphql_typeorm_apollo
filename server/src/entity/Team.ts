@@ -35,7 +35,7 @@ export class Team extends BaseEntity {
   async members(
     @Ctx() { teamMembersLoader }: Context
   ): Promise<User[]> {
-    return await teamMembersLoader.load(this.id);
+    return (await teamMembersLoader.load(this.id)) || [];
   }
 
   @Column()
