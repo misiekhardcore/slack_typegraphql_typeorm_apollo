@@ -8,7 +8,11 @@ import {
   Header,
   Message,
 } from "semantic-ui-react";
-import { useCreateTeamMutation } from "../generated/graphql";
+import {
+  GetTeamsDocument,
+  GetTeamsQuery,
+  useCreateTeamMutation,
+} from "../generated/graphql";
 import { graphqlErrorToObject } from "../utils/graphqlErrorToObject";
 import { isAuthError } from "../utils/isAuthError";
 import { isErrorField } from "../utils/isErrorField";
@@ -16,7 +20,7 @@ import { isErrorField } from "../utils/isErrorField";
 const CreateTeam: React.FC = () => {
   const history = useHistory();
   const [state, setState] = useState({ name: "" });
-  const [createTeam, { loading, data, error }] = useCreateTeamMutation({
+  const [createTeam, { loading, error }] = useCreateTeamMutation({
     errorPolicy: "all",
   });
 
@@ -28,12 +32,28 @@ const CreateTeam: React.FC = () => {
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    createTeam({ variables: { createTeamInput: state } });
+    createTeam({
+      variables: { createTeamInput: state },
+      update: (cache, { data: data2 }) => {
+        const { createTeam } = data2 || {};
+        const data = cache.readQuery<GetTeamsQuery>({
+          query: GetTeamsDocument,
+        });
+        let newData: GetTeamsQuery = { getTeams: [] };
+        console.log(cache);
+        if (data?.getTeams && createTeam?.team) {
+          newData.getTeams = [
+            ...data.getTeams,
+            { ...createTeam.team, members: [] },
+          ];
+        } else if (!data?.getTeams && createTeam?.team) {
+          newData.getTeams = [{ ...createTeam.team, members: [] }];
+        }
+        cache.writeQuery({ query: GetTeamsDocument, data: newData });
+        history.push(`/view-team/${createTeam!.team!.id}`);
+      },
+    });
   };
-
-  const { ok, team } = data?.createTeam || {};
-
-  if (ok) history.push(`/view-team/${team?.id || ""}`);
 
   if (isAuthError(error)) history.push("/login");
 
