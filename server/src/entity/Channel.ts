@@ -1,16 +1,17 @@
-import { Field, Int, ObjectType } from "type-graphql";
+import { Ctx, Field, Int, ObjectType } from "type-graphql";
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
-  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { Context } from "../index";
+import { ChannelMember } from "./ChannelMember";
 import { Message } from "./Message";
 import { Team } from "./Team";
 import { User } from "./User";
@@ -27,7 +28,7 @@ export class Channel extends BaseEntity {
   name: string;
 
   @Field(() => Boolean)
-  @Column({ default: false })
+  @Column({ default: true })
   isPublic: boolean;
 
   @Field(() => String)
@@ -49,9 +50,13 @@ export class Channel extends BaseEntity {
   @OneToMany(() => Message, (message) => message.channel)
   messages: Message[] | null;
 
-  @Field(() => [User])
-  @ManyToMany(() => User, (user) => user.channels, {
+  @OneToMany(() => ChannelMember, (member) => member.user, {
     onDelete: "CASCADE",
   })
-  users: User[];
+  userConnection: ChannelMember[];
+
+  @Field(() => [User])
+  async users(@Ctx() { channelUsersLoader }: Context): Promise<User[]> {
+    return await channelUsersLoader.load(this.id);
+  }
 }

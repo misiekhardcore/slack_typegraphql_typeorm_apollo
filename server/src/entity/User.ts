@@ -1,7 +1,7 @@
 import argon2 from "argon2";
 import { IsEmail, MaxLength, MinLength } from "class-validator";
 import jwt from "jsonwebtoken";
-import { Field, Int, ObjectType } from "type-graphql";
+import { Ctx, Field, Int, ObjectType } from "type-graphql";
 import {
   BaseEntity,
   BeforeInsert,
@@ -9,13 +9,16 @@ import {
   CreateDateColumn,
   Entity,
   JoinTable,
-  ManyToMany,
+  OneToMany,
   // OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
+  UpdateDateColumn
 } from "typeorm";
+import { Context } from "../index";
 import { Channel } from "./Channel";
+import { ChannelMember } from "./ChannelMember";
 import { Team } from "./Team";
+import { TeamMember } from "./TeamMember";
 
 export interface JWTTokenPayload {
   user: {
@@ -68,18 +71,28 @@ export class User extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Field(() => [Team], { nullable: true })
-  @ManyToMany<Team>(() => Team, (team) => team.members)
-  @JoinTable({ name: "team_member" })
-  teams: Team[] | null;
+  @OneToMany(() => TeamMember, (member) => member.user, {
+    cascade: true,
+  })
+  teamConnection: TeamMember[];
 
-  // @OneToMany(() => Team, (team) => team.owner)
-  // ownedTeams: Team[] | null;
+  @Field(() => [Team], { nullable: true })
+  async teams(
+    @Ctx() { memberTeamsLoader }: Context
+  ): Promise<Team[] | null> {
+    return await memberTeamsLoader.load(this.id);
+  }
+
+  @OneToMany(() => ChannelMember, (channel) => channel.user)
+  @JoinTable({ name: "channel_member" })
+  channelConnection: ChannelMember[];
 
   @Field(() => [Channel], { nullable: true })
-  @ManyToMany(() => Channel, (channel) => channel.users)
-  @JoinTable({ name: "channel_member" })
-  channels: Channel[] | null;
+  async channels(
+    @Ctx() { userChannelsLoader }: Context
+  ): Promise<Channel[] | null> {
+    return userChannelsLoader.load(this.id);
+  }
 
   @Field(() => Boolean, { defaultValue: false })
   @Column({ default: false })

@@ -1,17 +1,18 @@
-import { Field, Int, ObjectType } from "type-graphql";
+import { Ctx, Field, Int, ObjectType } from "type-graphql";
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
-  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
+  UpdateDateColumn,
 } from "typeorm";
+import { Context } from "../index";
 import { Channel } from "./Channel";
+import { TeamMember } from "./TeamMember";
 import { User } from "./User";
 
 @Entity({ name: "teams" })
@@ -25,14 +26,21 @@ export class Team extends BaseEntity {
   @Column()
   name: string;
 
-  @Field(() => [User])
-  @ManyToMany<User>(() => User, (user) => user.teams, {
+  @OneToMany(() => TeamMember, (member) => member.team, {
     nullable: false,
   })
-  members: User[];
+  userConnection: TeamMember[];
+
+  @Field(() => [User])
+  async members(
+    @Ctx() { teamMembersLoader }: Context
+  ): Promise<User[]> {
+    return await teamMembersLoader.load(this.id);
+  }
 
   @Column()
   ownerId: number;
+
   @Field(() => User)
   @ManyToOne<User>(() => User, { onDelete: "CASCADE", nullable: false })
   @JoinColumn({ name: "owner_id" })
