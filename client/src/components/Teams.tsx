@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 
 const TeamsWrapper = styled.div`
   grid-column: 1;
@@ -34,7 +35,9 @@ const TeamListItem = styled.li`
 type TTeam = { id: number; letter: string };
 
 const team = ({ id, letter }: TTeam): JSX.Element => (
-  <TeamListItem key={`team-${id}`}>{letter}</TeamListItem>
+  <Link to={`/view-team/${id}`} key={`team-${id}`}>
+    <TeamListItem>{letter}</TeamListItem>
+  </Link>
 );
 interface TeamsProps {
   teams: TTeam[];
