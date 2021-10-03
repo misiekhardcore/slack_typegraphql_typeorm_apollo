@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router";
+import { Link } from "react-router-dom";
 import {
   Button,
   Container,
@@ -80,6 +81,7 @@ const Register: React.FC = () => {
         />
         <Button type="submit">Register</Button>
       </Form>
+      <Link to="/login">Have an account already? Log in</Link>
     </Container>
   );
 };
