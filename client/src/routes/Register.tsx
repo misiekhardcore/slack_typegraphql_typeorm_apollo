@@ -12,7 +12,7 @@ import { useRegisterMutation } from "../generated/graphql";
 import { graphqlErrorToObject } from "../utils/graphqlErrorToObject";
 import { isErrorField } from "../utils/isErrorField";
 
-export const Register: React.FC = () => {
+const Register: React.FC = () => {
   const history = useHistory();
   const [state, setState] = useState({
     username: "",
@@ -83,3 +83,5 @@ export const Register: React.FC = () => {
     </Container>
   );
 };
+
+export default Register;

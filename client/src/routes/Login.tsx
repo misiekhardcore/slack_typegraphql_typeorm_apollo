@@ -12,7 +12,7 @@ import { useLoginMutation } from "../generated/graphql";
 import { graphqlErrorToObject } from "../utils/graphqlErrorToObject";
 import { isErrorField } from "../utils/isErrorField";
 
-export const Login: React.FC = () => {
+const Login: React.FC = () => {
   const history = useHistory();
   const [state, setState] = useState({ email: "", password: "" });
   const [login, { loading, data, error }] = useLoginMutation({
@@ -75,3 +75,5 @@ export const Login: React.FC = () => {
     </Container>
   );
 };
+
+export default Login;
