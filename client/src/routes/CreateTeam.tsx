@@ -13,7 +13,7 @@ import { graphqlErrorToObject } from "../utils/graphqlErrorToObject";
 import { isAuthError } from "../utils/isAuthError";
 import { isErrorField } from "../utils/isErrorField";
 
-export const CreateTeam: React.FC = () => {
+const CreateTeam: React.FC = () => {
   const history = useHistory();
   const [state, setState] = useState({ name: "" });
   const [createTeam, { loading, data, error }] = useCreateTeamMutation({
@@ -31,7 +31,9 @@ export const CreateTeam: React.FC = () => {
     createTeam({ variables: { createTeamInput: state } });
   };
 
-  if (data?.createTeam.ok) history.push("/");
+  const { ok, team } = data?.createTeam || {};
+
+  if (ok) history.push(`/view-team/${team?.id || ""}`);
 
   if (isAuthError(error)) history.push("/login");
 
@@ -63,3 +65,5 @@ export const CreateTeam: React.FC = () => {
     </Container>
   );
 };
+
+export default CreateTeam;
