@@ -1,6 +1,10 @@
 mutation addMember($addMemberAddMemberInput: AddMemberInput!) {
   addMember(addMemberInput: $addMemberAddMemberInput) {
     ok
+    member {
+      id
+      username
+    }
     errors {
       msg
       path
