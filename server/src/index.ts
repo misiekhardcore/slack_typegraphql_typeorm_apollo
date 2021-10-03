@@ -7,16 +7,27 @@ import { buildSchema } from "type-graphql";
 import { createConnection, getConnectionOptions } from "typeorm";
 import { SnakeNamingStrategy } from "typeorm-naming-strategies";
 import { JWTTokenPayload, User } from "./entity/User";
+import { createChannelUsersLoader } from "./loaders/channelUsersLoader";
+import { createUserChannelsLoader } from "./loaders/userChannelsLoader";
 import { ChannelResolver } from "./resolvers/ChannelResolver";
 import { MessageResolver } from "./resolvers/MessageResolver";
 import { TeamResolver } from "./resolvers/TeamResolver";
 import { UserResolver } from "./resolvers/UserResolver";
+import DataLaoder from "dataloader";
+import { Channel } from "./entity/Channel";
+import { Team } from "./entity/Team";
+import { createTeamMembersLoader } from "./loaders/teamMembersLoader";
+import { createMemberTeamsLoader } from "./loaders/memberTeamsLoader";
 
 config();
 
 export interface Context {
   req: any;
   res: any;
+  userChannelsLoader: DataLaoder<number, Channel[], number>;
+  channelUsersLoader: DataLaoder<number, User[], number>;
+  memberTeamsLoader: DataLaoder<number, Team[], number>;
+  teamMembersLoader: DataLaoder<number, User[], number>;
   user: { id: number } | null;
   jwtSecret1: string;
   jwtSecret2: string;
@@ -106,6 +117,10 @@ export interface Context {
       return {
         req,
         res,
+        userChannelsLoader: createUserChannelsLoader(),
+        channelUsersLoader: createChannelUsersLoader(),
+        teamMembersLoader: createTeamMembersLoader(),
+        memberTeamsLoader: createMemberTeamsLoader(),
         user: (await extractTokens(req, res)) || null,
         jwtSecret1: process.env.SECRET1 || "",
         jwtSecret2: process.env.SECRET2 || "",
