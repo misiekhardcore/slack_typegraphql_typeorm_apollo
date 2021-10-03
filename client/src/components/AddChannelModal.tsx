@@ -8,6 +8,7 @@ import {
   FormField,
   FormGroup,
   Input,
+  Message,
   Modal,
 } from "semantic-ui-react";
 import {
@@ -15,6 +16,7 @@ import {
   GetTeamsQuery,
   useCreateChannelMutation,
 } from "../generated/graphql";
+import errorToFieldError from "../utils/errorToFieldError";
 
 interface AddChannelModalProps {
   teamId: number;
@@ -31,49 +33,75 @@ export const AddChannelModal: React.FC<AddChannelModalProps> = ({
 
   const [createChannel] = useCreateChannelMutation();
 
-  const formik = useFormik({
+  const {
+    isSubmitting,
+    handleBlur,
+    handleChange,
+    handleSubmit,
+    resetForm,
+    values,
+    touched,
+    errors,
+  } = useFormik({
     initialValues: {
       channelName: "",
     },
-    onSubmit: async (values, { setSubmitting, resetForm }) => {
-      await createChannel({
-        variables: {
-          createChannelChannelInput: {
-            name: values.channelName,
-            teamId,
+    onSubmit: async (
+      values,
+      { setSubmitting, resetForm, setErrors }
+    ) => {
+      if (!values.channelName)
+        setErrors({ channelName: "Field cannot be empty" });
+      else {
+        const response = await createChannel({
+          variables: {
+            createChannelChannelInput: {
+              name: values.channelName,
+              teamId,
+            },
           },
-        },
-        update: (cache, { data: data2 }) => {
-          const { createChannel } = data2 || {};
-          const data = cache.readQuery<GetTeamsQuery>({
-            query: GetTeamsDocument,
-          });
-          const teamIdx = findIndex(data?.getTeams, ["id", teamId]);
-          if (
-            data?.getTeams[teamIdx]?.channels &&
-            createChannel?.channel
-          ) {
-            cache.writeFragment({
-              id: "Team:" + teamId,
-              fragment: gql`
-                fragment Channel on Team {
-                  channels
-                }
-              `,
-              data: {
-                channels: [
-                  ...data.getTeams[teamIdx].channels,
-                  createChannel.channel,
-                ],
-              },
-            });
-          }
-        },
-      });
+          update: (cache, { data: data2 }) => {
+            const { createChannel } = data2 || {};
 
-      onClose();
-      resetForm();
-      setSubmitting(false);
+            const data = cache.readQuery<GetTeamsQuery>({
+              query: GetTeamsDocument,
+            });
+
+            const teamIdx = findIndex(data?.getTeams, ["id", teamId]);
+
+            if (
+              data?.getTeams[teamIdx]?.channels &&
+              createChannel?.channel
+            ) {
+              cache.writeFragment({
+                id: "Team:" + teamId,
+                fragment: gql`
+                  fragment Channel on Team {
+                    channels
+                  }
+                `,
+                data: {
+                  channels: [
+                    ...data.getTeams[teamIdx].channels,
+                    createChannel.channel,
+                  ],
+                },
+              });
+            }
+          },
+        });
+
+        const { ok, errors } = response.data?.createChannel || {};
+
+        if (ok) {
+          onClose();
+          resetForm();
+        }
+        if (errors) {
+          setErrors(errorToFieldError(errors));
+        }
+        setSubmitting(false);
+      }
     },
   });
 
@@ -85,26 +113,31 @@ export const AddChannelModal: React.FC<AddChannelModalProps> = ({
     <Modal open={open} onClose={onClose} closeOnDimmerClick>
       <Modal.Header>Add channel</Modal.Header>
       <Modal.Content>
-        <Form onSubmit={formik.handleSubmit}>
-          <FormField>
+        <Form onSubmit={handleSubmit}>
+          <FormField
+            error={touched.channelName && !!errors.channelName}
+          >
             <Input
               ref={inputRef}
               fluid
               placeholder="Channel name"
               type="text"
               name="channelName"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.channelName}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              value={values.channelName}
             />
           </FormField>
+          {touched.channelName && errors.channelName ? (
+            <Message negative content={errors.channelName} />
+          ) : null}
           <FormGroup widths="equal">
             <FormField>
               <Button
                 type="button"
-                disabled={formik.isSubmitting}
+                disabled={isSubmitting}
                 onClick={() => {
-                  formik.resetForm();
+                  resetForm();
                   onClose();
                 }}
                 fluid
