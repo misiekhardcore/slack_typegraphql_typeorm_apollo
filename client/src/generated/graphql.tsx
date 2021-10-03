@@ -19,6 +19,13 @@ export type AddMemberInput = {
   teamId: Scalars['Int'];
 };
 
+export type AddMemberResponse = {
+  __typename?: 'AddMemberResponse';
+  ok: Scalars['Boolean'];
+  member: User;
+  errors?: Maybe<Array<ListError>>;
+};
+
 export type Channel = {
   __typename?: 'Channel';
   id: Scalars['Int'];
@@ -107,7 +114,7 @@ export type Mutation = {
   createChannel: CreateChannelResponse;
   createMessage: Message;
   createTeam: CreateTeamResponse;
-  addMember: VoidResponse;
+  addMember: AddMemberResponse;
   register: CreateUserResponse;
   login: LoginResponse;
   updateUser: User;
@@ -205,18 +212,12 @@ export type User = {
   isAdmin?: Maybe<Scalars['Boolean']>;
 };
 
-export type VoidResponse = {
-  __typename?: 'VoidResponse';
-  ok: Scalars['Boolean'];
-  errors?: Maybe<Array<ListError>>;
-};
-
 export type AddMemberMutationVariables = Exact<{
   addMemberAddMemberInput: AddMemberInput;
 }>;
 
 
-export type AddMemberMutation = { __typename?: 'Mutation', addMember: { __typename?: 'VoidResponse', ok: boolean, errors?: Maybe<Array<{ __typename?: 'ListError', msg: string, path: string }>> } };
+export type AddMemberMutation = { __typename?: 'Mutation', addMember: { __typename?: 'AddMemberResponse', ok: boolean, member: { __typename?: 'User', id: number, username: string }, errors?: Maybe<Array<{ __typename?: 'ListError', msg: string, path: string }>> } };
 
 export type CreateChannelMutationVariables = Exact<{
   createChannelChannelInput: CreateChannelInput;
@@ -261,6 +262,10 @@ export const AddMemberDocument = gql`
     mutation addMember($addMemberAddMemberInput: AddMemberInput!) {
   addMember(addMemberInput: $addMemberAddMemberInput) {
     ok
+    member {
+      id
+      username
+    }
     errors {
       msg
       path
