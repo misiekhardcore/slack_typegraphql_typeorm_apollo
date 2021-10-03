@@ -1,27 +1,16 @@
+import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { CreateUserResponse, LoginResponse } from "../entity/Outputs";
-import {
-  Arg,
-  Ctx,
-  FieldResolver,
-  Mutation,
-  Query,
-  Resolver,
-  ResolverInterface,
-  Root,
-} from "type-graphql";
-import { Channel } from "../entity/Channel";
-import { Team } from "../entity/Team";
 import { User } from "../entity/User";
+import { Context } from "../index";
 import {
   CreateUserInput,
   LoginUserInput,
   UpdateUserInput,
 } from "../inputs/UserInputs";
 import { UserService } from "../services/user.service";
-import { Context } from "../index";
 
 @Resolver(() => User)
-export class UserResolver implements ResolverInterface<User> {
+export class UserResolver {
   private readonly userService;
   constructor() {
     this.userService = new UserService();
@@ -88,18 +77,5 @@ export class UserResolver implements ResolverInterface<User> {
     @Arg("userInput", { nullable: false }) userInput: UpdateUserInput
   ) {
     return await this.userService.update(userInput);
-  }
-
-  @FieldResolver()
-  async teams(@Root() user: User) {
-    return await this.userService.populateMany<Team>(user, "teams");
-  }
-
-  @FieldResolver()
-  async channels(@Root() user: User) {
-    return await this.userService.populateMany<Channel>(
-      user,
-      "channels"
-    );
   }
 }
