@@ -22,7 +22,7 @@ export type AddMemberInput = {
 export type AddMemberResponse = {
   __typename?: 'AddMemberResponse';
   ok: Scalars['Boolean'];
-  member: User;
+  member?: Maybe<User>;
   errors?: Maybe<Array<ListError>>;
 };
 
@@ -217,7 +217,7 @@ export type AddMemberMutationVariables = Exact<{
 }>;
 
 
-export type AddMemberMutation = { __typename?: 'Mutation', addMember: { __typename?: 'AddMemberResponse', ok: boolean, member: { __typename?: 'User', id: number, username: string }, errors?: Maybe<Array<{ __typename?: 'ListError', msg: string, path: string }>> } };
+export type AddMemberMutation = { __typename?: 'Mutation', addMember: { __typename?: 'AddMemberResponse', ok: boolean, member?: Maybe<{ __typename?: 'User', id: number, username: string }>, errors?: Maybe<Array<{ __typename?: 'ListError', msg: string, path: string }>> } };
 
 export type CreateChannelMutationVariables = Exact<{
   createChannelChannelInput: CreateChannelInput;
@@ -231,7 +231,7 @@ export type CreateTeamMutationVariables = Exact<{
 }>;
 
 
-export type CreateTeamMutation = { __typename?: 'Mutation', createTeam: { __typename?: 'CreateTeamResponse', ok: boolean, team?: Maybe<{ __typename?: 'Team', id: number, name: string, owner: { __typename?: 'User', username: string }, channels: Array<{ __typename?: 'Channel', id: number, isPublic: boolean, name: string }> }>, errors?: Maybe<Array<{ __typename?: 'ListError', msg: string, path: string }>> } };
+export type CreateTeamMutation = { __typename?: 'Mutation', createTeam: { __typename?: 'CreateTeamResponse', ok: boolean, team?: Maybe<{ __typename?: 'Team', id: number, name: string, owner: { __typename?: 'User', username: string, id: number }, channels: Array<{ __typename?: 'Channel', id: number, isPublic: boolean, name: string }> }>, errors?: Maybe<Array<{ __typename?: 'ListError', msg: string, path: string }>> } };
 
 export type LoginMutationVariables = Exact<{
   loginUserInput: LoginUserInput;
@@ -250,7 +250,7 @@ export type RegisterMutation = { __typename?: 'Mutation', register: { __typename
 export type GetTeamsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetTeamsQuery = { __typename?: 'Query', getTeams: Array<{ __typename?: 'Team', id: number, name: string, owner: { __typename?: 'User', username: string }, channels: Array<{ __typename?: 'Channel', id: number, isPublic: boolean, name: string }>, members: Array<{ __typename?: 'User', username: string, id: number }> }> };
+export type GetTeamsQuery = { __typename?: 'Query', getTeams: Array<{ __typename?: 'Team', id: number, name: string, owner: { __typename?: 'User', username: string, id: number }, channels: Array<{ __typename?: 'Channel', id: number, isPublic: boolean, name: string }>, members: Array<{ __typename?: 'User', username: string, id: number }> }> };
 
 export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -350,6 +350,7 @@ export const CreateTeamDocument = gql`
       name
       owner {
         username
+        id
       }
       channels {
         id
@@ -473,6 +474,7 @@ export const GetTeamsDocument = gql`
     name
     owner {
       username
+      id
     }
     channels {
       id
