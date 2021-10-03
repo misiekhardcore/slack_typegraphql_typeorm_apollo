@@ -9,8 +9,8 @@ import {
 } from "type-graphql";
 import { Channel } from "../entity/Channel";
 import { Message } from "../entity/Message";
+import { CreateChannelResponse } from "../entity/Outputs";
 import { Team } from "../entity/Team";
-import { User } from "../entity/User";
 import { CreateChannelInput } from "../inputs/ChannelInputs";
 import { ChannelService } from "../services/channel.service";
 
@@ -31,21 +31,23 @@ export class ChannelResolver implements ResolverInterface<Channel> {
     return await this.channelService.getOne(channelId);
   }
 
-  @Mutation(() => Channel)
+  @Mutation(() => CreateChannelResponse)
   async createChannel(
     @Arg("channelInput") createChannelInput: CreateChannelInput
-  ): Promise<Channel> {
-    return await this.channelService.create(createChannelInput);
+  ): Promise<CreateChannelResponse> {
+    try {
+      const channel = await this.channelService.create(
+        createChannelInput
+      );
+      return { ok: true, channel };
+    } catch (error) {
+      return {
+        ok: false,
+        errors: error,
+      };
+    }
   }
 
-  @FieldResolver()
-  async users(@Root() channel: Channel) {
-    const users = await this.channelService.populateMany<User>(
-      channel,
-      "users"
-    );
-    return users;
-  }
   @FieldResolver()
   async team(@Root() channel: Channel) {
     return (
