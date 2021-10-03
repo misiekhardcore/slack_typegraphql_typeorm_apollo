@@ -1,10 +1,8 @@
-import decode from "jwt-decode";
 import React from "react";
 import { Link } from "react-router-dom";
 import { Icon } from "semantic-ui-react";
 import styled from "styled-components";
 import { Channel, Team, User } from "../generated/graphql";
-import { JWTTokenPayload } from "../types";
 
 const ChannelsWrapper = styled.div`
   grid-column: 2;
@@ -67,22 +65,17 @@ const user = ({ id, username }: User): JSX.Element => (
 
 interface ChannelsProps {
   team: Team;
+  userId: number;
   onAddChannelClick: () => void;
   onInvitePeople: () => void;
 }
 
 export const Channels: React.FC<ChannelsProps> = ({
   team,
+  userId,
   onAddChannelClick,
   onInvitePeople,
 }) => {
-  let userId = 0;
-  try {
-    const token = localStorage.getItem("token") || "";
-    const { user } = decode(token) as JWTTokenPayload;
-    userId = user.id;
-  } catch (error) {}
-
   const { channels, owner, name, id, members } = team || {};
   const allPeople = [owner, ...(members || [])].filter(
     (user) => user.id !== userId
