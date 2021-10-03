@@ -76,16 +76,16 @@ export const Channels: React.FC<ChannelsProps> = ({
   onAddChannelClick,
   onInvitePeople,
 }) => {
-  let username = "";
+  let userId = 0;
   try {
     const token = localStorage.getItem("token") || "";
     const { user } = decode(token) as JWTTokenPayload;
-    username = user.username;
+    userId = user.id;
   } catch (error) {}
 
   const { channels, owner, name, id, members } = team || {};
   const allPeople = [owner, ...(members || [])].filter(
-    (user) => user.username !== username
+    (user) => user.id !== userId
   );
   return (
     <ChannelsWrapper>
@@ -96,7 +96,9 @@ export const Channels: React.FC<ChannelsProps> = ({
       <SideBarList>
         <SideBarListHeader>
           Channels
-          <Icon onClick={onAddChannelClick} name="add circle" />
+          {team.owner.id === userId && (
+            <Icon onClick={onAddChannelClick} name="add circle" />
+          )}
         </SideBarListHeader>
         {channels.map((chan) => channel(chan, id))}
       </SideBarList>

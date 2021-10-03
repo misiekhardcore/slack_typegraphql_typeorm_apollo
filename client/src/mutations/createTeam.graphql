@@ -6,6 +6,7 @@ mutation createTeam($createTeamInput: CreateTeamInput!) {
       name
       owner {
         username
+        id
       }
       channels {
         id

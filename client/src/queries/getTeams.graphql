@@ -4,6 +4,7 @@ query getTeams {
     name
     owner {
       username
+      id
     }
     channels {
       id
