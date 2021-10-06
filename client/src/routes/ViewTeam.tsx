@@ -3,8 +3,8 @@ import React from "react";
 import { Redirect } from "react-router";
 import { AppLayout } from "../components/AppLayout";
 import { Header } from "../components/Header";
-import { Messages } from "../components/Messages";
 import { SendMessage } from "../components/SendMessage";
+import { MessagesContainer } from "../containers/MessagesContainer";
 import { Sidebar } from "../containers/Sidebar";
 import { Team, useGetTeamsQuery } from "../generated/graphql";
 
@@ -68,16 +68,12 @@ const ViewTeam: React.FC<ViewTeamProps> = ({
       />
       {channel && (
         <>
-          <Header channelName={channel?.name || "none"} />
-          <Messages>
-            <ul className="message-list">
-              <li></li>
-              <li></li>
-            </ul>
-          </Messages>
-          <SendMessage channelName="general">
-            <input type="text" placeholder="CSS Grid Layout Module" />
-          </SendMessage>
+          <Header channelName={channel.name} />
+          <MessagesContainer channelId={channel.id} />
+          <SendMessage
+            channelName={channel.name}
+            channelId={channel.id}
+          />
         </>
       )}
     </AppLayout>
