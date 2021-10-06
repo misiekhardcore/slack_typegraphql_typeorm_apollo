@@ -173,6 +173,16 @@ export type QueryGetChannelArgs = {
 };
 
 
+export type QueryGetMessagesArgs = {
+  channelId: Scalars['Float'];
+};
+
+
+export type QueryGetMessageArgs = {
+  messageId: Scalars['Float'];
+};
+
+
 export type QueryGetTeamArgs = {
   teamId: Scalars['Float'];
 };
@@ -226,6 +236,13 @@ export type CreateChannelMutationVariables = Exact<{
 
 export type CreateChannelMutation = { __typename?: 'Mutation', createChannel: { __typename?: 'CreateChannelResponse', ok: boolean, channel?: Maybe<{ __typename?: 'Channel', id: number, name: string, isPublic: boolean }>, errors?: Maybe<Array<{ __typename?: 'ListError', msg: string, path: string }>> } };
 
+export type CreateMessageMutationVariables = Exact<{
+  createMessageMessageInput: CreateMessageInput;
+}>;
+
+
+export type CreateMessageMutation = { __typename?: 'Mutation', createMessage: { __typename?: 'Message', text: string, id: number } };
+
 export type CreateTeamMutationVariables = Exact<{
   createTeamInput: CreateTeamInput;
 }>;
@@ -246,6 +263,13 @@ export type RegisterMutationVariables = Exact<{
 
 
 export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'CreateUserResponse', ok: boolean, errors?: Maybe<Array<{ __typename?: 'ListError', path: string, msg: string }>> } };
+
+export type GetMessagesQueryVariables = Exact<{
+  channelId: Scalars['Float'];
+}>;
+
+
+export type GetMessagesQuery = { __typename?: 'Query', getMessages: Array<{ __typename?: 'Message', id: number, text: string, createdAt: string, updatedAt: string, user: { __typename?: 'User', id: number, username: string } }> };
 
 export type GetTeamsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -341,6 +365,40 @@ export function useCreateChannelMutation(baseOptions?: Apollo.MutationHookOption
 export type CreateChannelMutationHookResult = ReturnType<typeof useCreateChannelMutation>;
 export type CreateChannelMutationResult = Apollo.MutationResult<CreateChannelMutation>;
 export type CreateChannelMutationOptions = Apollo.BaseMutationOptions<CreateChannelMutation, CreateChannelMutationVariables>;
+export const CreateMessageDocument = gql`
+    mutation createMessage($createMessageMessageInput: CreateMessageInput!) {
+  createMessage(messageInput: $createMessageMessageInput) {
+    text
+    id
+  }
+}
+    `;
+export type CreateMessageMutationFn = Apollo.MutationFunction<CreateMessageMutation, CreateMessageMutationVariables>;
+
+/**
+ * __useCreateMessageMutation__
+ *
+ * To run a mutation, you first call `useCreateMessageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateMessageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createMessageMutation, { data, loading, error }] = useCreateMessageMutation({
+ *   variables: {
+ *      createMessageMessageInput: // value for 'createMessageMessageInput'
+ *   },
+ * });
+ */
+export function useCreateMessageMutation(baseOptions?: Apollo.MutationHookOptions<CreateMessageMutation, CreateMessageMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateMessageMutation, CreateMessageMutationVariables>(CreateMessageDocument, options);
+      }
+export type CreateMessageMutationHookResult = ReturnType<typeof useCreateMessageMutation>;
+export type CreateMessageMutationResult = Apollo.MutationResult<CreateMessageMutation>;
+export type CreateMessageMutationOptions = Apollo.BaseMutationOptions<CreateMessageMutation, CreateMessageMutationVariables>;
 export const CreateTeamDocument = gql`
     mutation createTeam($createTeamInput: CreateTeamInput!) {
   createTeam(createTeamInput: $createTeamInput) {
@@ -467,6 +525,48 @@ export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<Reg
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
+export const GetMessagesDocument = gql`
+    query getMessages($channelId: Float!) {
+  getMessages(channelId: $channelId) {
+    id
+    text
+    user {
+      id
+      username
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useGetMessagesQuery__
+ *
+ * To run a query within a React component, call `useGetMessagesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetMessagesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetMessagesQuery({
+ *   variables: {
+ *      channelId: // value for 'channelId'
+ *   },
+ * });
+ */
+export function useGetMessagesQuery(baseOptions: Apollo.QueryHookOptions<GetMessagesQuery, GetMessagesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetMessagesQuery, GetMessagesQueryVariables>(GetMessagesDocument, options);
+      }
+export function useGetMessagesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMessagesQuery, GetMessagesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetMessagesQuery, GetMessagesQueryVariables>(GetMessagesDocument, options);
+        }
+export type GetMessagesQueryHookResult = ReturnType<typeof useGetMessagesQuery>;
+export type GetMessagesLazyQueryHookResult = ReturnType<typeof useGetMessagesLazyQuery>;
+export type GetMessagesQueryResult = Apollo.QueryResult<GetMessagesQuery, GetMessagesQueryVariables>;
 export const GetTeamsDocument = gql`
     query getTeams {
   getTeams {
@@ -516,7 +616,7 @@ export type GetTeamsQueryHookResult = ReturnType<typeof useGetTeamsQuery>;
 export type GetTeamsLazyQueryHookResult = ReturnType<typeof useGetTeamsLazyQuery>;
 export type GetTeamsQueryResult = Apollo.QueryResult<GetTeamsQuery, GetTeamsQueryVariables>;
 export const GetUsersDocument = gql`
-    query GetUsers {
+    query getUsers {
   getUsers {
     id
     username
