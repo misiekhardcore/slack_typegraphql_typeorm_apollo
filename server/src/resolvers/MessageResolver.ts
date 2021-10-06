@@ -23,12 +23,12 @@ export class MessageResolver implements ResolverInterface<Message> {
   }
 
   @Query(() => [Message])
-  async getMessages() {
-    return await this.messageService.getMany();
+  async getMessages(@Arg("channelId") channelId: number) {
+    return await this.messageService.getMany(channelId);
   }
 
   @Query(() => Message)
-  async getMessage(messageId: number) {
+  async getMessage(@Arg("messageId") messageId: number) {
     return await this.messageService.getOne(messageId);
   }
 

@@ -30,8 +30,8 @@ export class MessageService {
     return await this.messageRepository.findOne(id);
   }
 
-  public async getMany() {
-    return await this.messageRepository.find();
+  public async getMany(channelId: number) {
+    return await this.messageRepository.find({ where: { channelId } });
   }
 
   public async populateMany<T>(
