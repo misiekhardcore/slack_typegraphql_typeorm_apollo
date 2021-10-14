@@ -1,7 +1,7 @@
 mutation createMessage(
-  $createMessageMessageInput: CreateMessageInput!
+  $createMessageInput: CreateMessageInput!
 ) {
-  createMessage(messageInput: $createMessageMessageInput) {
+  createMessage(messageInput: $createMessageInput) {
     text
     id
   }

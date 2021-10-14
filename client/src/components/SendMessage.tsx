@@ -7,7 +7,7 @@ import { useCreateMessageMutation } from "../generated/graphql";
 const SendMessageWrapper = styled.div`
   grid-column: 3;
   grid-row: 3;
-  margin: 20px;
+  margin: 1.5rem;
   /* background-color: #4e3a4c; */
 `;
 
@@ -42,7 +42,7 @@ export const SendMessage: React.FC<SendMessageProps> = ({
       } else {
         await createMessage({
           variables: {
-            createMessageMessageInput: {
+            createMessageInput: {
               channelId,
               text: values.message,
             },
