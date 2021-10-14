@@ -31,7 +31,7 @@ export class MessageService {
   }
 
   public async getMany(channelId: number) {
-    return await this.messageRepository.find({ where: { channelId } });
+    return await this.messageRepository.find({ where: { channelId },order:{createdAt:'ASC'} });
   }
 
   public async populateMany<T>(
