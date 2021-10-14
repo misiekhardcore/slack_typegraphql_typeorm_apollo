@@ -1,7 +1,7 @@
 import argon2 from "argon2";
 import { IsEmail, MaxLength, MinLength } from "class-validator";
 import jwt from "jsonwebtoken";
-import { Ctx, Field, Int, ObjectType } from "type-graphql";
+import { Field, Int, ObjectType } from "type-graphql";
 import {
   BaseEntity,
   BeforeInsert,
@@ -12,9 +12,8 @@ import {
   OneToMany,
   // OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
+  UpdateDateColumn,
 } from "typeorm";
-import { Context } from "../index";
 import { Channel } from "./Channel";
 import { ChannelMember } from "./ChannelMember";
 import { Team } from "./Team";
@@ -77,22 +76,14 @@ export class User extends BaseEntity {
   teamConnection: TeamMember[];
 
   @Field(() => [Team], { nullable: true })
-  async teams(
-    @Ctx() { memberTeamsLoader }: Context
-  ): Promise<Team[] | null> {
-    return await memberTeamsLoader.load(this.id);
-  }
+  teams: Team[];
 
   @OneToMany(() => ChannelMember, (channel) => channel.user)
   @JoinTable({ name: "channel_member" })
   channelConnection: ChannelMember[];
 
   @Field(() => [Channel], { nullable: true })
-  async channels(
-    @Ctx() { userChannelsLoader }: Context
-  ): Promise<Channel[] | null> {
-    return userChannelsLoader.load(this.id);
-  }
+  channels: Channel[];
 
   @Field(() => Boolean, { defaultValue: false })
   @Column({ default: false })

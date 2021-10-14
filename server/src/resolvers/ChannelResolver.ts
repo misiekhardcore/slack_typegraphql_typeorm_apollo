@@ -1,3 +1,4 @@
+import { User } from "src/entity/User";
 import {
   Arg,
   Ctx,
@@ -74,7 +75,7 @@ export class ChannelResolver implements ResolverInterface<Channel> {
   }
 
   @FieldResolver()
-  async team(@Root() channel: Channel) {
+  async team(@Root() channel: Channel): Promise<Team> {
     return (
       (await this.channelService.populateOne<Team>(channel, "team")) ||
       new Team()
@@ -82,10 +83,18 @@ export class ChannelResolver implements ResolverInterface<Channel> {
   }
 
   @FieldResolver()
-  async messages(@Root() channel: Channel) {
+  async messages(@Root() channel: Channel): Promise<Message[]> {
     return await this.channelService.populateMany<Message>(
       channel,
       "messages"
     );
+  }
+
+  @FieldResolver()
+  async users(
+    @Root() channel: Channel,
+    @Ctx() { channelUsersLoader }: Context
+  ): Promise<User[]> {
+    return await channelUsersLoader.load(channel.id);
   }
 }

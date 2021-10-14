@@ -1,4 +1,4 @@
-import { Ctx, Field, Int, ObjectType } from "type-graphql";
+import { Field, Int, ObjectType } from "type-graphql";
 import {
   BaseEntity,
   Column,
@@ -10,7 +10,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { Context } from "../index";
 import { ChannelMember } from "./ChannelMember";
 import { Message } from "./Message";
 import { Team } from "./Team";
@@ -56,7 +55,5 @@ export class Channel extends BaseEntity {
   userConnection: ChannelMember[];
 
   @Field(() => [User])
-  async users(@Ctx() { channelUsersLoader }: Context): Promise<User[]> {
-    return await channelUsersLoader.load(this.id);
-  }
+  users: User[];
 }

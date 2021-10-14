@@ -1,4 +1,14 @@
-import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
+import { Channel } from "src/entity/Channel";
+import { Team } from "src/entity/Team";
+import {
+  Arg,
+  Ctx,
+  FieldResolver,
+  Mutation,
+  Query,
+  Resolver,
+  Root,
+} from "type-graphql";
 import { CreateUserResponse, LoginResponse } from "../entity/Outputs";
 import { User } from "../entity/User";
 import { Context } from "../index";
@@ -77,5 +87,21 @@ export class UserResolver {
     @Arg("userInput", { nullable: false }) userInput: UpdateUserInput
   ) {
     return await this.userService.update(userInput);
+  }
+
+  @FieldResolver()
+  async teams(
+    @Root() user: User,
+    @Ctx() { memberTeamsLoader }: Context
+  ): Promise<Team[]> {
+    return await memberTeamsLoader.load(user.id);
+  }
+
+  @FieldResolver()
+  async channels(
+    @Root() user: User,
+    @Ctx() { userChannelsLoader }: Context
+  ): Promise<Channel[]> {
+    return await userChannelsLoader.load(user.id);
   }
 }
