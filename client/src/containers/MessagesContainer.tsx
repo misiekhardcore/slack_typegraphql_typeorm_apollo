@@ -1,23 +1,7 @@
 import React from "react";
-import styled from "styled-components";
+import { Comment } from "semantic-ui-react";
 import { Messages } from "../components/Messages";
 import { Message, useGetMessagesQuery } from "../generated/graphql";
-
-const Glowka = styled.span`
-  display: block;
-  width: 3rem;
-  height: 3rem;
-  border-radius: 25%;
-  background-color: red;
-`;
-
-const MessagesList = styled.ul`
-  list-style: none;
-`;
-
-const MessageItem = styled.li`
-  display: flex;
-`;
 
 const message = ({
   text,
@@ -25,16 +9,19 @@ const message = ({
   id,
   user: { username },
 }: Message): JSX.Element => (
-  <MessageItem key={`mess-${id}`}>
-    <Glowka />
-    <div>
-      <p>
-        {username}
-        <span>{new Date(+createdAt).toLocaleString()}</span>
-      </p>
-      <p>{text}</p>
-    </div>
-  </MessageItem>
+  <Comment key={`mess-${id}`}>
+    <Comment.Avatar src="https://react.semantic-ui.com/images/avatar/small/matt.jpg" />
+    <Comment.Content>
+      <Comment.Author as="a">{username}</Comment.Author>
+      <Comment.Metadata>
+        <div>{new Date(+createdAt).toLocaleString()}</div>
+      </Comment.Metadata>
+      <Comment.Text>{text}</Comment.Text>
+      <Comment.Actions>
+        <Comment.Action>Reply</Comment.Action>
+      </Comment.Actions>
+    </Comment.Content>
+  </Comment>
 );
 
 interface MessagesContainerProps {
@@ -50,10 +37,10 @@ export const MessagesContainer: React.FC<MessagesContainerProps> = ({
 
   return loading ? null : (
     <Messages>
-      <MessagesList>
+      <Comment.Group>
         {data?.getMessages &&
           data.getMessages.map((mes) => message(mes as Message))}
-      </MessagesList>
+      </Comment.Group>
       {error && JSON.stringify(error)}
     </Messages>
   );
