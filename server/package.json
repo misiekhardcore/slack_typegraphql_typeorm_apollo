@@ -28,6 +28,7 @@
     "pg": "^8.6.0",
     "reflect-metadata": "^0.1.13",
     "sqlite3": "^5.0.2",
+    "subscriptions-transport-ws": "^0.9.19",
     "type-graphql": "^1.1.1",
     "typeorm": "^0.2.32",
     "typeorm-naming-strategies": "^2.0.0"
