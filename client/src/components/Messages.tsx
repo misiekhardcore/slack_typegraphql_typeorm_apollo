@@ -1,7 +1,10 @@
 import styled from "styled-components";
 
 export const Messages = styled.div`
+  padding: 1.5rem;
   grid-column: 3;
   grid-row: 2;
-  /* background-color: #4e3a4c; */
+  display: flex;
+  flex-direction: column-reverse;
+  overflow-y: auto;
 `;
