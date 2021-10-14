@@ -1,23 +1,27 @@
 import { ApolloServer } from "apollo-server-express";
+import DataLaoder from "dataloader";
 import { config } from "dotenv";
 import express, { Request, Response } from "express";
+import { execute, subscribe } from "graphql";
+import { createServer } from "http";
 import jwt from "jsonwebtoken";
 import "reflect-metadata";
+// import { PubSub } from "graphql-subscriptions";
+import { SubscriptionServer } from "subscriptions-transport-ws";
 import { buildSchema } from "type-graphql";
 import { createConnection, getConnectionOptions } from "typeorm";
 import { SnakeNamingStrategy } from "typeorm-naming-strategies";
+import { Channel } from "./entity/Channel";
+import { Team } from "./entity/Team";
 import { JWTTokenPayload, User } from "./entity/User";
 import { createChannelUsersLoader } from "./loaders/channelUsersLoader";
+import { createMemberTeamsLoader } from "./loaders/memberTeamsLoader";
+import { createTeamMembersLoader } from "./loaders/teamMembersLoader";
 import { createUserChannelsLoader } from "./loaders/userChannelsLoader";
 import { ChannelResolver } from "./resolvers/ChannelResolver";
 import { MessageResolver } from "./resolvers/MessageResolver";
 import { TeamResolver } from "./resolvers/TeamResolver";
 import { UserResolver } from "./resolvers/UserResolver";
-import DataLaoder from "dataloader";
-import { Channel } from "./entity/Channel";
-import { Team } from "./entity/Team";
-import { createTeamMembersLoader } from "./loaders/teamMembersLoader";
-import { createMemberTeamsLoader } from "./loaders/memberTeamsLoader";
 
 config();
 
@@ -137,7 +141,29 @@ export interface Context {
 
   apolloServer.applyMiddleware({ app, cors: corsOptions });
   const port = process.env.PORT || 4000;
-  app.listen(port, () => {
+
+  const server = createServer(app);
+
+  server.listen(port, async () => {
+    new SubscriptionServer(
+      {
+        execute,
+        subscribe,
+        schema: await buildSchema({
+          resolvers: [
+            UserResolver,
+            TeamResolver,
+            ChannelResolver,
+            MessageResolver,
+          ],
+          validate: true,
+        }),
+      },
+      {
+        server,
+        path: "/subscriptions",
+      }
+    );
     console.log(`server started at http://localhost:${port}/graphql`);
   });
 })();
