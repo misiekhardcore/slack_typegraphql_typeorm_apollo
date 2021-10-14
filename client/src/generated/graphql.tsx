@@ -237,7 +237,7 @@ export type CreateChannelMutationVariables = Exact<{
 export type CreateChannelMutation = { __typename?: 'Mutation', createChannel: { __typename?: 'CreateChannelResponse', ok: boolean, channel?: Maybe<{ __typename?: 'Channel', id: number, name: string, isPublic: boolean }>, errors?: Maybe<Array<{ __typename?: 'ListError', msg: string, path: string }>> } };
 
 export type CreateMessageMutationVariables = Exact<{
-  createMessageMessageInput: CreateMessageInput;
+  createMessageInput: CreateMessageInput;
 }>;
 
 
@@ -366,8 +366,8 @@ export type CreateChannelMutationHookResult = ReturnType<typeof useCreateChannel
 export type CreateChannelMutationResult = Apollo.MutationResult<CreateChannelMutation>;
 export type CreateChannelMutationOptions = Apollo.BaseMutationOptions<CreateChannelMutation, CreateChannelMutationVariables>;
 export const CreateMessageDocument = gql`
-    mutation createMessage($createMessageMessageInput: CreateMessageInput!) {
-  createMessage(messageInput: $createMessageMessageInput) {
+    mutation createMessage($createMessageInput: CreateMessageInput!) {
+  createMessage(messageInput: $createMessageInput) {
     text
     id
   }
@@ -388,7 +388,7 @@ export type CreateMessageMutationFn = Apollo.MutationFunction<CreateMessageMutat
  * @example
  * const [createMessageMutation, { data, loading, error }] = useCreateMessageMutation({
  *   variables: {
- *      createMessageMessageInput: // value for 'createMessageMessageInput'
+ *      createMessageInput: // value for 'createMessageInput'
  *   },
  * });
  */
