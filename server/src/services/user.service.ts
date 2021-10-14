@@ -24,10 +24,6 @@ export class UserService {
     return await this.userRepository.findOne(id);
   }
 
-  public async getOneByAny(query: any) {
-    return await this.userRepository.findOne({ where: query });
-  }
-
   public async getOneByEmail(email: string): Promise<User | undefined> {
     return await this.userRepository.findOne({ email });
   }
