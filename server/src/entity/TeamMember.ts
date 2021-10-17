@@ -22,13 +22,13 @@ export class TeamMember extends BaseEntity {
     primary: true,
   })
   @JoinColumn({ name: "user_id" })
-  user: Promise<User>;
+  user: User;
 
   @ManyToOne(() => Team, (team) => team.userConnection, {
     primary: true,
   })
   @JoinColumn({ name: "team_id" })
-  team: Promise<Team>;
+  team: Team;
 
   @CreateDateColumn()
   createdAt: Date;
