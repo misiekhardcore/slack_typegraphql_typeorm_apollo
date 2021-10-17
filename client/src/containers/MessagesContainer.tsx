@@ -1,7 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Comment } from "semantic-ui-react";
 import { Messages } from "../components/Messages";
-import { Message, useGetMessagesQuery } from "../generated/graphql";
+import {
+  Message,
+  NewMessageDocument,
+  NewMessageSubscription,
+  NewMessageSubscriptionVariables,
+  useGetMessagesQuery,
+} from "../generated/graphql";
 
 const message = ({
   text,
@@ -31,9 +37,34 @@ interface MessagesContainerProps {
 export const MessagesContainer: React.FC<MessagesContainerProps> = ({
   channelId,
 }) => {
-  const { data, error, loading } = useGetMessagesQuery({
-    variables: { channelId },
-  });
+  const { data, error, loading, subscribeToMore } = useGetMessagesQuery(
+    {
+      variables: { channelId },
+      fetchPolicy: "network-only",
+    }
+  );
+
+  useEffect(() => {
+    const unsubscribe = subscribeToMore<
+      NewMessageSubscription,
+      NewMessageSubscriptionVariables
+    >({
+      document: NewMessageDocument,
+      variables: { channelId },
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData?.data) return prev;
+        return {
+          ...prev,
+          getMessages: [
+            ...prev.getMessages,
+            subscriptionData.data!.newMessage,
+          ],
+        };
+      },
+    });
+
+    return unsubscribe;
+  }, [channelId, subscribeToMore]);
 
   return loading ? null : (
     <Messages>

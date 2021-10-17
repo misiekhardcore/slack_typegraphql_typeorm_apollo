@@ -3,10 +3,13 @@ import {
   Ctx,
   FieldResolver,
   Mutation,
+  Publisher,
+  PubSub,
   Query,
   Resolver,
   ResolverInterface,
   Root,
+  Subscription,
 } from "type-graphql";
 import { Channel } from "../entity/Channel";
 import { Message } from "../entity/Message";
@@ -35,12 +38,35 @@ export class MessageResolver implements ResolverInterface<Message> {
   @Mutation(() => Message)
   async createMessage(
     @Arg("messageInput") createMessageInput: CreateMessageInput,
-    @Ctx() { user }: Context
+    @Ctx() { user }: Context,
+    @PubSub("NEW_MESSAGE") publish: Publisher<Message>
   ): Promise<Message> {
-    return this.messageService.create(
+    const message = await this.messageService.create(
       createMessageInput,
       user?.id || 0
     );
+
+    await publish(message);
+    return message;
+  }
+
+  @Subscription(() => Message, {
+    topics: "NEW_MESSAGE",
+    filter: ({
+      payload,
+      args,
+    }: {
+      payload: Message;
+      args: { channelId: number };
+    }) => {
+      return payload.channelId === args.channelId;
+    },
+  })
+  newMessage(
+    @Root() payload: Message,
+    @Arg("channelId") _channelId: number
+  ): Message {
+    return payload;
   }
 
   @FieldResolver()
