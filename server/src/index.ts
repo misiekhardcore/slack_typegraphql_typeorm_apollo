@@ -1,4 +1,7 @@
-import { ApolloServer } from "apollo-server-express";
+import {
+  ApolloServer,
+  AuthenticationError,
+} from "apollo-server-express";
 import DataLaoder from "dataloader";
 import { config } from "dotenv";
 import express, { Request, Response } from "express";
@@ -6,7 +9,6 @@ import { execute, subscribe } from "graphql";
 import { createServer } from "http";
 import jwt from "jsonwebtoken";
 import "reflect-metadata";
-// import { PubSub } from "graphql-subscriptions";
 import { SubscriptionServer } from "subscriptions-transport-ws";
 import { buildSchema } from "type-graphql";
 import { createConnection, getConnectionOptions } from "typeorm";
@@ -22,6 +24,7 @@ import { ChannelResolver } from "./resolvers/ChannelResolver";
 import { MessageResolver } from "./resolvers/MessageResolver";
 import { TeamResolver } from "./resolvers/TeamResolver";
 import { UserResolver } from "./resolvers/UserResolver";
+import { UserService } from "./services/user.service";
 
 config();
 
@@ -39,6 +42,55 @@ export interface Context {
 (async () => {
   const app = express();
 
+  const checkToken = async (
+    token: string,
+    refreshToken: string,
+    res?: Response
+  ): Promise<
+    { id: number; username: string; isAdmin: boolean } | undefined
+  > => {
+    if (token) {
+      try {
+        const { user } = jwt.verify(
+          token,
+          process.env.SECRET1 || ""
+        ) as JWTTokenPayload;
+        if (res) {
+          res.header(
+            "Access-Control-Expose-Headers",
+            "x-token, x-refresh-token"
+          );
+
+          res.header("x-token", token);
+          res.header("x-refresh-token", refreshToken);
+        }
+        return user;
+      } catch (error) {
+        const newTokens = await new User().refreshTokens(
+          refreshToken,
+          process.env.SECRET1 || "",
+          process.env.SECRET2 || ""
+        );
+
+        if (!newTokens) return undefined;
+
+        if (newTokens.token && newTokens.refreshToken) {
+          if (res) {
+            res.header(
+              "Access-Control-Expose-Headers",
+              "x-token, x-refresh-token"
+            );
+
+            res.header("x-token", newTokens.token);
+            res.header("x-refresh-token", newTokens.refreshToken);
+          }
+        }
+        return newTokens.user;
+      }
+    }
+    return undefined;
+  };
+
   /**
    * Extracts the user info from header tokens and returns it. Creates new tkens and put them in response header.
    * @param {Request} req express request
@@ -51,45 +103,7 @@ export interface Context {
   ) => {
     const token = req.headers["x-token"] as string;
     const refreshToken = req.headers["x-refresh-token"] as string;
-    if (token) {
-      try {
-        const { user } = jwt.verify(
-          token,
-          process.env.SECRET1 || ""
-        ) as JWTTokenPayload;
-        res.header(
-          "Access-Control-Expose-Headers",
-          "x-token, x-refresh-token"
-        );
-
-        res.header("x-token", token);
-        res.header("x-refresh-token", refreshToken);
-        return user;
-      } catch (error) {
-        const refreshToken =
-          (req.headers["x-refresh-token"] as string) || "";
-
-        const newTokens = await new User().refreshTokens(
-          refreshToken,
-          process.env.SECRET1 || "",
-          process.env.SECRET2 || ""
-        );
-
-        if (!newTokens) return undefined;
-
-        if (newTokens.token && newTokens.refreshToken) {
-          res.header(
-            "Access-Control-Expose-Headers",
-            "x-token, x-refresh-token"
-          );
-
-          res.header("x-token", newTokens.token);
-          res.header("x-refresh-token", newTokens.refreshToken);
-        }
-        return newTokens.user;
-      }
-    }
-    return undefined;
+    return await checkToken(token, refreshToken, res);
   };
 
   const options = await getConnectionOptions(
@@ -101,16 +115,18 @@ export interface Context {
     namingStrategy: new SnakeNamingStrategy(),
   });
 
+  const schema = await buildSchema({
+    resolvers: [
+      UserResolver,
+      TeamResolver,
+      ChannelResolver,
+      MessageResolver,
+    ],
+    validate: true,
+  });
+
   const apolloServer = new ApolloServer({
-    schema: await buildSchema({
-      resolvers: [
-        UserResolver,
-        TeamResolver,
-        ChannelResolver,
-        MessageResolver,
-      ],
-      validate: true,
-    }),
+    schema,
     context: async ({
       req,
       res,
@@ -149,19 +165,27 @@ export interface Context {
       {
         execute,
         subscribe,
-        schema: await buildSchema({
-          resolvers: [
-            UserResolver,
-            TeamResolver,
-            ChannelResolver,
-            MessageResolver,
-          ],
-          validate: true,
-        }),
+        schema,
+        onConnect: async (
+          {
+            token,
+            refreshToken,
+          }: { token: string; refreshToken: string },
+          _webSocket: WebSocket
+        ) => {
+          const user = await checkToken(token, refreshToken);
+          if (!user) throw new AuthenticationError("invalid tokens");
+
+          const userService = new UserService();
+          const member = await userService.getMember(1, user.id);
+
+          console.log(member);
+
+          return true;
+        },
       },
       {
         server,
-        path: "/subscriptions",
       }
     );
     console.log(`server started at http://localhost:${port}/graphql`);
