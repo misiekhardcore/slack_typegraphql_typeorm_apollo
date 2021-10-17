@@ -55,5 +55,5 @@ export class Channel extends BaseEntity {
   userConnection: ChannelMember[];
 
   @Field(() => [User])
-  users: User[];
+  members: User[];
 }

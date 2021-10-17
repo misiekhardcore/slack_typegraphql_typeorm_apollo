@@ -91,7 +91,7 @@ export class ChannelResolver implements ResolverInterface<Channel> {
   }
 
   @FieldResolver()
-  async users(
+  async members(
     @Root() channel: Channel,
     @Ctx() { channelUsersLoader }: Context
   ): Promise<User[]> {
