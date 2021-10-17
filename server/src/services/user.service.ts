@@ -1,11 +1,14 @@
+import { TeamMember } from "../entity/TeamMember";
 import { getRepository, Repository } from "typeorm";
 import { User } from "../entity/User";
 import { CreateUserInput, UpdateUserInput } from "../inputs/UserInputs";
 
 export class UserService {
   private readonly userRepository: Repository<User>;
+  private readonly teamMemberRepository: Repository<TeamMember>;
   constructor() {
     this.userRepository = getRepository(User);
+    this.teamMemberRepository = getRepository(TeamMember);
   }
 
   public async create(createUserInput: CreateUserInput): Promise<User> {
@@ -20,7 +23,7 @@ export class UserService {
     return await this.userRepository.findOne(id);
   }
 
-  public async getOneById(id: number) {
+  public async getOneById(id: number): Promise<User | undefined> {
     return await this.userRepository.findOne(id);
   }
 
@@ -30,6 +33,15 @@ export class UserService {
 
   public async getMany(): Promise<User[]> {
     return await this.userRepository.find();
+  }
+
+  public async getMember(
+    teamId: number,
+    userId: number
+  ): Promise<TeamMember | undefined> {
+    return await this.teamMemberRepository.findOne({
+      where: { teamId, userId },
+    });
   }
 
   public async populateMany<T>(
