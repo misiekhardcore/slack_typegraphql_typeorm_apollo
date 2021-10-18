@@ -8,7 +8,7 @@ const batchUsers = async (channelIds: readonly number[]) => {
     join: {
       alias: "channelMember",
       innerJoinAndSelect: {
-        author: "channelMember.user",
+        user: "channelMember.user",
       },
     },
     where: {
@@ -20,9 +20,9 @@ const batchUsers = async (channelIds: readonly number[]) => {
 
   userChannels.forEach((uc) => {
     if (uc.channelId in channelIdToUser) {
-      channelIdToUser[uc.channelId].push((uc as any).__user__);
+      channelIdToUser[uc.channelId].push((uc as any).user);
     } else {
-      channelIdToUser[uc.channelId] = [(uc as any).__user__];
+      channelIdToUser[uc.channelId] = [(uc as any).user];
     }
   });
 

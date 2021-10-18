@@ -9,18 +9,17 @@ import {
   Root,
   UseMiddleware,
 } from "type-graphql";
-import { getRepository } from "typeorm";
 import { Channel } from "../entity/Channel";
 import {
   AddMemberResponse,
   CreateTeamResponse,
 } from "../entity/Outputs";
 import { Team } from "../entity/Team";
-import { TeamMember } from "../entity/TeamMember";
 import { User } from "../entity/User";
 import { Context } from "../index";
 import { AddMemberInput, CreateTeamInput } from "../inputs/TeamInputs";
 import { isAuth } from "../permissions";
+import { TeamMemberService } from "../services/team-member.service";
 import { TeamService } from "../services/team.service";
 import { UserService } from "../services/user.service";
 
@@ -31,9 +30,11 @@ import { UserService } from "../services/user.service";
 export class TeamResolver implements ResolverInterface<Team> {
   private readonly teamService: TeamService;
   private readonly userService: UserService;
+  private readonly teamMemberService: TeamMemberService;
   constructor() {
     this.teamService = new TeamService();
     this.userService = new UserService();
+    this.teamMemberService = new TeamMemberService();
   }
 
   /**
@@ -56,7 +57,8 @@ export class TeamResolver implements ResolverInterface<Team> {
   ) {
     if (user) {
       const team = await this.teamService.getOne(teamId);
-      if (team?.ownerId == user.id) return team;
+      //TODO: if (team?.ownerId == user.id)
+      return team;
     }
     return null;
   }
@@ -74,10 +76,13 @@ export class TeamResolver implements ResolverInterface<Team> {
           errors: [{ path: "user", msg: "" }],
         };
 
-      const team = await this.teamService.create(
-        createTeamInput,
-        user.id
-      );
+      const team = await this.teamService.create(createTeamInput);
+
+      await this.teamMemberService.create({
+        teamId: team.id,
+        userId: user.id,
+        admin: true,
+      });
 
       if (!team)
         return {
@@ -117,17 +122,18 @@ export class TeamResolver implements ResolverInterface<Team> {
         userToAddPromise,
       ]);
 
-      if (team?.ownerId !== user.id) {
-        return {
-          ok: false,
-          errors: [
-            {
-              msg: "You cannot add members to the team",
-              path: "email",
-            },
-          ],
-        };
-      }
+      // TODO:
+      // if (team?.ownerId !== user.id) {
+      //   return {
+      //     ok: false,
+      //     errors: [
+      //       {
+      //         msg: "You cannot add members to the team",
+      //         path: "email",
+      //       },
+      //     ],
+      //   };
+      // }
 
       if (!userToAdd) {
         return {
@@ -140,15 +146,10 @@ export class TeamResolver implements ResolverInterface<Team> {
           ],
         };
       }
-
-      // team.members.push({ userId: userToAdd.id, teamId: team.id });
-      // team.save();
-      await getRepository(TeamMember)
-        .create({
-          teamId: team.id,
-          userId: userToAdd.id,
-        })
-        .save();
+      await this.teamMemberService.create({
+        teamId: team!.id,
+        userId: userToAdd.id,
+      });
 
       return {
         ok: true,
@@ -163,11 +164,11 @@ export class TeamResolver implements ResolverInterface<Team> {
   }
 
   @FieldResolver()
-  async owner(@Root() team: Team): Promise<User> {
-    return (
-      (await this.teamService.populateOne<User>(team, "owner")) ||
-      new User()
-    );
+  async members(
+    @Root() team: Team,
+    @Ctx() { teamMembersLoader }: Context
+  ): Promise<User[]> {
+    return (await teamMembersLoader.load(team.id)) || [];
   }
 
   @FieldResolver()

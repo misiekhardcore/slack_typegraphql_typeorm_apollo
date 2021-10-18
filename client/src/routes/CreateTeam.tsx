@@ -1,3 +1,4 @@
+import gql from "graphql-tag";
 import React, { useState } from "react";
 import { useHistory } from "react-router";
 import {
@@ -9,8 +10,8 @@ import {
   Message,
 } from "semantic-ui-react";
 import {
-  GetTeamsDocument,
-  GetTeamsQuery,
+  MeDocument,
+  MeQuery,
   useCreateTeamMutation,
 } from "../generated/graphql";
 import { graphqlErrorToObject } from "../utils/graphqlErrorToObject";
@@ -36,20 +37,25 @@ const CreateTeam: React.FC = () => {
       variables: { createTeamInput: state },
       update: (cache, { data: data2 }) => {
         const { createTeam } = data2 || {};
-        const data = cache.readQuery<GetTeamsQuery>({
-          query: GetTeamsDocument,
+
+        const data = cache.readQuery<MeQuery>({
+          query: MeDocument,
         });
-        let newData: GetTeamsQuery = { getTeams: [] };
-        console.log(cache);
-        if (data?.getTeams && createTeam?.team) {
-          newData.getTeams = [
-            ...data.getTeams,
-            { ...createTeam.team, members: [] },
-          ];
-        } else if (!data?.getTeams && createTeam?.team) {
-          newData.getTeams = [{ ...createTeam.team, members: [] }];
+
+        if (data?.me?.teams && createTeam?.team) {
+          cache.writeFragment({
+            id: "User:" + data.me.id,
+            fragment: gql`
+              fragment Team on User {
+                teams
+              }
+            `,
+            data: {
+              teams: [...data.me.teams, createTeam.team],
+            },
+          });
         }
-        cache.writeQuery({ query: GetTeamsDocument, data: newData });
+
         history.push(`/view-team/${createTeam!.team!.id}`);
       },
     });

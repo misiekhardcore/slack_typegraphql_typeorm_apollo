@@ -8,7 +8,7 @@ const batchTeams = async (userIds: readonly number[]) => {
     join: {
       alias: "teamMember",
       innerJoinAndSelect: {
-        author: "teamMember.team",
+        team: "teamMember.team",
       },
     },
     where: {
@@ -20,9 +20,9 @@ const batchTeams = async (userIds: readonly number[]) => {
 
   teamMembers.forEach((tm) => {
     if (tm.userId in userIdToTeam) {
-      userIdToTeam[tm.userId].push((tm as any).__team__);
+      userIdToTeam[tm.userId].push((tm as any).team);
     } else {
-      userIdToTeam[tm.userId] = [(tm as any).__team__];
+      userIdToTeam[tm.userId] = [(tm as any).team];
     }
   });
 

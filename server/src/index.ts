@@ -177,9 +177,7 @@ export interface Context {
           if (!user) throw new AuthenticationError("invalid tokens");
 
           const userService = new UserService();
-          const member = await userService.getMember(1, user.id);
-
-          console.log(member);
+          await userService.getMember(1, user.id);
 
           return true;
         },

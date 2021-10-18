@@ -18,17 +18,13 @@ export class TeamService {
     this.getConnection = getConnection();
   }
 
-  public async create(
-    createTeamInput: CreateTeamInput,
-    ownerId: number
-  ): Promise<Team> {
+  public async create(createTeamInput: CreateTeamInput): Promise<Team> {
     return await this.getConnection.transaction(
       "SERIALIZABLE",
       async (transactionEntityManager) => {
         const team = await transactionEntityManager
           .create(Team, {
             ...createTeamInput,
-            ownerId,
           })
           .save();
         await transactionEntityManager
@@ -60,7 +56,7 @@ export class TeamService {
    * @returns all teams owned by user or where user is member
    */
   public async getMany(userId: number) {
-    //SELECT * FROM teams LEFT JOIN team_member  ON team_member.team_id=teams.id LEFT JOIN users ON users.id=team_member.user_id WHERE users.id = $1 OR teams.owner_id = $1
+    //SELECT * FROM teams LEFT JOIN team_member  ON team_member.team_id=teams.id LEFT JOIN users ON users.id=team_member.user_id WHERE users.id = $1
     return await this.teamRepository
       .createQueryBuilder("teams")
       .leftJoinAndSelect(
@@ -69,8 +65,8 @@ export class TeamService {
         "team_member.team_id=teams.id"
       )
       .leftJoinAndSelect(User, "users", "users.id=team_member.user_id")
-      .where("users.id = :ownerId OR teams.owner_id = :ownerId", {
-        ownerId: userId,
+      .where("users.id = :userId", {
+        userId,
       })
       .getMany();
   }

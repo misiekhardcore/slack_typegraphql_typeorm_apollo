@@ -1,5 +1,3 @@
-import { Channel } from "src/entity/Channel";
-import { Team } from "src/entity/Team";
 import {
   Arg,
   Ctx,
@@ -8,8 +6,11 @@ import {
   Query,
   Resolver,
   Root,
+  UseMiddleware,
 } from "type-graphql";
+import { Channel } from "../entity/Channel";
 import { CreateUserResponse, LoginResponse } from "../entity/Outputs";
+import { Team } from "../entity/Team";
 import { User } from "../entity/User";
 import { Context } from "../index";
 import {
@@ -17,6 +18,7 @@ import {
   LoginUserInput,
   UpdateUserInput,
 } from "../inputs/UserInputs";
+import { isAuth } from "../permissions";
 import { UserService } from "../services/user.service";
 
 @Resolver(() => User)
@@ -31,8 +33,10 @@ export class UserResolver {
   }
 
   @Query(() => User, { nullable: true })
-  async getUser(@Arg("id") id: number): Promise<User | null> {
-    return (await this.userService.getOneById(id)) || null;
+  @UseMiddleware(isAuth)
+  async me(@Ctx() { user }: Context): Promise<User | null> {
+    if (!user) return null;
+    return (await this.userService.getOneById(user.id)) || null;
   }
 
   @Mutation(() => CreateUserResponse)

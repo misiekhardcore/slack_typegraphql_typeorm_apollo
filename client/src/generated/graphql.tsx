@@ -164,7 +164,7 @@ export type Query = {
   getTeams: Array<Team>;
   getTeam?: Maybe<Team>;
   getUsers?: Maybe<Array<User>>;
-  getUser?: Maybe<User>;
+  me?: Maybe<User>;
 };
 
 
@@ -187,11 +187,6 @@ export type QueryGetTeamArgs = {
   teamId: Scalars['Float'];
 };
 
-
-export type QueryGetUserArgs = {
-  id: Scalars['Float'];
-};
-
 export type Subscription = {
   __typename?: 'Subscription';
   newMessage: Message;
@@ -207,7 +202,6 @@ export type Team = {
   id: Scalars['Int'];
   name: Scalars['String'];
   members: Array<User>;
-  owner: User;
   channels: Array<Channel>;
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
@@ -258,7 +252,7 @@ export type CreateTeamMutationVariables = Exact<{
 }>;
 
 
-export type CreateTeamMutation = { __typename?: 'Mutation', createTeam: { __typename?: 'CreateTeamResponse', ok: boolean, team?: Maybe<{ __typename?: 'Team', id: number, name: string, owner: { __typename?: 'User', username: string, id: number }, channels: Array<{ __typename?: 'Channel', id: number, isPublic: boolean, name: string }> }>, errors?: Maybe<Array<{ __typename?: 'ListError', msg: string, path: string }>> } };
+export type CreateTeamMutation = { __typename?: 'Mutation', createTeam: { __typename?: 'CreateTeamResponse', ok: boolean, team?: Maybe<{ __typename?: 'Team', id: number, name: string, channels: Array<{ __typename?: 'Channel', id: number, isPublic: boolean, name: string }>, members: Array<{ __typename?: 'User', username: string, id: number }> }>, errors?: Maybe<Array<{ __typename?: 'ListError', msg: string, path: string }>> } };
 
 export type LoginMutationVariables = Exact<{
   loginUserInput: LoginUserInput;
@@ -284,12 +278,17 @@ export type GetMessagesQuery = { __typename?: 'Query', getMessages: Array<{ __ty
 export type GetTeamsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetTeamsQuery = { __typename?: 'Query', getTeams: Array<{ __typename?: 'Team', id: number, name: string, owner: { __typename?: 'User', username: string, id: number }, channels: Array<{ __typename?: 'Channel', id: number, isPublic: boolean, name: string }>, members: Array<{ __typename?: 'User', username: string, id: number }> }> };
+export type GetTeamsQuery = { __typename?: 'Query', getTeams: Array<{ __typename?: 'Team', id: number, name: string, channels: Array<{ __typename?: 'Channel', id: number, isPublic: boolean, name: string }>, members: Array<{ __typename?: 'User', username: string, id: number }> }> };
 
 export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetUsersQuery = { __typename?: 'Query', getUsers?: Maybe<Array<{ __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string }>> };
+
+export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeQuery = { __typename?: 'Query', me?: Maybe<{ __typename?: 'User', id: number, username: string, teams?: Maybe<Array<{ __typename?: 'Team', id: number, name: string, channels: Array<{ __typename?: 'Channel', id: number, isPublic: boolean, name: string }>, members: Array<{ __typename?: 'User', username: string, id: number }> }>> }> };
 
 export type NewMessageSubscriptionVariables = Exact<{
   channelId: Scalars['Float'];
@@ -423,14 +422,14 @@ export const CreateTeamDocument = gql`
     team {
       id
       name
-      owner {
-        username
-        id
-      }
       channels {
         id
         isPublic
         name
+      }
+      members {
+        username
+        id
       }
     }
     errors {
@@ -589,10 +588,6 @@ export const GetTeamsDocument = gql`
   getTeams {
     id
     name
-    owner {
-      username
-      id
-    }
     channels {
       id
       isPublic
@@ -670,6 +665,54 @@ export function useGetUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<G
 export type GetUsersQueryHookResult = ReturnType<typeof useGetUsersQuery>;
 export type GetUsersLazyQueryHookResult = ReturnType<typeof useGetUsersLazyQuery>;
 export type GetUsersQueryResult = Apollo.QueryResult<GetUsersQuery, GetUsersQueryVariables>;
+export const MeDocument = gql`
+    query me {
+  me {
+    id
+    username
+    teams {
+      id
+      name
+      channels {
+        id
+        isPublic
+        name
+      }
+      members {
+        username
+        id
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useMeQuery__
+ *
+ * To run a query within a React component, call `useMeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMeQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMeQuery(baseOptions?: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, options);
+      }
+export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery, MeQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, options);
+        }
+export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
+export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
+export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
 export const NewMessageDocument = gql`
     subscription newMessage($channelId: Float!) {
   newMessage(channelId: $channelId) {

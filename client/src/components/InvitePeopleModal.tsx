@@ -12,8 +12,8 @@ import {
   Modal,
 } from "semantic-ui-react";
 import {
-  GetTeamsDocument,
-  GetTeamsQuery,
+  MeDocument,
+  MeQuery,
   useAddMemberMutation,
 } from "../generated/graphql";
 import errorToFieldError from "../utils/errorToFieldError";
@@ -59,13 +59,17 @@ export const InvitePeopleModal: React.FC<InvitePeopleModalProps> = ({
           update: (cache, { data: data2 }) => {
             const { addMember } = data2 || {};
 
-            const data = cache.readQuery<GetTeamsQuery>({
-              query: GetTeamsDocument,
+            const data = cache.readQuery<MeQuery>({
+              query: MeDocument,
             });
 
-            const teamIdx = findIndex(data?.getTeams, ["id", teamId]);
+            const teamIdx = findIndex(data?.me?.teams, ["id", teamId]);
 
-            if (data?.getTeams[teamIdx]?.members && addMember?.member) {
+            if (
+              data?.me?.teams &&
+              data.me.teams[teamIdx]?.members &&
+              addMember?.member
+            ) {
               cache.writeFragment({
                 id: "Team:" + teamId,
                 fragment: gql`
@@ -75,8 +79,8 @@ export const InvitePeopleModal: React.FC<InvitePeopleModalProps> = ({
                 `,
                 data: {
                   members: [
-                    ...data.getTeams[teamIdx].members,
-                    addMember,
+                    ...data.me.teams[teamIdx].members,
+                    addMember.member,
                   ],
                 },
               });

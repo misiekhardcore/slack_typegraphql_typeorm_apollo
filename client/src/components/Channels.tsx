@@ -76,17 +76,17 @@ export const Channels: React.FC<ChannelsProps> = ({
   onAddChannelClick,
   onInvitePeople,
 }) => {
-  const { channels, owner, name, id, members } = team || {};
+  const { channels, name, id, members } = team || {};
 
-  const allPeople = [owner, ...(members || [])]
+  const allPeople = [...(members || [])]
     .filter((user) => user.id !== userId)
     .filter((value, index, self) => self.indexOf(value) === index);
-  const isOwner = team.owner.id === userId;
+  const isOwner = true; //team.owner.id === userId;
   return (
     <ChannelsWrapper>
       <PushLeft>
         <TeamNameHeader>{name}</TeamNameHeader>
-        {owner.username}
+        {members[0].username}
       </PushLeft>
       <SideBarList>
         <SideBarListHeader>

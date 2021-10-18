@@ -4,14 +4,14 @@ mutation createTeam($createTeamInput: CreateTeamInput!) {
     team {
       id
       name
-      owner {
-        username
-        id
-      }
       channels {
         id
         isPublic
         name
+      }
+      members {
+        username
+        id
       }
     }
     errors {

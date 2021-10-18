@@ -1,5 +1,6 @@
 import {
   BaseEntity,
+  Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
@@ -17,6 +18,9 @@ export class TeamMember extends BaseEntity {
 
   @PrimaryColumn()
   teamId: number;
+
+  @Column({ default: false })
+  admin: boolean;
 
   @ManyToOne(() => User, (user) => user.teamConnection, {
     primary: true,

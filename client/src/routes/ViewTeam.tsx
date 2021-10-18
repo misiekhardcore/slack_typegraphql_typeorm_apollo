@@ -6,7 +6,7 @@ import { Header } from "../components/Header";
 import { SendMessage } from "../components/SendMessage";
 import { MessagesContainer } from "../containers/MessagesContainer";
 import { Sidebar } from "../containers/Sidebar";
-import { Team, useGetTeamsQuery } from "../generated/graphql";
+import { Team, useMeQuery } from "../generated/graphql";
 
 interface ViewTeamProps {
   match: { params: { teamId: string; channelId: string } };
@@ -17,9 +17,10 @@ const ViewTeam: React.FC<ViewTeamProps> = ({
     params: { teamId, channelId },
   },
 }) => {
-  const { loading, error, data } = useGetTeamsQuery();
+  const { loading, error, data } = useMeQuery();
 
-  const { getTeams } = data || {};
+  const { me } = data || {};
+  const { teams } = me || {};
 
   const teamIdInt = parseInt(teamId);
 
@@ -35,15 +36,15 @@ const ViewTeam: React.FC<ViewTeamProps> = ({
     return <Redirect to="/view-team" />;
   }
 
-  if (!(loading || getTeams)) {
+  if (!(loading || teams)) {
     console.error("no teams!");
     return <Redirect to="/create-team" />;
   }
 
-  if (!getTeams) return null;
+  if (!teams) return null;
 
-  const teamIdx = teamId ? findIndex(getTeams, ["id", teamIdInt]) : 0;
-  const team = getTeams[teamIdx];
+  const teamIdx = teamId ? findIndex(teams, ["id", teamIdInt]) : 0;
+  const team = teams[teamIdx];
 
   if (!team) {
     console.error("no team with that id!");
@@ -60,7 +61,7 @@ const ViewTeam: React.FC<ViewTeamProps> = ({
   return (
     <AppLayout>
       <Sidebar
-        teams={getTeams.map((t) => ({
+        teams={teams.map((t) => ({
           id: t.id,
           letter: t.name.charAt(0).toUpperCase(),
         }))}

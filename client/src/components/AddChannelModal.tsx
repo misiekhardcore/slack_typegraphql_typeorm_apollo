@@ -12,8 +12,8 @@ import {
   Modal,
 } from "semantic-ui-react";
 import {
-  GetTeamsDocument,
-  GetTeamsQuery,
+  MeDocument,
+  MeQuery,
   useCreateChannelMutation,
 } from "../generated/graphql";
 import errorToFieldError from "../utils/errorToFieldError";
@@ -63,14 +63,15 @@ export const AddChannelModal: React.FC<AddChannelModalProps> = ({
           update: (cache, { data: data2 }) => {
             const { createChannel } = data2 || {};
 
-            const data = cache.readQuery<GetTeamsQuery>({
-              query: GetTeamsDocument,
+            const data = cache.readQuery<MeQuery>({
+              query: MeDocument,
             });
 
-            const teamIdx = findIndex(data?.getTeams, ["id", teamId]);
+            const teamIdx = findIndex(data?.me?.teams, ["id", teamId]);
 
             if (
-              data?.getTeams[teamIdx]?.channels &&
+              data?.me?.teams &&
+              data?.me?.teams[teamIdx]?.channels &&
               createChannel?.channel
             ) {
               cache.writeFragment({
@@ -82,7 +83,7 @@ export const AddChannelModal: React.FC<AddChannelModalProps> = ({
                 `,
                 data: {
                   channels: [
-                    ...data.getTeams[teamIdx].channels,
+                    ...data.me.teams[teamIdx].channels,
                     createChannel.channel,
                   ],
                 },

@@ -1,0 +1,19 @@
+query me {
+  me {
+    id
+    username
+    teams {
+      id
+      name
+      channels {
+        id
+        isPublic
+        name
+      }
+      members {
+        username
+        id
+      }
+    }
+  }
+}

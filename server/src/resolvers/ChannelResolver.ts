@@ -43,23 +43,23 @@ export class ChannelResolver implements ResolverInterface<Channel> {
   @UseMiddleware(isAuth)
   async createChannel(
     @Arg("channelInput") createChannelInput: CreateChannelInput,
-    @Ctx() { user }: Context
+    @Ctx() {}: Context
   ): Promise<CreateChannelResponse> {
     try {
-      const team = await this.teamService.getOne(
-        createChannelInput.teamId
-      );
+      // const team =
+      await this.teamService.getOne(createChannelInput.teamId);
 
-      if (team?.ownerId !== user?.id)
-        return {
-          ok: false,
-          errors: [
-            {
-              msg: "You have to be team owner to create channels",
-              path: "channelName",
-            },
-          ],
-        };
+      // TODO:
+      // if (team?.ownerId !== user?.id)
+      //   return {
+      //     ok: false,
+      //     errors: [
+      //       {
+      //         msg: "You have to be team owner to create channels",
+      //         path: "channelName",
+      //       },
+      //     ],
+      //   };
 
       const channel = await this.channelService.create(
         createChannelInput
