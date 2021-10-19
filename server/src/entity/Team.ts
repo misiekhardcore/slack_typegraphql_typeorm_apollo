@@ -23,6 +23,9 @@ export class Team extends BaseEntity {
   @Column()
   name: string;
 
+  @Field(() => Boolean)
+  admin: boolean;
+
   @OneToMany(() => TeamMember, (member) => member.team, {
     nullable: false,
     onDelete: "CASCADE",

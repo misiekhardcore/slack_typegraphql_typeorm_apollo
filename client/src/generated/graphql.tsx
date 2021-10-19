@@ -201,6 +201,7 @@ export type Team = {
   __typename?: 'Team';
   id: Scalars['Int'];
   name: Scalars['String'];
+  admin: Scalars['Boolean'];
   members: Array<User>;
   channels: Array<Channel>;
   createdAt: Scalars['String'];
@@ -288,7 +289,7 @@ export type GetUsersQuery = { __typename?: 'Query', getUsers?: Maybe<Array<{ __t
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: Maybe<{ __typename?: 'User', id: number, username: string, teams?: Maybe<Array<{ __typename?: 'Team', id: number, name: string, channels: Array<{ __typename?: 'Channel', id: number, isPublic: boolean, name: string }>, members: Array<{ __typename?: 'User', username: string, id: number }> }>> }> };
+export type MeQuery = { __typename?: 'Query', me?: Maybe<{ __typename?: 'User', id: number, username: string, teams?: Maybe<Array<{ __typename?: 'Team', id: number, name: string, admin: boolean, channels: Array<{ __typename?: 'Channel', id: number, isPublic: boolean, name: string }>, members: Array<{ __typename?: 'User', username: string, id: number }> }>> }> };
 
 export type NewMessageSubscriptionVariables = Exact<{
   channelId: Scalars['Float'];
@@ -673,6 +674,7 @@ export const MeDocument = gql`
     teams {
       id
       name
+      admin
       channels {
         id
         isPublic

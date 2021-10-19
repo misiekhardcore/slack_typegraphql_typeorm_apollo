@@ -24,7 +24,6 @@ import { ChannelResolver } from "./resolvers/ChannelResolver";
 import { MessageResolver } from "./resolvers/MessageResolver";
 import { TeamResolver } from "./resolvers/TeamResolver";
 import { UserResolver } from "./resolvers/UserResolver";
-import { UserService } from "./services/user.service";
 
 config();
 
@@ -176,10 +175,7 @@ export interface Context {
           const user = await checkToken(token, refreshToken);
           if (!user) throw new AuthenticationError("invalid tokens");
 
-          const userService = new UserService();
-          await userService.getMember(1, user.id);
-
-          return true;
+          return { user };
         },
       },
       {

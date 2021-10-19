@@ -40,10 +40,10 @@ export class TeamResolver implements ResolverInterface<Team> {
   /**
    * Get the list of all teams
    * @type query
-   * @returns {Promise<Team[]>} all teams
+   * @returns all teams
    */
   @Query(() => [Team])
-  // @UseMiddleware(isAuth)
+  @UseMiddleware(isAuth)
   async getTeams(@Ctx() { user }: Context): Promise<Team[]> {
     if (user) return await this.teamService.getMany(user.id);
     return [];
@@ -57,8 +57,11 @@ export class TeamResolver implements ResolverInterface<Team> {
   ) {
     if (user) {
       const team = await this.teamService.getOne(teamId);
-      //TODO: if (team?.ownerId == user.id)
-      return team;
+      const member = await this.teamMemberService.getOne(
+        user.id,
+        teamId
+      );
+      if (member?.admin) return team;
     }
     return null;
   }
@@ -115,25 +118,29 @@ export class TeamResolver implements ResolverInterface<Team> {
           errors: [{ path: "user", msg: "You must be logged in" }],
         };
 
+      const memberPromise = this.teamMemberService.getOne(
+        user.id,
+        teamId
+      );
       const teamPromise = this.teamService.getOne(teamId);
       const userToAddPromise = this.userService.getOneByEmail(email);
-      const [team, userToAdd] = await Promise.all([
+      const [member, team, userToAdd] = await Promise.all([
+        memberPromise,
         teamPromise,
         userToAddPromise,
       ]);
 
-      // TODO:
-      // if (team?.ownerId !== user.id) {
-      //   return {
-      //     ok: false,
-      //     errors: [
-      //       {
-      //         msg: "You cannot add members to the team",
-      //         path: "email",
-      //       },
-      //     ],
-      //   };
-      // }
+      if (!member?.admin) {
+        return {
+          ok: false,
+          errors: [
+            {
+              msg: "You cannot add members to the team",
+              path: "email",
+            },
+          ],
+        };
+      }
 
       if (!userToAdd) {
         return {

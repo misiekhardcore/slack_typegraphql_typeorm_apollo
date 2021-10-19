@@ -76,12 +76,11 @@ export const Channels: React.FC<ChannelsProps> = ({
   onAddChannelClick,
   onInvitePeople,
 }) => {
-  const { channels, name, id, members } = team || {};
+  const { channels, name, id, members, admin } = team || {};
 
-  const allPeople = [...(members || [])]
-    .filter((user) => user.id !== userId)
-    .filter((value, index, self) => self.indexOf(value) === index);
-  const isOwner = true; //team.owner.id === userId;
+  const allPeople = (members || []).filter(
+    (user) => user.id !== userId
+  );
   return (
     <ChannelsWrapper>
       <PushLeft>
@@ -91,7 +90,7 @@ export const Channels: React.FC<ChannelsProps> = ({
       <SideBarList>
         <SideBarListHeader>
           Channels
-          {isOwner && (
+          {admin && (
             <Icon
               style={{ marginLeft: "5px" }}
               onClick={onAddChannelClick}
@@ -104,7 +103,7 @@ export const Channels: React.FC<ChannelsProps> = ({
       <SideBarList>
         <SideBarListHeader>Direct Messages</SideBarListHeader>
         {allPeople.map(user)}
-        {isOwner && (
+        {admin && (
           <SideBarListItem style={{ marginTop: "0.5rem" }}>
             <a href="#invite-people" onClick={onInvitePeople}>
               + Invite People

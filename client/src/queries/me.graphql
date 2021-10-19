@@ -5,6 +5,7 @@ query me {
     teams {
       id
       name
+      admin
       channels {
         id
         isPublic

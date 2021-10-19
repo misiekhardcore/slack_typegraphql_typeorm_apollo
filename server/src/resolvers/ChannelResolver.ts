@@ -1,4 +1,3 @@
-import { User } from "src/entity/User";
 import {
   Arg,
   Ctx,
@@ -14,19 +13,24 @@ import { Channel } from "../entity/Channel";
 import { Message } from "../entity/Message";
 import { CreateChannelResponse } from "../entity/Outputs";
 import { Team } from "../entity/Team";
+import { User } from "../entity/User";
 import { Context } from "../index";
 import { CreateChannelInput } from "../inputs/ChannelInputs";
 import { isAuth } from "../permissions";
 import { ChannelService } from "../services/channel.service";
+import { TeamMemberService } from "../services/team-member.service";
 import { TeamService } from "../services/team.service";
 
 @Resolver(() => Channel)
 export class ChannelResolver implements ResolverInterface<Channel> {
   private readonly channelService: ChannelService;
   private readonly teamService: TeamService;
+  private readonly teamMemberService: TeamMemberService;
+
   constructor() {
     this.channelService = new ChannelService();
     this.teamService = new TeamService();
+    this.teamMemberService = new TeamMemberService();
   }
 
   @Query(() => [Channel], { nullable: true })
@@ -43,23 +47,40 @@ export class ChannelResolver implements ResolverInterface<Channel> {
   @UseMiddleware(isAuth)
   async createChannel(
     @Arg("channelInput") createChannelInput: CreateChannelInput,
-    @Ctx() {}: Context
+    @Ctx() { user }: Context
   ): Promise<CreateChannelResponse> {
     try {
-      // const team =
-      await this.teamService.getOne(createChannelInput.teamId);
+      const team = await this.teamService.getOne(
+        createChannelInput.teamId
+      );
 
-      // TODO:
-      // if (team?.ownerId !== user?.id)
-      //   return {
-      //     ok: false,
-      //     errors: [
-      //       {
-      //         msg: "You have to be team owner to create channels",
-      //         path: "channelName",
-      //       },
-      //     ],
-      //   };
+      if (!user)
+        return {
+          ok: false,
+          errors: [{ path: "user", msg: "" }],
+        };
+
+      if (!team)
+        return {
+          ok: false,
+          errors: [{ msg: "Team not found", path: "team" }],
+        };
+
+      const member = await this.teamMemberService.getOne(
+        user.id,
+        team.id
+      );
+
+      if (!member?.admin)
+        return {
+          ok: false,
+          errors: [
+            {
+              msg: "You have to be team owner to create channels",
+              path: "channelName",
+            },
+          ],
+        };
 
       const channel = await this.channelService.create(
         createChannelInput

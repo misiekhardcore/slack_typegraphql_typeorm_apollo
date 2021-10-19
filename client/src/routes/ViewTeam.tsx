@@ -20,7 +20,7 @@ const ViewTeam: React.FC<ViewTeamProps> = ({
   const { loading, error, data } = useMeQuery();
 
   const { me } = data || {};
-  const { teams } = me || {};
+  const { teams, id } = me || {};
 
   const teamIdInt = parseInt(teamId);
 
@@ -51,6 +51,11 @@ const ViewTeam: React.FC<ViewTeamProps> = ({
     return <Redirect to="/create-team" />;
   }
 
+  if (!id) {
+    console.error("no user id!");
+    return <Redirect to="/login" />;
+  }
+
   const channelIdx = channelId
     ? findIndex(team.channels, ["id", channelIdInt])
     : 0;
@@ -66,6 +71,7 @@ const ViewTeam: React.FC<ViewTeamProps> = ({
           letter: t.name.charAt(0).toUpperCase(),
         }))}
         team={team as Team}
+        userId={id}
       />
       {channel && (
         <>

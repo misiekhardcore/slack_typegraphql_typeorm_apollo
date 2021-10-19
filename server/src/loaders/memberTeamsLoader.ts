@@ -20,9 +20,14 @@ const batchTeams = async (userIds: readonly number[]) => {
 
   teamMembers.forEach((tm) => {
     if (tm.userId in userIdToTeam) {
-      userIdToTeam[tm.userId].push((tm as any).team);
+      userIdToTeam[tm.userId].push({
+        ...(tm as any).team,
+        admin: tm.admin,
+      });
     } else {
-      userIdToTeam[tm.userId] = [(tm as any).team];
+      userIdToTeam[tm.userId] = [
+        { ...(tm as any).team, admin: tm.admin },
+      ];
     }
   });
 

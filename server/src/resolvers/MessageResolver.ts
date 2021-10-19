@@ -1,3 +1,4 @@
+import { AuthenticationError } from "apollo-server-errors";
 import {
   Arg,
   Ctx,
@@ -7,16 +8,21 @@ import {
   PubSub,
   Query,
   Resolver,
+  ResolverFilterData,
   ResolverInterface,
   Root,
   Subscription,
+  UseMiddleware,
 } from "type-graphql";
 import { Channel } from "../entity/Channel";
 import { Message } from "../entity/Message";
 import { User } from "../entity/User";
 import { Context } from "../index";
 import { CreateMessageInput } from "../inputs/MessageInput";
+import { isAuth } from "../permissions";
+import { ChannelService } from "../services/channel.service";
 import { MessageService } from "../services/message.service";
+import { TeamMemberService } from "../services/team-member.service";
 
 @Resolver(() => Message)
 export class MessageResolver implements ResolverInterface<Message> {
@@ -52,16 +58,25 @@ export class MessageResolver implements ResolverInterface<Message> {
 
   @Subscription(() => Message, {
     topics: "NEW_MESSAGE",
-    filter: ({
+    filter: async ({
       payload,
-      args,
-    }: {
-      payload: Message;
-      args: { channelId: number };
-    }) => {
-      return payload.channelId === args.channelId;
+      args: { channelId },
+      context: { user },
+    }: ResolverFilterData<Message, { channelId: number }, Context>) => {
+      const channelService = new ChannelService();
+      const teamMemberService = new TeamMemberService();
+      const { teamId } = (await channelService.getOne(channelId)) || {};
+      if (!(user && teamId))
+        throw new AuthenticationError("Not athenticated");
+      const member = teamMemberService.getOne(user.id, teamId);
+      if (!member)
+        throw new AuthenticationError(
+          "You have to be a part of a team"
+        );
+      return payload.channelId === channelId;
     },
   })
+  @UseMiddleware(isAuth)
   newMessage(
     @Root() payload: Message,
     @Arg("channelId") _channelId: number
