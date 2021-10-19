@@ -1,7 +1,7 @@
 import { AuthenticationError } from "apollo-server-errors";
-import { DirectMessage } from "src/entity/DirectMessage";
-import { CreateDirectMessageInput } from "src/inputs/DirectMessageInput";
-import { DirectMessageService } from "src/services/direct-message.service";
+import { DirectMessage } from "../entity/DirectMessage";
+import { CreateDirectMessageInput } from "../inputs/DirectMessageInput";
+import { DirectMessageService } from "../services/direct-message.service";
 import {
   Arg,
   Ctx,
@@ -34,17 +34,18 @@ export class DirectMessageResolver
   }
 
   @Query(() => [DirectMessage])
-  async getMessages(@Arg("channelId") channelId: number) {
-    return await this.directMessageService.getMany(channelId);
+  async getDirectMessages(@Ctx() { user }: Context) {
+    if (!user) return [];
+    return await this.directMessageService.getMany(user.id);
   }
 
   @Query(() => DirectMessage)
-  async getMessage(@Arg("messageId") messageId: number) {
+  async getDirectMessage(@Arg("messageId") messageId: number) {
     return await this.directMessageService.getOne(messageId);
   }
 
   @Mutation(() => DirectMessage)
-  async createMessage(
+  async createDirectMessage(
     @Arg("messageInput") createMessageInput: CreateDirectMessageInput,
     @Ctx() { user }: Context,
     @PubSub("NEW_DIRECT_MESSAGE") publish: Publisher<DirectMessage>
@@ -79,9 +80,9 @@ export class DirectMessageResolver
     },
   })
   @UseMiddleware(isAuth)
-  newMessage(
+  newDirectMessage(
     @Root() payload: DirectMessage,
-    @Arg("channelId") _channelId: number
+    @Arg("userToId") _userToId: number
   ): DirectMessage {
     return payload;
   }

@@ -1,4 +1,4 @@
-import { DirectMessage } from "src/entity/DirectMessage";
+import { DirectMessage } from "../entity/DirectMessage";
 import { getRepository, Repository } from "typeorm";
 import {
   CreateDirectMessageInput,
