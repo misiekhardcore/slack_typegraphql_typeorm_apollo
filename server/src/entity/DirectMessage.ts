@@ -9,6 +9,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { Team } from "./Team";
 import { User } from "./User";
 
 @Entity({ name: "direct_messages" })
@@ -21,6 +22,15 @@ export class DirectMessage extends BaseEntity {
   @Field(() => String)
   @Column()
   text: string;
+
+  @Column({ nullable: false })
+  teamId: number;
+  @Field(() => Team)
+  @ManyToOne(() => Team, (team) => team.id, {
+    onDelete: "CASCADE",
+  })
+  @JoinColumn({ name: "team_id" })
+  team: User;
 
   @Column({ nullable: false })
   userFromId: number;
