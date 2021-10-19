@@ -38,6 +38,11 @@ export class DirectMessageResolver
     return await this.directMessageService.getMany(channelId);
   }
 
+  @Query(() => DirectMessage)
+  async getMessage(@Arg("messageId") messageId: number) {
+    return await this.directMessageService.getOne(messageId);
+  }
+
   @Mutation(() => DirectMessage)
   async createMessage(
     @Arg("messageInput") createMessageInput: CreateDirectMessageInput,
