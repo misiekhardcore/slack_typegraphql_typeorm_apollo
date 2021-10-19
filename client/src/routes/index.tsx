@@ -7,6 +7,7 @@ import {
   Switch,
 } from "react-router-dom";
 import CreateTeam from "./CreateTeam";
+import DirectMessages from "./DirectMessages";
 import Home from "./Home";
 import Login from "./Login";
 import Register from "./Register";
@@ -40,6 +41,11 @@ const Routes: React.FC = () => (
       <Route exact path="/" component={Home} />
       <Route exact path="/register" component={Register} />
       <Route exact path="/login" component={Login} />
+      <PrivateRoute
+        exact
+        path="/view-team/user/:teamId/:userId"
+        component={DirectMessages}
+      />
       <PrivateRoute
         exact
         path="/view-team/:teamId?/:channelId?"
