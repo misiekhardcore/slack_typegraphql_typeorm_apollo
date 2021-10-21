@@ -2,7 +2,6 @@ import { useFormik } from "formik";
 import React, { ChangeEvent, useState } from "react";
 import { Input } from "semantic-ui-react";
 import styled from "styled-components";
-import { useCreateMessageMutation } from "../generated/graphql";
 
 const SendMessageWrapper = styled.div`
   grid-column: 3;
@@ -12,18 +11,15 @@ const SendMessageWrapper = styled.div`
 `;
 
 interface SendMessageProps {
-  channelName: string;
-  channelId: number;
+  onSubmit: (message: string) => Promise<any>;
+  placeholder: string;
 }
 
 export const SendMessage: React.FC<SendMessageProps> = ({
-  channelName,
-  channelId,
+  onSubmit,
+  placeholder,
 }) => {
-  const [createMessage] = useCreateMessageMutation();
-  const [placeholder, setPlaceholder] = useState(
-    `Message #${channelName}`
-  );
+  const [pholder, setPlaceholder] = useState(`Message #${placeholder}`);
 
   const {
     isSubmitting,
@@ -40,14 +36,7 @@ export const SendMessage: React.FC<SendMessageProps> = ({
         setErrors({ message: "Field cannot be empty" });
         setPlaceholder("Field cannot be empty");
       } else {
-        await createMessage({
-          variables: {
-            createMessageInput: {
-              channelId,
-              text: values.message,
-            },
-          },
-        });
+        await onSubmit(values.message);
         setSubmitting(false);
         resetForm();
       }
@@ -58,11 +47,11 @@ export const SendMessage: React.FC<SendMessageProps> = ({
       <Input
         error={!!errors.message}
         fluid
-        placeholder={placeholder}
+        placeholder={pholder}
         type="text"
         name="message"
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
-          setPlaceholder(`Message #${channelName}`);
+          setPlaceholder(`Message #${placeholder}`);
           handleChange(e);
         }}
         onBlur={handleBlur}
