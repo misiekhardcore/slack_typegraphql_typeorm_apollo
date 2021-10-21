@@ -6,7 +6,11 @@ import { Header } from "../components/Header";
 import { SendMessage } from "../components/SendMessage";
 import { MessagesContainer } from "../containers/MessagesContainer";
 import { Sidebar } from "../containers/Sidebar";
-import { Team, useMeQuery } from "../generated/graphql";
+import {
+  Team,
+  useCreateMessageMutation,
+  useMeQuery,
+} from "../generated/graphql";
 
 interface ViewTeamProps {
   match: { params: { teamId: string; channelId: string } };
@@ -17,6 +21,7 @@ const ViewTeam: React.FC<ViewTeamProps> = ({
     params: { teamId, channelId },
   },
 }) => {
+  const [createMessage] = useCreateMessageMutation();
   const { loading, error, data } = useMeQuery();
 
   const { me } = data || {};
@@ -63,6 +68,16 @@ const ViewTeam: React.FC<ViewTeamProps> = ({
 
   if (loading || error) return null;
 
+  const onSubmit = async (message: string) =>
+    await createMessage({
+      variables: {
+        createMessageInput: {
+          channelId: channel.id,
+          text: message,
+        },
+      },
+    });
+
   return (
     <AppLayout>
       <Sidebar
@@ -77,10 +92,7 @@ const ViewTeam: React.FC<ViewTeamProps> = ({
         <>
           <Header channelName={channel.name} />
           <MessagesContainer channelId={channel.id} />
-          <SendMessage
-            channelName={channel.name}
-            channelId={channel.id}
-          />
+          <SendMessage placeholder={channel.name} onSubmit={onSubmit} />
         </>
       )}
     </AppLayout>

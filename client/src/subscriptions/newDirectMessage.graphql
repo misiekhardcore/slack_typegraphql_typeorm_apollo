@@ -1,0 +1,12 @@
+subscription newDirectMessage($userToId: Float!, $teamId: Float!) {
+  newDirectMessage(userToId: $userToId, teamId: $teamId) {
+    id
+    text
+    userFrom {
+      id
+      username
+    }
+    createdAt
+    updatedAt
+  }
+}
