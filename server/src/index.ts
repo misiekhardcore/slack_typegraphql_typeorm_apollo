@@ -15,7 +15,11 @@ import { createConnection, getConnectionOptions } from "typeorm";
 import { SnakeNamingStrategy } from "typeorm-naming-strategies";
 import { Channel } from "./entity/Channel";
 import { Team } from "./entity/Team";
-import { JWTTokenPayload, User } from "./entity/User";
+import {
+  JWTTokenPayload,
+  RefreshTokensResponse,
+  User,
+} from "./entity/User";
 import { createChannelUsersLoader } from "./loaders/channelUsersLoader";
 import { createMemberTeamsLoader } from "./loaders/memberTeamsLoader";
 import { createTeamMembersLoader } from "./loaders/teamMembersLoader";
@@ -42,6 +46,48 @@ export interface Context {
 (async () => {
   const app = express();
 
+  const refreshTokens = async (
+    refreshToken: string,
+    secret1: string,
+    secret2: string
+  ): Promise<RefreshTokensResponse | null> => {
+    let userId = 0;
+    try {
+      const { user } = jwt.decode(refreshToken) as JWTTokenPayload;
+      userId = user.id;
+    } catch (error) {
+      return null;
+    }
+    const user = await User.findOne(userId);
+
+    if (!user) {
+      return null;
+    }
+
+    const refreshSecret = user.password + secret2;
+
+    try {
+      jwt.verify(refreshToken, refreshSecret);
+    } catch (error) {
+      return null;
+    }
+
+    const [newToken, newRefreshToken] = user.createTokens(
+      secret1,
+      secret2
+    );
+
+    return {
+      token: newToken,
+      refreshToken: newRefreshToken,
+      user: {
+        id: user.id,
+        isAdmin: user.isAdmin,
+        username: user.username,
+      },
+    };
+  };
+
   const checkToken = async (
     token: string,
     refreshToken: string,
@@ -66,7 +112,7 @@ export interface Context {
         }
         return user;
       } catch (error) {
-        const newTokens = await new User().refreshTokens(
+        const newTokens = await refreshTokens(
           refreshToken,
           process.env.SECRET1 || "",
           process.env.SECRET2 || ""
