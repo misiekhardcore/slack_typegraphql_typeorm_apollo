@@ -34,6 +34,12 @@ export class UserResolver {
 
   @Query(() => User, { nullable: true })
   @UseMiddleware(isAuth)
+  async getUser(@Arg("userId") userId: number): Promise<User | null> {
+    return (await this.userService.getOneById(userId)) || null;
+  }
+
+  @Query(() => User, { nullable: true })
+  @UseMiddleware(isAuth)
   async me(@Ctx() { user }: Context): Promise<User | null> {
     if (!user) return null;
     return (await this.userService.getOneById(user.id)) || null;

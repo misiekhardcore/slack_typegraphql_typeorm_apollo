@@ -129,47 +129,4 @@ export class User extends BaseEntity {
     );
     return [createToken, createRefreshToken];
   }
-
-  async refreshTokens(
-    refreshToken: string,
-    secret1: string,
-    secret2: string
-  ): Promise<RefreshTokensResponse | null> {
-    let userId = 0;
-    try {
-      const { user } = jwt.decode(refreshToken) as JWTTokenPayload;
-      userId = user.id;
-    } catch (error) {
-      return null;
-    }
-
-    const user = await User.findOne(userId);
-
-    if (!user) {
-      return null;
-    }
-
-    const refreshSecret = user.password + secret2;
-
-    try {
-      jwt.verify(refreshToken, refreshSecret);
-    } catch (error) {
-      return null;
-    }
-
-    const [newToken, newRefreshToken] = user.createTokens(
-      secret1,
-      secret2
-    );
-
-    return {
-      token: newToken,
-      refreshToken: newRefreshToken,
-      user: {
-        id: user.id,
-        isAdmin: user.isAdmin,
-        username: user.username,
-      },
-    };
-  }
 }

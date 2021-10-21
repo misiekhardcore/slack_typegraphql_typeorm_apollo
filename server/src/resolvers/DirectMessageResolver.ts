@@ -1,7 +1,4 @@
 import { AuthenticationError } from "apollo-server-errors";
-import { DirectMessage } from "../entity/DirectMessage";
-import { CreateDirectMessageInput } from "../inputs/DirectMessageInput";
-import { DirectMessageService } from "../services/direct-message.service";
 import {
   Arg,
   Ctx,
@@ -17,12 +14,13 @@ import {
   Subscription,
   UseMiddleware,
 } from "type-graphql";
-import { Message } from "../entity/Message";
+import { DirectMessage } from "../entity/DirectMessage";
+import { Team } from "../entity/Team";
 import { User } from "../entity/User";
 import { Context } from "../index";
-import { isAuth } from "../permissions";
-import { ChannelService } from "../services/channel.service";
-import { TeamMemberService } from "../services/team-member.service";
+import { CreateDirectMessageInput } from "../inputs/DirectMessageInput";
+import { isAuth, isTeamMember } from "../permissions";
+import { DirectMessageService } from "../services/direct-message.service";
 
 @Resolver(() => DirectMessage)
 export class DirectMessageResolver
@@ -45,6 +43,7 @@ export class DirectMessageResolver
   }
 
   @Mutation(() => DirectMessage)
+  @UseMiddleware(isAuth)
   async createDirectMessage(
     @Arg("messageInput") createMessageInput: CreateDirectMessageInput,
     @Ctx() { user }: Context,
@@ -60,31 +59,41 @@ export class DirectMessageResolver
   }
 
   @Subscription(() => DirectMessage, {
-    topics: "NEW_MESSAGE",
+    topics: "NEW_DIRECT_MESSAGE",
     filter: async ({
       payload,
-      args: { channelId },
+      args: { teamId, userToId },
       context: { user },
-    }: ResolverFilterData<Message, { channelId: number }, Context>) => {
-      const channelService = new ChannelService();
-      const teamMemberService = new TeamMemberService();
-      const { teamId } = (await channelService.getOne(channelId)) || {};
-      if (!(user && teamId))
-        throw new AuthenticationError("Not athenticated");
-      const member = teamMemberService.getOne(user.id, teamId);
-      if (!member)
-        throw new AuthenticationError(
-          "You have to be a part of a team"
-        );
-      return payload.channelId === channelId;
+    }: ResolverFilterData<
+      DirectMessage,
+      { teamId: number; userToId: number },
+      Context
+    >) => {
+      if (!user) throw new AuthenticationError("not authenticated");
+      return (
+        payload.teamId === teamId &&
+        payload.userToId === userToId &&
+        payload.userFromId === user.id
+      );
     },
   })
-  @UseMiddleware(isAuth)
+  @UseMiddleware(isTeamMember)
   newDirectMessage(
     @Root() payload: DirectMessage,
-    @Arg("userToId") _userToId: number
+    @Arg("userToId") _userToId: number,
+    @Arg("teamId") _teamId: number
   ): DirectMessage {
     return payload;
+  }
+
+  @FieldResolver()
+  async team(@Root() message: DirectMessage) {
+    return (
+      (await this.directMessageService.populateOne<Team>(
+        message,
+        "team"
+      )) || new Team()
+    );
   }
 
   @FieldResolver()
@@ -102,7 +111,7 @@ export class DirectMessageResolver
     return (
       (await this.directMessageService.populateOne<User>(
         message,
-        "userFrom"
+        "userTo"
       )) || new User()
     );
   }

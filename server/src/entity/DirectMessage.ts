@@ -30,7 +30,7 @@ export class DirectMessage extends BaseEntity {
     onDelete: "CASCADE",
   })
   @JoinColumn({ name: "team_id" })
-  team: User;
+  team: Team;
 
   @Column({ nullable: false })
   userFromId: number;

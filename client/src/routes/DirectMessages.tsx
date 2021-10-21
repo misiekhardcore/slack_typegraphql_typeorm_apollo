@@ -2,11 +2,13 @@ import { findIndex } from "lodash";
 import React from "react";
 import { Redirect } from "react-router";
 import { AppLayout } from "../components/AppLayout";
-import { Header } from "../components/Header";
 import { SendMessage } from "../components/SendMessage";
-import { MessagesContainer } from "../containers/MessagesContainer";
 import { Sidebar } from "../containers/Sidebar";
-import { Team, useMeQuery } from "../generated/graphql";
+import {
+  Team,
+  useCreateDirectMessageMutation,
+  useMeQuery,
+} from "../generated/graphql";
 
 interface DirectMessagesProps {
   match: { params: { teamId: string; userId: string } };
@@ -17,6 +19,7 @@ const DirectMessages: React.FC<DirectMessagesProps> = ({
     params: { teamId, userId },
   },
 }) => {
+  const [createDirectMessage] = useCreateDirectMessageMutation();
   const { loading, error, data } = useMeQuery();
 
   const { me } = data || {};
@@ -58,6 +61,17 @@ const DirectMessages: React.FC<DirectMessagesProps> = ({
 
   if (loading || error) return null;
 
+  const onSubmit = async (message: string) =>
+    await createDirectMessage({
+      variables: {
+        createDirectMessageInput: {
+          teamId: team.id,
+          userToId: userIdInt,
+          text: message,
+        },
+      },
+    });
+
   return (
     <AppLayout>
       <Sidebar
@@ -68,9 +82,9 @@ const DirectMessages: React.FC<DirectMessagesProps> = ({
         team={team as Team}
         userId={id}
       />
-      <Header channelName={""} />
-      <MessagesContainer channelId={1} />
-      <SendMessage channelName={""} channelId={1} />
+      {/* <Header channelName={""} />
+      <MessagesContainer channelId={1} /> */}
+      <SendMessage placeholder={"asdasdsadads"} onSubmit={onSubmit} />
     </AppLayout>
   );
 };

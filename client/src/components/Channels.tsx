@@ -56,11 +56,13 @@ const channel = (
   </Link>
 );
 
-const user = ({ id, username }: User): JSX.Element => (
-  <SideBarListItem key={`user-${id}`}>
-    <Bubble on />
-    {username}
-  </SideBarListItem>
+const user = ({ id, username }: User, teamId: number): JSX.Element => (
+  <Link key={`user-${id}`} to={`/view-team/user/${teamId}/${id}`}>
+    <SideBarListItem>
+      <Bubble on />
+      {username}
+    </SideBarListItem>
+  </Link>
 );
 
 interface ChannelsProps {
@@ -102,7 +104,7 @@ export const Channels: React.FC<ChannelsProps> = ({
       </SideBarList>
       <SideBarList>
         <SideBarListHeader>Direct Messages</SideBarListHeader>
-        {allPeople.map(user)}
+        {allPeople.map((us) => user(us, id))}
         {admin && (
           <SideBarListItem style={{ marginTop: "0.5rem" }}>
             <a href="#invite-people" onClick={onInvitePeople}>
