@@ -30,9 +30,16 @@ export class DirectMessageService {
     return await this.directMessageRepository.findOne(id);
   }
 
-  public async getMany(userFromId: number) {
+  public async getMany(
+    userFromId: number,
+    userToId: number,
+    teamId: number
+  ) {
     return await this.directMessageRepository.find({
-      where: { userFromId },
+      where: [
+        { userFromId, userToId, teamId },
+        { userFromId: userToId, userToId: userFromId, teamId },
+      ],
       order: { createdAt: "ASC" },
     });
   }

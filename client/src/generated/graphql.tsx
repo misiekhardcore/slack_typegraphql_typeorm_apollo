@@ -21,40 +21,40 @@ export type AddMemberInput = {
 
 export type AddMemberResponse = {
   __typename?: 'AddMemberResponse';
-  ok: Scalars['Boolean'];
-  member?: Maybe<User>;
   errors?: Maybe<Array<ListError>>;
+  member?: Maybe<User>;
+  ok: Scalars['Boolean'];
 };
 
 export type Channel = {
   __typename?: 'Channel';
-  id: Scalars['Int'];
-  name: Scalars['String'];
-  isPublic: Scalars['Boolean'];
   createdAt: Scalars['String'];
-  updatedAt: Scalars['String'];
-  team: Team;
-  messages?: Maybe<Array<Message>>;
+  id: Scalars['Int'];
+  isPublic: Scalars['Boolean'];
   members: Array<User>;
+  messages?: Maybe<Array<Message>>;
+  name: Scalars['String'];
+  team: Team;
+  updatedAt: Scalars['String'];
 };
 
 export type CreateChannelInput = {
+  isPublic?: Maybe<Scalars['Boolean']>;
   name: Scalars['String'];
   teamId: Scalars['Float'];
-  isPublic?: Maybe<Scalars['Boolean']>;
 };
 
 export type CreateChannelResponse = {
   __typename?: 'CreateChannelResponse';
-  ok: Scalars['Boolean'];
   channel?: Maybe<Channel>;
   errors?: Maybe<Array<ListError>>;
+  ok: Scalars['Boolean'];
 };
 
 export type CreateDirectMessageInput = {
   teamId: Scalars['Float'];
-  userToId: Scalars['Float'];
   text: Scalars['String'];
+  userToId: Scalars['Float'];
 };
 
 export type CreateMessageInput = {
@@ -68,47 +68,47 @@ export type CreateTeamInput = {
 
 export type CreateTeamResponse = {
   __typename?: 'CreateTeamResponse';
+  errors?: Maybe<Array<ListError>>;
   ok: Scalars['Boolean'];
   team?: Maybe<Team>;
-  errors?: Maybe<Array<ListError>>;
 };
 
 export type CreateUserInput = {
-  username: Scalars['String'];
   email: Scalars['String'];
   password: Scalars['String'];
+  username: Scalars['String'];
 };
 
 export type CreateUserResponse = {
   __typename?: 'CreateUserResponse';
+  errors?: Maybe<Array<ListError>>;
   ok: Scalars['Boolean'];
   user?: Maybe<User>;
-  errors?: Maybe<Array<ListError>>;
 };
 
 export type DirectMessage = {
   __typename?: 'DirectMessage';
+  createdAt: Scalars['String'];
   id: Scalars['Int'];
-  text: Scalars['String'];
   team: Team;
+  text: Scalars['String'];
+  updatedAt: Scalars['String'];
   userFrom: User;
   userTo: User;
-  createdAt: Scalars['String'];
-  updatedAt: Scalars['String'];
 };
 
 export type ListError = {
   __typename?: 'ListError';
-  path: Scalars['String'];
   msg: Scalars['String'];
+  path: Scalars['String'];
 };
 
 export type LoginResponse = {
   __typename?: 'LoginResponse';
-  ok: Scalars['Boolean'];
-  token?: Maybe<Scalars['String']>;
-  refreshToken?: Maybe<Scalars['String']>;
   errors?: Maybe<Array<ListError>>;
+  ok: Scalars['Boolean'];
+  refreshToken?: Maybe<Scalars['String']>;
+  token?: Maybe<Scalars['String']>;
 };
 
 export type LoginUserInput = {
@@ -118,24 +118,29 @@ export type LoginUserInput = {
 
 export type Message = {
   __typename?: 'Message';
+  channel: Channel;
+  createdAt: Scalars['String'];
   id: Scalars['Int'];
   text: Scalars['String'];
-  channel: Channel;
-  user: User;
-  createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
+  user: User;
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addMember: AddMemberResponse;
   createChannel: CreateChannelResponse;
   createDirectMessage: DirectMessage;
   createMessage: Message;
   createTeam: CreateTeamResponse;
-  addMember: AddMemberResponse;
-  register: CreateUserResponse;
   login: LoginResponse;
+  register: CreateUserResponse;
   updateUser: User;
+};
+
+
+export type MutationAddMemberArgs = {
+  addMemberInput: AddMemberInput;
 };
 
 
@@ -159,18 +164,13 @@ export type MutationCreateTeamArgs = {
 };
 
 
-export type MutationAddMemberArgs = {
-  addMemberInput: AddMemberInput;
+export type MutationLoginArgs = {
+  userInput: LoginUserInput;
 };
 
 
 export type MutationRegisterArgs = {
   userInput: CreateUserInput;
-};
-
-
-export type MutationLoginArgs = {
-  userInput: LoginUserInput;
 };
 
 
@@ -180,16 +180,16 @@ export type MutationUpdateUserArgs = {
 
 export type Query = {
   __typename?: 'Query';
-  getChannels?: Maybe<Array<Channel>>;
   getChannel?: Maybe<Channel>;
-  getDirectMessages: Array<DirectMessage>;
+  getChannels?: Maybe<Array<Channel>>;
   getDirectMessage: DirectMessage;
-  getMessages: Array<Message>;
+  getDirectMessages: Array<DirectMessage>;
   getMessage: Message;
-  getTeams: Array<Team>;
+  getMessages: Array<Message>;
   getTeam?: Maybe<Team>;
-  getUsers?: Maybe<Array<User>>;
+  getTeams: Array<Team>;
   getUser?: Maybe<User>;
+  getUsers?: Maybe<Array<User>>;
   me?: Maybe<User>;
 };
 
@@ -204,13 +204,19 @@ export type QueryGetDirectMessageArgs = {
 };
 
 
-export type QueryGetMessagesArgs = {
-  channelId: Scalars['Float'];
+export type QueryGetDirectMessagesArgs = {
+  teamId: Scalars['Float'];
+  userToId: Scalars['Float'];
 };
 
 
 export type QueryGetMessageArgs = {
   messageId: Scalars['Float'];
+};
+
+
+export type QueryGetMessagesArgs = {
+  channelId: Scalars['Float'];
 };
 
 
@@ -242,32 +248,32 @@ export type SubscriptionNewMessageArgs = {
 
 export type Team = {
   __typename?: 'Team';
-  id: Scalars['Int'];
-  name: Scalars['String'];
   admin: Scalars['Boolean'];
-  members: Array<User>;
   channels: Array<Channel>;
   createdAt: Scalars['String'];
+  id: Scalars['Int'];
+  members: Array<User>;
+  name: Scalars['String'];
   updatedAt: Scalars['String'];
 };
 
 export type UpdateUserInput = {
-  id: Scalars['Float'];
-  username?: Maybe<Scalars['String']>;
   email?: Maybe<Scalars['String']>;
+  id: Scalars['Float'];
   password?: Maybe<Scalars['String']>;
+  username?: Maybe<Scalars['String']>;
 };
 
 export type User = {
   __typename?: 'User';
-  id: Scalars['Int'];
-  username: Scalars['String'];
-  email: Scalars['String'];
-  createdAt: Scalars['String'];
-  updatedAt: Scalars['String'];
-  teams?: Maybe<Array<Team>>;
   channels?: Maybe<Array<Channel>>;
+  createdAt: Scalars['String'];
+  email: Scalars['String'];
+  id: Scalars['Int'];
   isAdmin?: Maybe<Scalars['Boolean']>;
+  teams?: Maybe<Array<Team>>;
+  updatedAt: Scalars['String'];
+  username: Scalars['String'];
 };
 
 export type AddMemberMutationVariables = Exact<{
@@ -275,14 +281,14 @@ export type AddMemberMutationVariables = Exact<{
 }>;
 
 
-export type AddMemberMutation = { __typename?: 'Mutation', addMember: { __typename?: 'AddMemberResponse', ok: boolean, member?: Maybe<{ __typename?: 'User', id: number, username: string }>, errors?: Maybe<Array<{ __typename?: 'ListError', msg: string, path: string }>> } };
+export type AddMemberMutation = { __typename?: 'Mutation', addMember: { __typename?: 'AddMemberResponse', ok: boolean, member?: { __typename?: 'User', id: number, username: string } | null | undefined, errors?: Array<{ __typename?: 'ListError', msg: string, path: string }> | null | undefined } };
 
 export type CreateChannelMutationVariables = Exact<{
   createChannelChannelInput: CreateChannelInput;
 }>;
 
 
-export type CreateChannelMutation = { __typename?: 'Mutation', createChannel: { __typename?: 'CreateChannelResponse', ok: boolean, channel?: Maybe<{ __typename?: 'Channel', id: number, name: string, isPublic: boolean }>, errors?: Maybe<Array<{ __typename?: 'ListError', msg: string, path: string }>> } };
+export type CreateChannelMutation = { __typename?: 'Mutation', createChannel: { __typename?: 'CreateChannelResponse', ok: boolean, channel?: { __typename?: 'Channel', id: number, name: string, isPublic: boolean } | null | undefined, errors?: Array<{ __typename?: 'ListError', msg: string, path: string }> | null | undefined } };
 
 export type CreateDirectMessageMutationVariables = Exact<{
   createDirectMessageInput: CreateDirectMessageInput;
@@ -303,21 +309,29 @@ export type CreateTeamMutationVariables = Exact<{
 }>;
 
 
-export type CreateTeamMutation = { __typename?: 'Mutation', createTeam: { __typename?: 'CreateTeamResponse', ok: boolean, team?: Maybe<{ __typename?: 'Team', id: number, name: string, channels: Array<{ __typename?: 'Channel', id: number, isPublic: boolean, name: string }>, members: Array<{ __typename?: 'User', username: string, id: number }> }>, errors?: Maybe<Array<{ __typename?: 'ListError', msg: string, path: string }>> } };
+export type CreateTeamMutation = { __typename?: 'Mutation', createTeam: { __typename?: 'CreateTeamResponse', ok: boolean, team?: { __typename?: 'Team', id: number, name: string, channels: Array<{ __typename?: 'Channel', id: number, isPublic: boolean, name: string }>, members: Array<{ __typename?: 'User', username: string, id: number }> } | null | undefined, errors?: Array<{ __typename?: 'ListError', msg: string, path: string }> | null | undefined } };
 
 export type LoginMutationVariables = Exact<{
   loginUserInput: LoginUserInput;
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'LoginResponse', ok: boolean, token?: Maybe<string>, refreshToken?: Maybe<string>, errors?: Maybe<Array<{ __typename?: 'ListError', msg: string, path: string }>> } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'LoginResponse', ok: boolean, token?: string | null | undefined, refreshToken?: string | null | undefined, errors?: Array<{ __typename?: 'ListError', msg: string, path: string }> | null | undefined } };
 
 export type RegisterMutationVariables = Exact<{
   userInput: CreateUserInput;
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'CreateUserResponse', ok: boolean, errors?: Maybe<Array<{ __typename?: 'ListError', path: string, msg: string }>> } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'CreateUserResponse', ok: boolean, errors?: Array<{ __typename?: 'ListError', path: string, msg: string }> | null | undefined } };
+
+export type GetDirectMessageQueryVariables = Exact<{
+  userToId: Scalars['Float'];
+  teamId: Scalars['Float'];
+}>;
+
+
+export type GetDirectMessageQuery = { __typename?: 'Query', getDirectMessages: Array<{ __typename?: 'DirectMessage', id: number, text: string, createdAt: string, updatedAt: string, userTo: { __typename?: 'User', id: number, username: string }, userFrom: { __typename?: 'User', id: number, username: string } }> };
 
 export type GetMessagesQueryVariables = Exact<{
   channelId: Scalars['Float'];
@@ -331,15 +345,22 @@ export type GetTeamsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetTeamsQuery = { __typename?: 'Query', getTeams: Array<{ __typename?: 'Team', id: number, name: string, channels: Array<{ __typename?: 'Channel', id: number, isPublic: boolean, name: string }>, members: Array<{ __typename?: 'User', username: string, id: number }> }> };
 
+export type GetUserQueryVariables = Exact<{
+  userId: Scalars['Float'];
+}>;
+
+
+export type GetUserQuery = { __typename?: 'Query', getUser?: { __typename?: 'User', id: number, username: string } | null | undefined };
+
 export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetUsersQuery = { __typename?: 'Query', getUsers?: Maybe<Array<{ __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string }>> };
+export type GetUsersQuery = { __typename?: 'Query', getUsers?: Array<{ __typename?: 'User', id: number, username: string, email: string, createdAt: string, updatedAt: string }> | null | undefined };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: Maybe<{ __typename?: 'User', id: number, username: string, teams?: Maybe<Array<{ __typename?: 'Team', id: number, name: string, admin: boolean, channels: Array<{ __typename?: 'Channel', id: number, isPublic: boolean, name: string }>, members: Array<{ __typename?: 'User', username: string, id: number }> }>> }> };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: number, username: string, teams?: Array<{ __typename?: 'Team', id: number, name: string, admin: boolean, channels: Array<{ __typename?: 'Channel', id: number, isPublic: boolean, name: string }>, members: Array<{ __typename?: 'User', username: string, id: number }> }> | null | undefined } | null | undefined };
 
 export type NewDirectMessageSubscriptionVariables = Exact<{
   userToId: Scalars['Float'];
@@ -347,7 +368,7 @@ export type NewDirectMessageSubscriptionVariables = Exact<{
 }>;
 
 
-export type NewDirectMessageSubscription = { __typename?: 'Subscription', newDirectMessage: { __typename?: 'DirectMessage', id: number, text: string, createdAt: string, updatedAt: string, userFrom: { __typename?: 'User', id: number, username: string } } };
+export type NewDirectMessageSubscription = { __typename?: 'Subscription', newDirectMessage: { __typename?: 'DirectMessage', id: number, text: string, createdAt: string, updatedAt: string, userFrom: { __typename?: 'User', id: number, username: string }, userTo: { __typename?: 'User', id: number, username: string } } };
 
 export type NewMessageSubscriptionVariables = Exact<{
   channelId: Scalars['Float'];
@@ -634,6 +655,53 @@ export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<Reg
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
+export const GetDirectMessageDocument = gql`
+    query getDirectMessage($userToId: Float!, $teamId: Float!) {
+  getDirectMessages(userToId: $userToId, teamId: $teamId) {
+    id
+    text
+    userTo {
+      id
+      username
+    }
+    userFrom {
+      id
+      username
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useGetDirectMessageQuery__
+ *
+ * To run a query within a React component, call `useGetDirectMessageQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDirectMessageQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDirectMessageQuery({
+ *   variables: {
+ *      userToId: // value for 'userToId'
+ *      teamId: // value for 'teamId'
+ *   },
+ * });
+ */
+export function useGetDirectMessageQuery(baseOptions: Apollo.QueryHookOptions<GetDirectMessageQuery, GetDirectMessageQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDirectMessageQuery, GetDirectMessageQueryVariables>(GetDirectMessageDocument, options);
+      }
+export function useGetDirectMessageLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDirectMessageQuery, GetDirectMessageQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDirectMessageQuery, GetDirectMessageQueryVariables>(GetDirectMessageDocument, options);
+        }
+export type GetDirectMessageQueryHookResult = ReturnType<typeof useGetDirectMessageQuery>;
+export type GetDirectMessageLazyQueryHookResult = ReturnType<typeof useGetDirectMessageLazyQuery>;
+export type GetDirectMessageQueryResult = Apollo.QueryResult<GetDirectMessageQuery, GetDirectMessageQueryVariables>;
 export const GetMessagesDocument = gql`
     query getMessages($channelId: Float!) {
   getMessages(channelId: $channelId) {
@@ -720,6 +788,42 @@ export function useGetTeamsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<G
 export type GetTeamsQueryHookResult = ReturnType<typeof useGetTeamsQuery>;
 export type GetTeamsLazyQueryHookResult = ReturnType<typeof useGetTeamsLazyQuery>;
 export type GetTeamsQueryResult = Apollo.QueryResult<GetTeamsQuery, GetTeamsQueryVariables>;
+export const GetUserDocument = gql`
+    query getUser($userId: Float!) {
+  getUser(userId: $userId) {
+    id
+    username
+  }
+}
+    `;
+
+/**
+ * __useGetUserQuery__
+ *
+ * To run a query within a React component, call `useGetUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGetUserQuery(baseOptions: Apollo.QueryHookOptions<GetUserQuery, GetUserQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument, options);
+      }
+export function useGetUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserQuery, GetUserQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument, options);
+        }
+export type GetUserQueryHookResult = ReturnType<typeof useGetUserQuery>;
+export type GetUserLazyQueryHookResult = ReturnType<typeof useGetUserLazyQuery>;
+export type GetUserQueryResult = Apollo.QueryResult<GetUserQuery, GetUserQueryVariables>;
 export const GetUsersDocument = gql`
     query getUsers {
   getUsers {
@@ -813,6 +917,10 @@ export const NewDirectMessageDocument = gql`
     id
     text
     userFrom {
+      id
+      username
+    }
+    userTo {
       id
       username
     }

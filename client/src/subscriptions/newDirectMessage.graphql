@@ -6,6 +6,10 @@ subscription newDirectMessage($userToId: Float!, $teamId: Float!) {
       id
       username
     }
+    userTo {
+      id
+      username
+    }
     createdAt
     updatedAt
   }

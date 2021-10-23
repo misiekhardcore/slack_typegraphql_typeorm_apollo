@@ -1,0 +1,16 @@
+query getDirectMessage($userToId: Float!, $teamId: Float!) {
+  getDirectMessages(userToId: $userToId, teamId: $teamId) {
+    id
+    text
+    userTo {
+      id
+      username
+    }
+    userFrom {
+      id
+      username
+    }
+    createdAt
+    updatedAt
+  }
+}

@@ -32,9 +32,17 @@ export class DirectMessageResolver
   }
 
   @Query(() => [DirectMessage])
-  async getDirectMessages(@Ctx() { user }: Context) {
+  async getDirectMessages(
+    @Ctx() { user }: Context,
+    @Arg("userToId") userToId: number,
+    @Arg("teamId") teamId: number
+  ) {
     if (!user) return [];
-    return await this.directMessageService.getMany(user.id);
+    return await this.directMessageService.getMany(
+      user.id,
+      userToId,
+      teamId
+    );
   }
 
   @Query(() => DirectMessage)
@@ -71,9 +79,12 @@ export class DirectMessageResolver
     >) => {
       if (!user) throw new AuthenticationError("not authenticated");
       return (
-        payload.teamId === teamId &&
-        payload.userToId === userToId &&
-        payload.userFromId === user.id
+        (payload.teamId === teamId &&
+          payload.userToId === userToId &&
+          payload.userFromId === user.id) ||
+        (payload.teamId === teamId &&
+          payload.userFromId === userToId &&
+          payload.userToId === user.id)
       );
     },
   })

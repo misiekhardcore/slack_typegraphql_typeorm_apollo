@@ -90,9 +90,12 @@ const ViewTeam: React.FC<ViewTeamProps> = ({
       />
       {channel && (
         <>
-          <Header channelName={channel.name} />
+          <Header title={"#" + channel.name} />
           <MessagesContainer channelId={channel.id} />
-          <SendMessage placeholder={channel.name} onSubmit={onSubmit} />
+          <SendMessage
+            placeholder={"#" + channel.name}
+            onSubmit={onSubmit}
+          />
         </>
       )}
     </AppLayout>

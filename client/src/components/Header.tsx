@@ -12,13 +12,13 @@ export const HeaderWrapper = styled.div`
 `;
 
 interface HeaderPros {
-  channelName: string;
+  title: string;
 }
 
-export const Header: React.FC<HeaderPros> = ({ channelName }) => {
+export const Header: React.FC<HeaderPros> = ({ title }) => {
   return (
     <HeaderWrapper>
-      <He>#{channelName}</He>
+      <He>{title}</He>
     </HeaderWrapper>
   );
 };

@@ -19,7 +19,7 @@ export const SendMessage: React.FC<SendMessageProps> = ({
   onSubmit,
   placeholder,
 }) => {
-  const [pholder, setPlaceholder] = useState(`Message #${placeholder}`);
+  const [pholder, setPlaceholder] = useState(`Message ${placeholder}`);
 
   const {
     isSubmitting,
@@ -51,7 +51,7 @@ export const SendMessage: React.FC<SendMessageProps> = ({
         type="text"
         name="message"
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
-          setPlaceholder(`Message #${placeholder}`);
+          setPlaceholder(`Message ${placeholder}`);
           handleChange(e);
         }}
         onBlur={handleBlur}
