@@ -12,6 +12,8 @@ import {
   Modal,
 } from "semantic-ui-react";
 import {
+  GetTeamMembersDocument,
+  GetTeamMembersQuery,
   MeDocument,
   MeQuery,
   useAddMemberMutation,
@@ -59,31 +61,62 @@ export const InvitePeopleModal: React.FC<InvitePeopleModalProps> = ({
           update: (cache, { data: data2 }) => {
             const { addMember } = data2 || {};
 
-            const data = cache.readQuery<MeQuery>({
+            const meData = cache.readQuery<MeQuery>({
               query: MeDocument,
             });
 
-            const teamIdx = findIndex(data?.me?.teams, ["id", teamId]);
+            const membersData = cache.readQuery<GetTeamMembersQuery>({
+              query: GetTeamMembersDocument,
+              variables: { teamId },
+            });
 
+            const teamIdx = findIndex(meData?.me?.teams, [
+              "id",
+              teamId,
+            ]);
             if (
-              data?.me?.teams &&
-              data.me.teams[teamIdx]?.members &&
+              meData?.me?.teams &&
+              meData.me.teams[teamIdx]?.members &&
               addMember?.member
             ) {
-              cache.writeFragment({
-                id: "Team:" + teamId,
-                fragment: gql`
-                  fragment Member on Team {
-                    members
-                  }
-                `,
-                data: {
-                  members: [
-                    ...data.me.teams[teamIdx].members,
-                    addMember.member,
-                  ],
-                },
-              });
+              const notAlreadyInTeam = meData.me.teams[
+                teamIdx
+              ].members.every(
+                (member) => member.id !== addMember.member?.id
+              );
+              if (notAlreadyInTeam) {
+                cache.writeFragment({
+                  id: "Team:" + teamId,
+                  fragment: gql`
+                    fragment Member on Team {
+                      members
+                    }
+                  `,
+                  data: {
+                    members: [
+                      ...meData.me.teams[teamIdx].members,
+                      addMember.member,
+                    ],
+                  },
+                });
+
+                if (membersData?.getTeam?.members && addMember.member) {
+                  cache.writeQuery({
+                    variables: { teamId },
+                    query: GetTeamMembersDocument,
+                    data: {
+                      ...membersData,
+                      getTeam: {
+                        ...membersData?.getTeam,
+                        members: [
+                          ...(membersData?.getTeam?.members || []),
+                          addMember.member,
+                        ],
+                      },
+                    },
+                  });
+                }
+              }
             }
           },
         });
