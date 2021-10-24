@@ -340,6 +340,13 @@ export type GetMessagesQueryVariables = Exact<{
 
 export type GetMessagesQuery = { __typename?: 'Query', getMessages: Array<{ __typename?: 'Message', id: number, text: string, createdAt: string, updatedAt: string, user: { __typename?: 'User', id: number, username: string } }> };
 
+export type GetTeamMembersQueryVariables = Exact<{
+  teamId: Scalars['Float'];
+}>;
+
+
+export type GetTeamMembersQuery = { __typename?: 'Query', getTeam?: { __typename?: 'Team', members: Array<{ __typename?: 'User', username: string, id: number }> } | null | undefined };
+
 export type GetTeamsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -744,6 +751,44 @@ export function useGetMessagesLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type GetMessagesQueryHookResult = ReturnType<typeof useGetMessagesQuery>;
 export type GetMessagesLazyQueryHookResult = ReturnType<typeof useGetMessagesLazyQuery>;
 export type GetMessagesQueryResult = Apollo.QueryResult<GetMessagesQuery, GetMessagesQueryVariables>;
+export const GetTeamMembersDocument = gql`
+    query getTeamMembers($teamId: Float!) {
+  getTeam(teamId: $teamId) {
+    members {
+      username
+      id
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetTeamMembersQuery__
+ *
+ * To run a query within a React component, call `useGetTeamMembersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTeamMembersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTeamMembersQuery({
+ *   variables: {
+ *      teamId: // value for 'teamId'
+ *   },
+ * });
+ */
+export function useGetTeamMembersQuery(baseOptions: Apollo.QueryHookOptions<GetTeamMembersQuery, GetTeamMembersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetTeamMembersQuery, GetTeamMembersQueryVariables>(GetTeamMembersDocument, options);
+      }
+export function useGetTeamMembersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTeamMembersQuery, GetTeamMembersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetTeamMembersQuery, GetTeamMembersQueryVariables>(GetTeamMembersDocument, options);
+        }
+export type GetTeamMembersQueryHookResult = ReturnType<typeof useGetTeamMembersQuery>;
+export type GetTeamMembersLazyQueryHookResult = ReturnType<typeof useGetTeamMembersLazyQuery>;
+export type GetTeamMembersQueryResult = Apollo.QueryResult<GetTeamMembersQuery, GetTeamMembersQueryVariables>;
 export const GetTeamsDocument = gql`
     query getTeams {
   getTeams {

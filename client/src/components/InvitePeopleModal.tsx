@@ -106,6 +106,10 @@ export const InvitePeopleModal: React.FC<InvitePeopleModalProps> = ({
     if (open && inputRef) inputRef.current?.focus();
   }, [open]);
 
+  useEffect(() => {
+    if (!open) resetForm();
+  }, [open, resetForm]);
+
   return (
     <Modal open={open} onClose={onClose} closeOnDimmerClick>
       <Modal.Header>Add member</Modal.Header>

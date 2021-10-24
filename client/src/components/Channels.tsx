@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Icon } from "semantic-ui-react";
+import { Icon as Icona } from "semantic-ui-react";
 import styled from "styled-components";
 import { Channel, Team, User } from "../generated/graphql";
 
@@ -47,6 +47,12 @@ const Green = styled.span`
 const Bubble = ({ on }: { on: boolean }): JSX.Element =>
   on ? <Green>● </Green> : <span>○</span>;
 
+const Icon = styled(Icona)`
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
 const channel = (
   { id, name }: Channel,
   teamId: number
@@ -69,12 +75,14 @@ interface ChannelsProps {
   team: Team;
   userId: number;
   onAddChannelClick: () => void;
+  onDirectMessageClick: () => void;
   onInvitePeople: () => void;
 }
 
 export const Channels: React.FC<ChannelsProps> = ({
   team,
   userId,
+  onDirectMessageClick,
   onAddChannelClick,
   onInvitePeople,
 }) => {
@@ -103,7 +111,16 @@ export const Channels: React.FC<ChannelsProps> = ({
         {channels.map((chan) => channel(chan, id))}
       </SideBarList>
       <SideBarList>
-        <SideBarListHeader>Direct Messages</SideBarListHeader>
+        <SideBarListHeader>
+          Direct Messages
+          {admin && (
+            <Icon
+              style={{ marginLeft: "5px" }}
+              onClick={onDirectMessageClick}
+              name="add circle"
+            />
+          )}
+        </SideBarListHeader>
         {allPeople.map((us) => user(us, id))}
         {admin && (
           <SideBarListItem style={{ marginTop: "0.5rem" }}>

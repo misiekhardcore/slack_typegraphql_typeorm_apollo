@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useHistory } from "react-router";
 import { AddChannelModal } from "../components/AddChannelModal";
 import { Channels } from "../components/Channels";
+import { DirectMessageModal } from "../components/DirectMessageModal";
 import { InvitePeopleModal } from "../components/InvitePeopleModal";
 import { Teams } from "../components/Teams";
 import { Team } from "../generated/graphql";
@@ -21,6 +22,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [state, setState] = useState({
     openAddChannelModal: false,
     openInvitePeopleModal: false,
+    openDirectMessageModal: false,
   });
 
   if (!(teams && team)) {
@@ -39,6 +41,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const handleInvitePeopleModalOpen = () =>
     setState({ ...state, openInvitePeopleModal: true });
+
+  const handleDirectMessageModalClose = () =>
+    setState({ ...state, openDirectMessageModal: false });
+
+  const handleDirectMessageModalOpen = () =>
+    setState({ ...state, openDirectMessageModal: true });
+
   return (
     <>
       <Teams key="team-sidebar" teams={teams} />
@@ -47,12 +56,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
         team={team}
         userId={userId}
         onAddChannelClick={handleAddChannelModalOpen}
+        onDirectMessageClick={handleDirectMessageModalOpen}
         onInvitePeople={handleInvitePeopleModalOpen}
       />
       <AddChannelModal
         teamId={team.id}
         open={state.openAddChannelModal}
         onClose={handleAddChannelModalClose}
+      />
+      <DirectMessageModal
+        teamId={team.id}
+        open={state.openDirectMessageModal}
+        onClose={handleDirectMessageModalClose}
       />
       <InvitePeopleModal
         teamId={team.id}

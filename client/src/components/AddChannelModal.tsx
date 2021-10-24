@@ -110,6 +110,10 @@ export const AddChannelModal: React.FC<AddChannelModalProps> = ({
     if (open && inputRef) inputRef.current?.focus();
   }, [open]);
 
+  useEffect(() => {
+    if (!open) resetForm();
+  }, [open, resetForm]);
+
   return (
     <Modal open={open} onClose={onClose} closeOnDimmerClick>
       <Modal.Header>Add channel</Modal.Header>
