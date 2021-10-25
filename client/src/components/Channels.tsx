@@ -48,6 +48,7 @@ const Bubble = ({ on }: { on: boolean }): JSX.Element =>
   on ? <Green>● </Green> : <span>○</span>;
 
 const Icon = styled(Icona)`
+  margin-left: 5px !important;
   &:hover {
     cursor: pointer;
   }
@@ -101,11 +102,7 @@ export const Channels: React.FC<ChannelsProps> = ({
         <SideBarListHeader>
           Channels
           {admin && (
-            <Icon
-              style={{ marginLeft: "5px" }}
-              onClick={onAddChannelClick}
-              name="add circle"
-            />
+            <Icon onClick={onAddChannelClick} name="add circle" />
           )}
         </SideBarListHeader>
         {channels.map((chan) => channel(chan, id))}
@@ -113,13 +110,7 @@ export const Channels: React.FC<ChannelsProps> = ({
       <SideBarList>
         <SideBarListHeader>
           Direct Messages
-          {admin && (
-            <Icon
-              style={{ marginLeft: "5px" }}
-              onClick={onDirectMessageClick}
-              name="add circle"
-            />
-          )}
+          <Icon onClick={onDirectMessageClick} name="add circle" />
         </SideBarListHeader>
         {allPeople.map((us) => user(us, id))}
         {admin && (

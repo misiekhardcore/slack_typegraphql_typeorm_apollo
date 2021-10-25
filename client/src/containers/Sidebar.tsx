@@ -45,8 +45,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const handleDirectMessageModalClose = () =>
     setState({ ...state, openDirectMessageModal: false });
 
-  const handleDirectMessageModalOpen = () =>
-    setState({ ...state, openDirectMessageModal: true });
+  const handleDirectMessageModalOpen = () =>{
+    setState({ ...state, openDirectMessageModal: true });}
 
   return (
     <>

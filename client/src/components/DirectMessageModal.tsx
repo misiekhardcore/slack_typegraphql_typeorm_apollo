@@ -37,8 +37,6 @@ export const DirectMessageModal: React.FC<DirectMessageModalProps> = ({
     variables: { teamId },
   });
 
-  const handleSubmit = () => {};
-
   useEffect(() => {
     if (open && inputRef) inputRef.current?.focus();
   }, [open]);
@@ -52,17 +50,8 @@ export const DirectMessageModal: React.FC<DirectMessageModalProps> = ({
     <Modal open={open} onClose={onClose} closeOnDimmerClick>
       <Modal.Header>Find user to chat</Modal.Header>
       <Modal.Content>
-        <Form onSubmit={handleSubmit}>
+        <Form>
           <FormField>
-            {/* <Input
-              ref={inputRef}
-              fluid
-              placeholder="Username"
-              type="text"
-              name="username"
-              onChange={handleChange}
-              value={value}
-            /> */}
             <Downshift
               onChange={(selection) => {
                 const memberId = members.filter(
