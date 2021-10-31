@@ -15,20 +15,24 @@ import {
   UseMiddleware,
 } from "type-graphql";
 import { DirectMessage } from "../entity/DirectMessage";
+import { File } from "../entity/File";
 import { Team } from "../entity/Team";
 import { User } from "../entity/User";
 import { Context } from "../index";
 import { CreateDirectMessageInput } from "../inputs/DirectMessageInput";
-import { isAuth, isTeamMember } from "../permissions";
+import { isAbleToDirectMessage, isAuth } from "../permissions";
 import { DirectMessageService } from "../services/direct-message.service";
+import { FileService } from "../services/file.service";
 
 @Resolver(() => DirectMessage)
 export class DirectMessageResolver
   implements ResolverInterface<DirectMessage>
 {
   private readonly directMessageService: DirectMessageService;
+  private readonly fileService: FileService;
   constructor() {
     this.directMessageService = new DirectMessageService();
+    this.fileService = new FileService();
   }
 
   @Query(() => [DirectMessage])
@@ -57,9 +61,15 @@ export class DirectMessageResolver
     @Ctx() { user }: Context,
     @PubSub("NEW_DIRECT_MESSAGE") publish: Publisher<DirectMessage>
   ): Promise<DirectMessage> {
+    let rawFile = await createMessageInput.file;
+    let file: File | null = null;
+    if (rawFile) {
+      file = await this.fileService.create(rawFile);
+    }
     const message = await this.directMessageService.create(
       createMessageInput,
-      user?.id || 0
+      user!.id,
+      file
     );
 
     await publish(message);
@@ -88,7 +98,7 @@ export class DirectMessageResolver
       );
     },
   })
-  @UseMiddleware(isTeamMember)
+  @UseMiddleware(isAbleToDirectMessage)
   newDirectMessage(
     @Root() payload: DirectMessage,
     @Arg("userToId") _userToId: number,

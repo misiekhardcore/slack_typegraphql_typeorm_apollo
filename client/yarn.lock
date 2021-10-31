@@ -2,7 +2,7 @@
 # yarn lockfile v1
 
 
-"@apollo/client@^3.4.16":
+"@apollo/client@^3.1.3", "@apollo/client@^3.4.16":
   version "3.4.16"
   resolved "https://registry.yarnpkg.com/@apollo/client/-/client-3.4.16.tgz#67090d5655aa843fa64d26f1913315e384a5fa0f"
   integrity sha512-iF4zEYwvebkri0BZQyv8zfavPfVEafsK0wkOofa6eC2yZu50J18uTutKtC174rjHZ2eyxZ8tV7NvAPKRT+OtZw==
@@ -2205,6 +2205,15 @@
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-1.1.2.tgz#ccb91445360179a04e7fe6aff78c00ffc1eeaf82"
   integrity sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==
 
+"@types/apollo-upload-client@^14.1.0":
+  version "14.1.0"
+  resolved "https://registry.yarnpkg.com/@types/apollo-upload-client/-/apollo-upload-client-14.1.0.tgz#21a57d7e3f29ff946ba51a53b3d7da46ddd21fbc"
+  integrity sha512-ZLvcEqu+l9qKGdrIpASt/A2WY1ghAC9L3qaoegkiBOccjxvQmWN9liZzVFiuHTuWseWpVbMklqbs/z+KEjll9Q==
+  dependencies:
+    "@apollo/client" "^3.1.3"
+    "@types/extract-files" "*"
+    graphql "^15.3.0"
+
 "@types/aria-query@^4.2.0":
   version "4.2.2"
   resolved "https://registry.yarnpkg.com/@types/aria-query/-/aria-query-4.2.2.tgz#ed4e0ad92306a704f9fb132a0cfcf77486dbe2bc"
@@ -2260,6 +2269,11 @@
   version "0.0.39"
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.39.tgz#e177e699ee1b8c22d23174caaa7422644389509f"
   integrity sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==
+
+"@types/extract-files@*":
+  version "8.1.1"
+  resolved "https://registry.yarnpkg.com/@types/extract-files/-/extract-files-8.1.1.tgz#11b67e795ad2c8b483431e8d4f190db2fd22944b"
+  integrity sha512-dMJJqBqyhsfJKuK7p7HyyNmki7qj1AlwhUKWx6KrU7i1K2T2SPsUsSUTWFmr/sEM1q8rfR8j5IyUmYrDbrhfjQ==
 
 "@types/glob@^7.1.1":
   version "7.2.0"
@@ -3021,6 +3035,13 @@ anymatch@^3.0.0, anymatch@^3.0.3, anymatch@~3.1.2:
     normalize-path "^3.0.0"
     picomatch "^2.0.4"
 
+apollo-upload-client@^16.0.0:
+  version "16.0.0"
+  resolved "https://registry.yarnpkg.com/apollo-upload-client/-/apollo-upload-client-16.0.0.tgz#704c9bc21e12bd4687172876eb927cf756b2e524"
+  integrity sha512-aLhYucyA0T8aBEQ5g+p13qnR9RUyL8xqb8FSZ7e/Kw2KUOsotLUlFluLobqaE7JSUFwc6sKfXIcwB7y4yEjbZg==
+  dependencies:
+    extract-files "^11.0.0"
+
 aproba@^1.1.1:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/aproba/-/aproba-1.2.0.tgz#6802e6264efd18c790a1b0d517f0f2627bf2c94a"
@@ -3211,6 +3232,11 @@ atob@^2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
+
+attr-accept@^2.2.1:
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/attr-accept/-/attr-accept-2.2.2.tgz#646613809660110749e92f2c10833b70968d929b"
+  integrity sha512-7prDjvt9HmqiZ0cl5CRjtS84sEyhsHP2coDkaZKRKVfCDo9s7iw7ChVmar78Gu9pC4SoR/28wFu/G5JJhTnqEg==
 
 auto-bind@~4.0.0:
   version "4.0.0"
@@ -5928,7 +5954,7 @@ extglob@^2.0.4:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-extract-files@11.0.0:
+extract-files@11.0.0, extract-files@^11.0.0:
   version "11.0.0"
   resolved "https://registry.yarnpkg.com/extract-files/-/extract-files-11.0.0.tgz#b72d428712f787eef1f5193aff8ab5351ca8469a"
   integrity sha512-FuoE1qtbJ4bBVvv94CC7s0oTnKUGvQs+Rjf1L2SJFfS+HTVVjhPFtehPdQ0JiGPqVNfSSZvL5yzHHQq2Z4WNhQ==
@@ -6044,6 +6070,13 @@ file-loader@6.1.1:
   dependencies:
     loader-utils "^2.0.0"
     schema-utils "^3.0.0"
+
+file-selector@^0.2.2:
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/file-selector/-/file-selector-0.2.4.tgz#7b98286f9dbb9925f420130ea5ed0a69238d4d80"
+  integrity sha512-ZDsQNbrv6qRi1YTDOEWzf5J2KjZ9KMI1Q2SGeTkCJmNNW25Jg4TW4UMcmoqcg4WrAyKRcpBXdbWRxkfrOzVRbA==
+  dependencies:
+    tslib "^2.0.3"
 
 file-uri-to-path@1.0.0:
   version "1.0.0"
@@ -6513,6 +6546,11 @@ graphql-ws@^5.4.1:
   version "5.5.3"
   resolved "https://registry.yarnpkg.com/graphql-ws/-/graphql-ws-5.5.3.tgz#1495c1c1ad7dcd3cf76a46db629810a55d3b2d18"
   integrity sha512-Okp3gE3vq9OoeqsYVbmzKvPcvlinKNXrfVajH7D3ul1UdCg2+K2zVYbWKmqxehkAZ+GKVfngK5fzyXSsfpe+pA==
+
+graphql@^15.3.0:
+  version "15.7.1"
+  resolved "https://registry.yarnpkg.com/graphql/-/graphql-15.7.1.tgz#c821a1741e04e2bc2c91e138f34c06a86c0464f1"
+  integrity sha512-x34S6gC0/peBZnlK60zCJox/d45A7p6At9oN9EPA3qhoIAlR4LNZmXRLkICBckwwTMJzVdA8cx3QIQZMOl606A==
 
 graphql@^15.6.1:
   version "15.6.1"
@@ -10794,6 +10832,15 @@ react-dom@^17.0.2:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
     scheduler "^0.20.2"
+
+react-dropzone@^11.4.2:
+  version "11.4.2"
+  resolved "https://registry.yarnpkg.com/react-dropzone/-/react-dropzone-11.4.2.tgz#1eb99e9def4cc7520f4f58e85c853ce52c483d56"
+  integrity sha512-ocYzYn7Qgp0tFc1gQtUTOaHHSzVTwhWHxxY+r7cj2jJTPfMTZB5GWSJHdIVoxsl+EQENpjJ/6Zvcw0BqKZQ+Eg==
+  dependencies:
+    attr-accept "^2.2.1"
+    file-selector "^0.2.2"
+    prop-types "^15.7.2"
 
 react-error-overlay@^6.0.9:
   version "6.0.9"

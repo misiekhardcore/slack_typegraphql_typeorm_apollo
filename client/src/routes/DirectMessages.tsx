@@ -7,10 +7,10 @@ import { SendMessage } from "../components/SendMessage";
 import { DirectMessagesContainer } from "../containers/DirectMessagesContainer";
 import { Sidebar } from "../containers/Sidebar";
 import {
+  File,
   Team,
   useCreateDirectMessageMutation,
-  useGetUserQuery,
-  useMeQuery,
+  useGetDirectModalQuery,
 } from "../generated/graphql";
 
 interface DirectMessagesProps {
@@ -23,15 +23,11 @@ const DirectMessages: React.FC<DirectMessagesProps> = ({
   },
 }) => {
   const [createDirectMessage] = useCreateDirectMessageMutation();
-  const { loading, error, data } = useMeQuery();
-  const {
-    loading: loading2,
-    error: error2,
-    data: data2,
-  } = useGetUserQuery({ variables: { userId: +userId } });
+  const { loading, error, data } = useGetDirectModalQuery({
+    variables: { userId: +userId },
+  });
 
-  const { me } = data || {};
-  const { getUser } = data2 || {};
+  const { me, getUser } = data || {};
   const { teams, id } = me || {};
 
   const teamIdInt = parseInt(teamId);
@@ -53,7 +49,7 @@ const DirectMessages: React.FC<DirectMessagesProps> = ({
     return <Redirect to="/create-team" />;
   }
 
-  if (!(loading2 || getUser)) {
+  if (!(loading || getUser)) {
     console.error("no such user!");
     return <Redirect to={`/view-team/${teamId}`} />;
   }
@@ -74,15 +70,16 @@ const DirectMessages: React.FC<DirectMessagesProps> = ({
     return <Redirect to="/login" />;
   }
 
-  if (loading || error || loading2 || error2) return null;
+  if (loading || error) return null;
 
-  const onSubmit = async (message: string) =>
+  const onSubmit = async (message?: string, file?: File) =>
     await createDirectMessage({
       variables: {
         createDirectMessageInput: {
           teamId: team.id,
           userToId: userIdInt,
           text: message,
+          file,
         },
       },
     });

@@ -6,6 +6,7 @@ import DataLaoder from "dataloader";
 import { config } from "dotenv";
 import express, { Request, Response } from "express";
 import { execute, subscribe } from "graphql";
+import { graphqlUploadExpress } from "graphql-upload";
 import { createServer } from "http";
 import jwt from "jsonwebtoken";
 import "reflect-metadata";
@@ -153,7 +154,7 @@ export interface Context {
   };
 
   const options = await getConnectionOptions(
-    process.env.NODE_ENV || "production"
+    process.env.TEST_DB ? "development" : "production"
   );
   await createConnection({
     ...options,
@@ -194,6 +195,12 @@ export interface Context {
       };
     },
   });
+
+  app.use("/files", express.static("files"));
+
+  app.use(
+    graphqlUploadExpress({ maxFieldSize: 100000000, maxFiles: 10 })
+  );
 
   const corsOptions = {
     origin: "*",

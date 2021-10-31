@@ -10,6 +10,12 @@ subscription newDirectMessage($userToId: Float!, $teamId: Float!) {
       id
       username
     }
+    file {
+      id
+      filename
+      mimetype
+      url
+    }
     createdAt
     updatedAt
   }

@@ -6,6 +6,12 @@ query getMessages($channelId: Float!) {
       id
       username
     }
+    file {
+      id
+      filename
+      mimetype
+      url
+    }
     createdAt
     updatedAt
   }

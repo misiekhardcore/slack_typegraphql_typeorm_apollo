@@ -1,3 +1,4 @@
+import { File } from "../entity/File";
 import { getRepository, Repository } from "typeorm";
 import { Message } from "../entity/Message";
 import {
@@ -13,25 +14,31 @@ export class MessageService {
 
   public async create(
     createMessageInput: CreateMessageInput,
-    userId: number
-  ) {
-    return await this.messageRepository
-      .create({ ...createMessageInput, userId })
+    userId: number,
+    file: File | null
+  ): Promise<Message> {
+    return this.messageRepository
+      .create({ ...createMessageInput, userId, file })
       .save();
   }
 
-  public async update(updateMessageInput: UpdateMessageInput) {
+  public async update(
+    updateMessageInput: UpdateMessageInput
+  ): Promise<Message | undefined> {
     const { id, ...rest } = updateMessageInput;
     this.messageRepository.update({ id }, rest);
-    return await this.messageRepository.findOne(id);
+    return this.messageRepository.findOne(id);
   }
 
-  public async getOne(id: number) {
-    return await this.messageRepository.findOne(id);
+  public async getOne(id: number): Promise<Message | undefined> {
+    return this.messageRepository.findOne(id);
   }
 
-  public async getMany(channelId: number) {
-    return await this.messageRepository.find({ where: { channelId },order:{createdAt:'ASC'} });
+  public async getMany(channelId: number): Promise<Message[]> {
+    return this.messageRepository.find({
+      where: { channelId },
+      order: { createdAt: "ASC" },
+    });
   }
 
   public async populateMany<T>(

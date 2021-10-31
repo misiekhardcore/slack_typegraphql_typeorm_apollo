@@ -11,21 +11,25 @@ import {
   ResolverInterface,
   Root,
   Subscription,
-  UseMiddleware
+  UseMiddleware,
 } from "type-graphql";
 import { Channel } from "../entity/Channel";
+import { File } from "../entity/File";
 import { Message } from "../entity/Message";
 import { User } from "../entity/User";
 import { Context } from "../index";
 import { CreateMessageInput } from "../inputs/MessageInput";
 import { isTeamMember } from "../permissions";
+import { FileService } from "../services/file.service";
 import { MessageService } from "../services/message.service";
 
 @Resolver(() => Message)
 export class MessageResolver implements ResolverInterface<Message> {
   private readonly messageService: MessageService;
+  private readonly fileService: FileService;
   constructor() {
     this.messageService = new MessageService();
+    this.fileService = new FileService();
   }
 
   @Query(() => [Message])
@@ -45,9 +49,16 @@ export class MessageResolver implements ResolverInterface<Message> {
     @Ctx() { user }: Context,
     @PubSub("NEW_MESSAGE") publish: Publisher<Message>
   ): Promise<Message> {
+    let rawFile = await createMessageInput.file;
+    let file: File | null = null;
+    if (rawFile) {
+      file = await this.fileService.create(rawFile);
+    }
+
     const message = await this.messageService.create(
       createMessageInput,
-      user?.id || 0
+      user!.id,
+      file
     );
 
     await publish(message);
@@ -86,6 +97,14 @@ export class MessageResolver implements ResolverInterface<Message> {
     return (
       (await this.messageService.populateOne<User>(message, "user")) ||
       new User()
+    );
+  }
+
+  @FieldResolver()
+  async file(@Root() message: Message) {
+    return (
+      (await this.messageService.populateOne<File>(message, "file")) ||
+      new File()
     );
   }
 }

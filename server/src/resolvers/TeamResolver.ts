@@ -18,7 +18,7 @@ import { Team } from "../entity/Team";
 import { User } from "../entity/User";
 import { Context } from "../index";
 import { AddMemberInput, CreateTeamInput } from "../inputs/TeamInputs";
-import { isAuth } from "../permissions";
+import { isAuth, isTeamMember } from "../permissions";
 import { TeamMemberService } from "../services/team-member.service";
 import { TeamService } from "../services/team.service";
 import { UserService } from "../services/user.service";
@@ -50,18 +50,15 @@ export class TeamResolver implements ResolverInterface<Team> {
   }
 
   @Query(() => Team, { nullable: true })
-  @UseMiddleware(isAuth)
+  @UseMiddleware(isTeamMember)
   async getTeam(
     @Ctx() { user }: Context,
     @Arg("teamId") teamId: number
   ) {
     if (user) {
       const team = await this.teamService.getOne(teamId);
-      const member = await this.teamMemberService.getOne(
-        user.id,
-        teamId
-      );
-      if (member?.admin) return team;
+
+      if (team) return team;
     }
     return null;
   }

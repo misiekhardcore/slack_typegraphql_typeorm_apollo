@@ -1,5 +1,6 @@
-import { DirectMessage } from "../entity/DirectMessage";
 import { getRepository, Repository } from "typeorm";
+import { DirectMessage } from "../entity/DirectMessage";
+import { File } from "../entity/File";
 import {
   CreateDirectMessageInput,
   UpdateDirectMessageInput,
@@ -13,20 +14,23 @@ export class DirectMessageService {
 
   public async create(
     createMessageInput: CreateDirectMessageInput,
-    userId: number
-  ) {
+    userId: number,
+    file: File | null
+  ): Promise<DirectMessage> {
     return await this.directMessageRepository
-      .create({ ...createMessageInput, userFromId: userId })
+      .create({ ...createMessageInput, userFromId: userId, file })
       .save();
   }
 
-  public async update(updateMessageInput: UpdateDirectMessageInput) {
+  public async update(
+    updateMessageInput: UpdateDirectMessageInput
+  ): Promise<DirectMessage | undefined> {
     const { id, ...rest } = updateMessageInput;
     this.directMessageRepository.update({ id }, rest);
     return await this.directMessageRepository.findOne(id);
   }
 
-  public async getOne(id: number) {
+  public async getOne(id: number): Promise<DirectMessage | undefined> {
     return await this.directMessageRepository.findOne(id);
   }
 
@@ -34,7 +38,7 @@ export class DirectMessageService {
     userFromId: number,
     userToId: number,
     teamId: number
-  ) {
+  ): Promise<DirectMessage[]> {
     return await this.directMessageRepository.find({
       where: [
         { userFromId, userToId, teamId },

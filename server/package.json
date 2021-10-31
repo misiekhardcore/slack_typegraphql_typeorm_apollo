@@ -2,15 +2,25 @@
   "name": "server",
   "version": "0.0.1",
   "devDependencies": {
+    "@babel/core": "^7.15.8",
+    "@babel/preset-env": "^7.15.8",
+    "@babel/preset-typescript": "^7.15.0",
+    "@types/axios": "^0.14.0",
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.2",
+    "@types/graphql-upload": "^8.0.7",
+    "@types/jest": "^27.0.2",
     "@types/jsonwebtoken": "^8.5.4",
     "@types/node": "^16.4.14",
     "@typescript-eslint/eslint-plugin": "^4.29.1",
     "@typescript-eslint/parser": "^4.29.1",
+    "axios": "^0.24.0",
+    "babel-cli": "^6.26.0",
+    "babel-jest": "^27.3.1",
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.24.0",
+    "jest": "^27.3.1",
     "nodemon": "^2.0.12",
     "ts-node": "10.2.0",
     "ts-node-dev": "^1.1.6",
@@ -24,6 +34,7 @@
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "graphql": "^15.5.0",
+    "graphql-upload": "^12.0.0",
     "jsonwebtoken": "^8.5.1",
     "pg": "^8.6.0",
     "reflect-metadata": "^0.1.13",
@@ -35,6 +46,13 @@
   },
   "scripts": {
     "start": "ts-node-dev src/index.ts",
-    "build": "tsc"
+    "test-server": "./reset_test_db.sh; TEST_DB=testslack ts-node-dev src/index.ts",
+    "build": "tsc",
+    "test": "jest"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.jsx?$": "babel-jest"
+    }
   }
 }

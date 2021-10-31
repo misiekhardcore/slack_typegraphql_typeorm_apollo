@@ -22,10 +22,17 @@ const ViewTeam: React.FC<ViewTeamProps> = ({
   },
 }) => {
   const [createMessage] = useCreateMessageMutation();
-  const { loading, error, data } = useMeQuery();
+  const { loading, error, data } = useMeQuery({
+    fetchPolicy: "cache-and-network",
+  });
 
   const { me } = data || {};
   const { teams, id } = me || {};
+
+  if (!(id || loading)) {
+    console.error("no user id!");
+    return <Redirect to="/login" />;
+  }
 
   const teamIdInt = parseInt(teamId);
 
@@ -56,11 +63,6 @@ const ViewTeam: React.FC<ViewTeamProps> = ({
     return <Redirect to="/create-team" />;
   }
 
-  if (!id) {
-    console.error("no user id!");
-    return <Redirect to="/login" />;
-  }
-
   const channelIdx = channelId
     ? findIndex(team.channels, ["id", channelIdInt])
     : 0;
@@ -68,12 +70,13 @@ const ViewTeam: React.FC<ViewTeamProps> = ({
 
   if (loading || error) return null;
 
-  const onSubmit = async (message: string) =>
+  const onSubmit = async (message?: string, file?: any) =>
     await createMessage({
       variables: {
         createMessageInput: {
           channelId: channel.id,
           text: message,
+          file,
         },
       },
     });
@@ -86,7 +89,7 @@ const ViewTeam: React.FC<ViewTeamProps> = ({
           letter: t.name.charAt(0).toUpperCase(),
         }))}
         team={team as Team}
-        userId={id}
+        userId={id || 0}
       />
       {channel && (
         <>

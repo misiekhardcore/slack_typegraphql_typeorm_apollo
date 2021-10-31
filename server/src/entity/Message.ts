@@ -6,11 +6,13 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
+  UpdateDateColumn,
 } from "typeorm";
 import { Channel } from "./Channel";
 import { User } from "./User";
+import { File } from "./File";
 
 @Entity({ name: "messages" })
 @ObjectType()
@@ -19,9 +21,9 @@ export class Message extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field(() => String)
-  @Column()
-  text: string;
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true, type: "text" })
+  text: string | null;
 
   @Column()
   channelId: number;
@@ -40,6 +42,13 @@ export class Message extends BaseEntity {
   })
   @JoinColumn({ name: "user_id" })
   user: User;
+
+  @Column({ nullable: true })
+  fileId: number | null;
+  @Field(() => File, { nullable: true })
+  @OneToOne(() => File, { nullable: true })
+  @JoinColumn({ name: "file_id" })
+  file: File | null;
 
   @Field(() => String)
   @CreateDateColumn()

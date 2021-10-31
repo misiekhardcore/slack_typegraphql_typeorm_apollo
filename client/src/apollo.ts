@@ -1,15 +1,15 @@
 import {
   ApolloClient,
   ApolloLink,
-  createHttpLink,
   InMemoryCache,
   split,
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { WebSocketLink } from "@apollo/client/link/ws";
 import { getMainDefinition } from "@apollo/client/utilities";
+import { createUploadLink } from "apollo-upload-client";
 
-const httpLink = createHttpLink({
+const httpLink = createUploadLink({
   uri: "http://localhost:4000/graphql",
   credentials: "same-origin",
 });
@@ -54,10 +54,10 @@ const wsLink = new WebSocketLink({
   uri: "ws://localhost:4000/graphql",
   options: {
     reconnect: true,
-    connectionParams: {
+    connectionParams: () => ({
       token: localStorage.getItem("token"),
       refreshToken: localStorage.getItem("refreshToken"),
-    },
+    }),
   },
 });
 

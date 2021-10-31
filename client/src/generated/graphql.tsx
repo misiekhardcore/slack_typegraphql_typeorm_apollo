@@ -12,6 +12,8 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  /** The `Upload` scalar type represents a file upload. */
+  Upload: any;
 };
 
 export type AddMemberInput = {
@@ -52,14 +54,16 @@ export type CreateChannelResponse = {
 };
 
 export type CreateDirectMessageInput = {
+  file?: Maybe<Scalars['Upload']>;
   teamId: Scalars['Float'];
-  text: Scalars['String'];
+  text?: Maybe<Scalars['String']>;
   userToId: Scalars['Float'];
 };
 
 export type CreateMessageInput = {
   channelId: Scalars['Float'];
-  text: Scalars['String'];
+  file?: Maybe<Scalars['Upload']>;
+  text?: Maybe<Scalars['String']>;
 };
 
 export type CreateTeamInput = {
@@ -89,12 +93,22 @@ export type CreateUserResponse = {
 export type DirectMessage = {
   __typename?: 'DirectMessage';
   createdAt: Scalars['String'];
+  file?: Maybe<File>;
   id: Scalars['Int'];
   team: Team;
-  text: Scalars['String'];
+  text?: Maybe<Scalars['String']>;
   updatedAt: Scalars['String'];
   userFrom: User;
   userTo: User;
+};
+
+export type File = {
+  __typename?: 'File';
+  encoding: Scalars['String'];
+  filename: Scalars['String'];
+  id: Scalars['Float'];
+  mimetype: Scalars['String'];
+  url: Scalars['String'];
 };
 
 export type ListError = {
@@ -120,8 +134,9 @@ export type Message = {
   __typename?: 'Message';
   channel: Channel;
   createdAt: Scalars['String'];
+  file?: Maybe<File>;
   id: Scalars['Int'];
-  text: Scalars['String'];
+  text?: Maybe<Scalars['String']>;
   updatedAt: Scalars['String'];
   user: User;
 };
@@ -295,14 +310,14 @@ export type CreateDirectMessageMutationVariables = Exact<{
 }>;
 
 
-export type CreateDirectMessageMutation = { __typename?: 'Mutation', createDirectMessage: { __typename?: 'DirectMessage', id: number, text: string } };
+export type CreateDirectMessageMutation = { __typename?: 'Mutation', createDirectMessage: { __typename?: 'DirectMessage', id: number, text?: string | null | undefined } };
 
 export type CreateMessageMutationVariables = Exact<{
   createMessageInput: CreateMessageInput;
 }>;
 
 
-export type CreateMessageMutation = { __typename?: 'Mutation', createMessage: { __typename?: 'Message', text: string, id: number } };
+export type CreateMessageMutation = { __typename?: 'Mutation', createMessage: { __typename?: 'Message', text?: string | null | undefined, id: number } };
 
 export type CreateTeamMutationVariables = Exact<{
   createTeamInput: CreateTeamInput;
@@ -331,14 +346,21 @@ export type GetDirectMessageQueryVariables = Exact<{
 }>;
 
 
-export type GetDirectMessageQuery = { __typename?: 'Query', getDirectMessages: Array<{ __typename?: 'DirectMessage', id: number, text: string, createdAt: string, updatedAt: string, userTo: { __typename?: 'User', id: number, username: string }, userFrom: { __typename?: 'User', id: number, username: string } }> };
+export type GetDirectMessageQuery = { __typename?: 'Query', getDirectMessages: Array<{ __typename?: 'DirectMessage', id: number, text?: string | null | undefined, createdAt: string, updatedAt: string, userTo: { __typename?: 'User', id: number, username: string }, userFrom: { __typename?: 'User', id: number, username: string }, file?: { __typename?: 'File', id: number, filename: string, mimetype: string, url: string } | null | undefined }> };
+
+export type GetDirectModalQueryVariables = Exact<{
+  userId: Scalars['Float'];
+}>;
+
+
+export type GetDirectModalQuery = { __typename?: 'Query', getUser?: { __typename?: 'User', id: number, username: string } | null | undefined, me?: { __typename?: 'User', id: number, username: string, teams?: Array<{ __typename?: 'Team', id: number, name: string, admin: boolean, channels: Array<{ __typename?: 'Channel', id: number, isPublic: boolean, name: string }>, members: Array<{ __typename?: 'User', username: string, id: number }> }> | null | undefined } | null | undefined };
 
 export type GetMessagesQueryVariables = Exact<{
   channelId: Scalars['Float'];
 }>;
 
 
-export type GetMessagesQuery = { __typename?: 'Query', getMessages: Array<{ __typename?: 'Message', id: number, text: string, createdAt: string, updatedAt: string, user: { __typename?: 'User', id: number, username: string } }> };
+export type GetMessagesQuery = { __typename?: 'Query', getMessages: Array<{ __typename?: 'Message', id: number, text?: string | null | undefined, createdAt: string, updatedAt: string, user: { __typename?: 'User', id: number, username: string }, file?: { __typename?: 'File', id: number, filename: string, mimetype: string, url: string } | null | undefined }> };
 
 export type GetTeamMembersQueryVariables = Exact<{
   teamId: Scalars['Float'];
@@ -375,14 +397,14 @@ export type NewDirectMessageSubscriptionVariables = Exact<{
 }>;
 
 
-export type NewDirectMessageSubscription = { __typename?: 'Subscription', newDirectMessage: { __typename?: 'DirectMessage', id: number, text: string, createdAt: string, updatedAt: string, userFrom: { __typename?: 'User', id: number, username: string }, userTo: { __typename?: 'User', id: number, username: string } } };
+export type NewDirectMessageSubscription = { __typename?: 'Subscription', newDirectMessage: { __typename?: 'DirectMessage', id: number, text?: string | null | undefined, createdAt: string, updatedAt: string, userFrom: { __typename?: 'User', id: number, username: string }, userTo: { __typename?: 'User', id: number, username: string }, file?: { __typename?: 'File', id: number, filename: string, mimetype: string, url: string } | null | undefined } };
 
 export type NewMessageSubscriptionVariables = Exact<{
   channelId: Scalars['Float'];
 }>;
 
 
-export type NewMessageSubscription = { __typename?: 'Subscription', newMessage: { __typename?: 'Message', id: number, text: string, createdAt: string, updatedAt: string, user: { __typename?: 'User', id: number, username: string } } };
+export type NewMessageSubscription = { __typename?: 'Subscription', newMessage: { __typename?: 'Message', id: number, text?: string | null | undefined, createdAt: string, updatedAt: string, user: { __typename?: 'User', id: number, username: string }, file?: { __typename?: 'File', id: number, filename: string, mimetype: string, url: string } | null | undefined } };
 
 
 export const AddMemberDocument = gql`
@@ -675,6 +697,12 @@ export const GetDirectMessageDocument = gql`
       id
       username
     }
+    file {
+      id
+      filename
+      mimetype
+      url
+    }
     createdAt
     updatedAt
   }
@@ -709,6 +737,60 @@ export function useGetDirectMessageLazyQuery(baseOptions?: Apollo.LazyQueryHookO
 export type GetDirectMessageQueryHookResult = ReturnType<typeof useGetDirectMessageQuery>;
 export type GetDirectMessageLazyQueryHookResult = ReturnType<typeof useGetDirectMessageLazyQuery>;
 export type GetDirectMessageQueryResult = Apollo.QueryResult<GetDirectMessageQuery, GetDirectMessageQueryVariables>;
+export const GetDirectModalDocument = gql`
+    query getDirectModal($userId: Float!) {
+  getUser(userId: $userId) {
+    id
+    username
+  }
+  me {
+    id
+    username
+    teams {
+      id
+      name
+      admin
+      channels {
+        id
+        isPublic
+        name
+      }
+      members {
+        username
+        id
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetDirectModalQuery__
+ *
+ * To run a query within a React component, call `useGetDirectModalQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDirectModalQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDirectModalQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGetDirectModalQuery(baseOptions: Apollo.QueryHookOptions<GetDirectModalQuery, GetDirectModalQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDirectModalQuery, GetDirectModalQueryVariables>(GetDirectModalDocument, options);
+      }
+export function useGetDirectModalLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDirectModalQuery, GetDirectModalQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDirectModalQuery, GetDirectModalQueryVariables>(GetDirectModalDocument, options);
+        }
+export type GetDirectModalQueryHookResult = ReturnType<typeof useGetDirectModalQuery>;
+export type GetDirectModalLazyQueryHookResult = ReturnType<typeof useGetDirectModalLazyQuery>;
+export type GetDirectModalQueryResult = Apollo.QueryResult<GetDirectModalQuery, GetDirectModalQueryVariables>;
 export const GetMessagesDocument = gql`
     query getMessages($channelId: Float!) {
   getMessages(channelId: $channelId) {
@@ -717,6 +799,12 @@ export const GetMessagesDocument = gql`
     user {
       id
       username
+    }
+    file {
+      id
+      filename
+      mimetype
+      url
     }
     createdAt
     updatedAt
@@ -969,6 +1057,12 @@ export const NewDirectMessageDocument = gql`
       id
       username
     }
+    file {
+      id
+      filename
+      mimetype
+      url
+    }
     createdAt
     updatedAt
   }
@@ -1006,6 +1100,12 @@ export const NewMessageDocument = gql`
     user {
       id
       username
+    }
+    file {
+      id
+      filename
+      mimetype
+      url
     }
     createdAt
     updatedAt

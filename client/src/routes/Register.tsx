@@ -35,7 +35,7 @@ const Register: React.FC = () => {
       variables: { userInput: state },
     });
   };
-  if (data?.register.ok) history.push("/");
+  if (data?.register.ok) history.push("/login");
 
   return (
     <Container>

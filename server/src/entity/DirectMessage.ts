@@ -6,9 +6,11 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { File } from "./File";
 import { Team } from "./Team";
 import { User } from "./User";
 
@@ -19,9 +21,9 @@ export class DirectMessage extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field(() => String)
-  @Column()
-  text: string;
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true, type: "text" })
+  text: string | null;
 
   @Column({ nullable: false })
   teamId: number;
@@ -49,6 +51,13 @@ export class DirectMessage extends BaseEntity {
   })
   @JoinColumn({ name: "user_to_id" })
   userTo: User;
+
+  @Column({ nullable: true })
+  fileId: number | null;
+  @Field(() => File, { nullable: true })
+  @OneToOne(() => File, { nullable: true })
+  @JoinColumn({ name: "file_id" })
+  file: File | null;
 
   @Field(() => String)
   @CreateDateColumn()

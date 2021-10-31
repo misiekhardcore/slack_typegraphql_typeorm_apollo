@@ -13,6 +13,7 @@ const message = ({
   text,
   createdAt,
   id,
+  file,
   userFrom: { username },
 }: DirectMessage): JSX.Element => (
   <Comment key={`dir-mess-${id}`}>
@@ -23,6 +24,14 @@ const message = ({
         <div>{new Date(+createdAt).toLocaleString()}</div>
       </Comment.Metadata>
       <Comment.Text>{text}</Comment.Text>
+      {file && (
+        <Comment.Text>
+          <img
+            src={`http://localhost:4000${file.url}`}
+            alt={file.filename}
+          />
+        </Comment.Text>
+      )}
       <Comment.Actions>
         <Comment.Action>Reply</Comment.Action>
       </Comment.Actions>

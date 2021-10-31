@@ -1,10 +1,18 @@
 module.exports = [
   {
     name: "development",
-    type: "sqlite",
-    database: "database.sqlite",
-    synchronize: true,
+    type: "postgres",
+    url: "postgres://postgres:postgres@localhost:5432/testslack",
+    synchronize: true, // switch this to false once you have the initial tables created and use migrations instead
     logging: true,
+    // entities: ["dist/entity/**/*.js"],
+    // migrations: ["dist/migration/**/*.js"],
+    // subscribers: ["dist/subscriber/**/*.js"],
+    // cli: {
+    //   entitiesDir: "dist/entity",
+    //   migrationsDir: "dist/migration",
+    //   subscribersDir: "dist/subscriber",
+    // },
     entities: ["src/entity/**/*.ts"],
     migrations: ["src/migration/**/*.ts"],
     subscribers: ["src/subscriber/**/*.ts"],
@@ -19,7 +27,7 @@ module.exports = [
     type: "postgres",
     url: "postgres://postgres:postgres@localhost:5432/slack",
     synchronize: true, // switch this to false once you have the initial tables created and use migrations instead
-    logging: false,
+    logging: true,
     // entities: ["dist/entity/**/*.js"],
     // migrations: ["dist/migration/**/*.js"],
     // subscribers: ["dist/subscriber/**/*.js"],

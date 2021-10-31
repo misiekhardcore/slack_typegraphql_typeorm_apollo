@@ -92,6 +92,7 @@ export const Channels: React.FC<ChannelsProps> = ({
   const allPeople = (members || []).filter(
     (user) => user.id !== userId
   );
+
   return (
     <ChannelsWrapper>
       <PushLeft>

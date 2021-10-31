@@ -35,7 +35,7 @@ const Login: React.FC = () => {
     if (token) localStorage.setItem("token", token);
     if (refreshToken)
       localStorage.setItem("refreshToken", refreshToken);
-    history.push("/");
+    history.push("/view-team");
   }
 
   return (
