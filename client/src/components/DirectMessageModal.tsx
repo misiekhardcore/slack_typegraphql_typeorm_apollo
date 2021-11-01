@@ -64,7 +64,6 @@ export const DirectMessageModal: React.FC<DirectMessageModalProps> = ({
               {({
                 getInputProps,
                 getItemProps,
-                getLabelProps,
                 getMenuProps,
                 isOpen,
                 inputValue,

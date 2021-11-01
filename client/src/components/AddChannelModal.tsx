@@ -4,6 +4,7 @@ import { findIndex } from "lodash";
 import React, { useEffect, useRef } from "react";
 import {
   Button,
+  Checkbox,
   Form,
   FormField,
   FormGroup,
@@ -17,6 +18,7 @@ import {
   useCreateChannelMutation,
 } from "../generated/graphql";
 import errorToFieldError from "../utils/errorToFieldError";
+import { MultiSelectUsers } from "./MultiSelectUsers";
 
 interface AddChannelModalProps {
   teamId: number;
@@ -42,9 +44,11 @@ export const AddChannelModal: React.FC<AddChannelModalProps> = ({
     values,
     touched,
     errors,
+    setFieldValue,
   } = useFormik({
     initialValues: {
       channelName: "",
+      isPublic: true,
     },
     onSubmit: async (
       values,
@@ -58,6 +62,7 @@ export const AddChannelModal: React.FC<AddChannelModalProps> = ({
             createChannelChannelInput: {
               name: values.channelName,
               teamId,
+              isPublic: values.isPublic,
             },
           },
           update: (cache, { data: data2 }) => {
@@ -133,6 +138,22 @@ export const AddChannelModal: React.FC<AddChannelModalProps> = ({
               value={values.channelName}
             />
           </FormField>
+          <FormField>
+            <Checkbox
+              checked={!values.isPublic}
+              value={values.isPublic + ""}
+              name="isPublic"
+              onChange={(_e, { checked }) =>
+                setFieldValue("isPublic", !checked)
+              }
+              label="Make this channel private"
+            />
+          </FormField>
+          {!values.isPublic && (
+            <FormField>
+              <MultiSelectUsers teamId={teamId} />
+            </FormField>
+          )}
           {touched.channelName && errors.channelName ? (
             <Message negative content={errors.channelName} />
           ) : null}
