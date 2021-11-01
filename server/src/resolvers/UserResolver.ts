@@ -7,34 +7,36 @@ import {
   Resolver,
   Root,
   UseMiddleware,
-} from "type-graphql";
-import { Channel } from "../entity/Channel";
-import { CreateUserResponse, LoginResponse } from "../entity/Outputs";
-import { Team } from "../entity/Team";
-import { User } from "../entity/User";
-import { Context } from "../index";
+} from 'type-graphql';
+import { Channel } from '../entity/Channel';
+import { CreateUserResponse, LoginResponse } from '../entity/Outputs';
+import { Team } from '../entity/Team';
+import { User } from '../entity/User';
+import { Context } from '../index';
 import {
   CreateUserInput,
   LoginUserInput,
   UpdateUserInput,
-} from "../inputs/UserInputs";
-import { isAuth } from "../permissions";
-import { UserService } from "../services/user.service";
+} from '../inputs/UserInputs';
+import { isAuth } from '../permissions';
+import { UserService } from '../services/user.service';
 
 @Resolver(() => User)
 export class UserResolver {
   private readonly userService;
+
   constructor() {
     this.userService = new UserService();
   }
+
   @Query(() => [User], { nullable: true })
   async getUsers(): Promise<User[]> {
-    return await this.userService.getMany();
+    return this.userService.getMany();
   }
 
   @Query(() => User, { nullable: true })
   @UseMiddleware(isAuth)
-  async getUser(@Arg("userId") userId: number): Promise<User | null> {
+  async getUser(@Arg('userId') userId: number): Promise<User | null> {
     return (await this.userService.getOneById(userId)) || null;
   }
 
@@ -47,7 +49,7 @@ export class UserResolver {
 
   @Mutation(() => CreateUserResponse)
   async register(
-    @Arg("userInput")
+    @Arg('userInput')
     cerateUserInput: CreateUserInput
   ): Promise<CreateUserResponse> {
     try {
@@ -60,7 +62,7 @@ export class UserResolver {
 
   @Mutation(() => LoginResponse)
   async login(
-    @Arg("userInput") loginUserInput: LoginUserInput,
+    @Arg('userInput') loginUserInput: LoginUserInput,
     @Ctx() { jwtSecret1, jwtSecret2 }: Context
   ): Promise<LoginResponse> {
     const { email, password } = loginUserInput;
@@ -68,14 +70,14 @@ export class UserResolver {
     if (!user)
       return {
         ok: false,
-        errors: [{ path: "email", msg: "user not found" }],
+        errors: [{ path: 'email', msg: 'user not found' }],
       };
     if (!user.validatePassword(password))
       return {
         ok: false,
         errors: [
-          { path: "email", msg: "invalid email or password" },
-          { path: "password", msg: "" },
+          { path: 'email', msg: 'invalid email or password' },
+          { path: 'password', msg: '' },
         ],
       };
 
@@ -94,9 +96,9 @@ export class UserResolver {
 
   @Mutation(() => User)
   async updateUser(
-    @Arg("userInput", { nullable: false }) userInput: UpdateUserInput
+    @Arg('userInput', { nullable: false }) userInput: UpdateUserInput
   ) {
-    return await this.userService.update(userInput);
+    return this.userService.update(userInput);
   }
 
   @FieldResolver()
@@ -104,7 +106,7 @@ export class UserResolver {
     @Root() user: User,
     @Ctx() { memberTeamsLoader }: Context
   ): Promise<Team[]> {
-    return await memberTeamsLoader.load(user.id);
+    return memberTeamsLoader.load(user.id);
   }
 
   @FieldResolver()
@@ -112,6 +114,6 @@ export class UserResolver {
     @Root() user: User,
     @Ctx() { userChannelsLoader }: Context
   ): Promise<Channel[]> {
-    return await userChannelsLoader.load(user.id);
+    return userChannelsLoader.load(user.id);
   }
 }

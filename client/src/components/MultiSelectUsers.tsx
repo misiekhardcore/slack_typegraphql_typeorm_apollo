@@ -1,9 +1,9 @@
-import Downshift from "downshift";
-import React from "react";
-import { useHistory } from "react-router";
-import { Input } from "semantic-ui-react";
-import styled from "styled-components";
-import { useGetTeamMembersQuery } from "../generated/graphql";
+import Downshift from 'downshift';
+import React from 'react';
+import { useHistory } from 'react-router';
+import { Input } from 'semantic-ui-react';
+import styled from 'styled-components';
+import { useGetTeamMembersQuery } from '../generated/graphql';
 
 const MembersList = styled.ul`
   list-style: none;
@@ -38,7 +38,7 @@ export const MultiSelectUsers: React.FC<MultiSelectUsersProps> = ({
         )[0].id;
         history.push(`/view-team/user/${teamId}/${memberId}`);
       }}
-      itemToString={(item) => (item ? item.username : "")}
+      itemToString={(item) => (item ? item.username : '')}
     >
       {({
         getInputProps,
@@ -62,8 +62,7 @@ export const MultiSelectUsers: React.FC<MultiSelectUsersProps> = ({
             {isOpen
               ? filteredMembers
                   .filter(
-                    (item) =>
-                      !inputValue || item.username.includes(inputValue)
+                    (item) => !inputValue || item.username.includes(inputValue)
                   )
                   .map((item, index) => (
                     <li
@@ -73,11 +72,8 @@ export const MultiSelectUsers: React.FC<MultiSelectUsersProps> = ({
                         item,
                         style: {
                           backgroundColor:
-                            highlightedIndex === index
-                              ? "lightgray"
-                              : "white",
-                          fontWeight:
-                            selectedItem === item ? "bold" : "normal",
+                            highlightedIndex === index ? 'lightgray' : 'white',
+                          fontWeight: selectedItem === item ? 'bold' : 'normal',
                         },
                       })}
                     >

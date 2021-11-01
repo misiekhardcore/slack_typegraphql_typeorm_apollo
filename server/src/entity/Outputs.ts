@@ -1,7 +1,7 @@
-import { Field, ObjectType } from "type-graphql";
-import { Channel } from "./Channel";
-import { Team } from "./Team";
-import { User } from "./User";
+import { Field, ObjectType } from 'type-graphql';
+import { Channel } from './Channel';
+import { Team } from './Team';
+import { User } from './User';
 
 @ObjectType()
 export class ListError {
@@ -30,10 +30,10 @@ export class LoginResponse {
   ok: boolean;
 
   @Field(() => String, { nullable: true })
-  token?: String;
+  token?: string;
 
   @Field(() => String, { nullable: true })
-  refreshToken?: String;
+  refreshToken?: string;
 
   @Field(() => [ListError], { nullable: true })
   errors?: ListError[];

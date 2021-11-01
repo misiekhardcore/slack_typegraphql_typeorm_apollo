@@ -1,8 +1,8 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { Icon as Icona } from "semantic-ui-react";
-import styled from "styled-components";
-import { Channel, Team, User } from "../generated/graphql";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Icon as Icona } from 'semantic-ui-react';
+import styled from 'styled-components';
+import { Channel, Team, User } from '../generated/graphql';
 
 const ChannelsWrapper = styled.div`
   grid-column: 2;
@@ -22,7 +22,7 @@ const SideBarList = styled.ul`
   padding-left: 0;
 `;
 
-const paddingLeft = "padding-left:10px;";
+const paddingLeft = 'padding-left:10px;';
 
 const SideBarListItem = styled.li`
   ${paddingLeft}
@@ -54,10 +54,7 @@ const Icon = styled(Icona)`
   }
 `;
 
-const channel = (
-  { id, name }: Channel,
-  teamId: number
-): JSX.Element => (
+const channel = ({ id, name }: Channel, teamId: number): JSX.Element => (
   <Link key={`channel-${id}`} to={`/view-team/${teamId}/${id}`}>
     <SideBarListItem>{`# ${name}`}</SideBarListItem>
   </Link>
@@ -89,9 +86,7 @@ export const Channels: React.FC<ChannelsProps> = ({
 }) => {
   const { channels, name, id, members, admin } = team || {};
 
-  const allPeople = (members || []).filter(
-    (user) => user.id !== userId
-  );
+  const allPeople = (members || []).filter((user) => user.id !== userId);
 
   return (
     <ChannelsWrapper>
@@ -102,9 +97,7 @@ export const Channels: React.FC<ChannelsProps> = ({
       <SideBarList>
         <SideBarListHeader>
           Channels
-          {admin && (
-            <Icon onClick={onAddChannelClick} name="add circle" />
-          )}
+          {admin && <Icon onClick={onAddChannelClick} name="add circle" />}
         </SideBarListHeader>
         {channels.map((chan) => channel(chan, id))}
       </SideBarList>
@@ -115,7 +108,7 @@ export const Channels: React.FC<ChannelsProps> = ({
         </SideBarListHeader>
         {allPeople.map((us) => user(us, id))}
         {admin && (
-          <SideBarListItem style={{ marginTop: "0.5rem" }}>
+          <SideBarListItem style={{ marginTop: '0.5rem' }}>
             <a href="#invite-people" onClick={onInvitePeople}>
               + Invite People
             </a>

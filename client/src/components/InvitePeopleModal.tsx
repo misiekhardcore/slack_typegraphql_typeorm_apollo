@@ -1,7 +1,7 @@
-import { useFormik } from "formik";
-import gql from "graphql-tag";
-import { findIndex } from "lodash";
-import React, { useEffect, useRef } from "react";
+import { useFormik } from 'formik';
+import gql from 'graphql-tag';
+import { findIndex } from 'lodash';
+import React, { useEffect, useRef } from 'react';
 import {
   Button,
   Form,
@@ -10,15 +10,15 @@ import {
   Input,
   Message,
   Modal,
-} from "semantic-ui-react";
+} from 'semantic-ui-react';
 import {
   GetTeamMembersDocument,
   GetTeamMembersQuery,
   MeDocument,
   MeQuery,
   useAddMemberMutation,
-} from "../generated/graphql";
-import errorToFieldError from "../utils/errorToFieldError";
+} from '../generated/graphql';
+import errorToFieldError from '../utils/errorToFieldError';
 
 interface InvitePeopleModalProps {
   teamId: number;
@@ -46,13 +46,10 @@ export const InvitePeopleModal: React.FC<InvitePeopleModalProps> = ({
     errors,
   } = useFormik({
     initialValues: {
-      email: "",
+      email: '',
     },
-    onSubmit: async (
-      values,
-      { setSubmitting, resetForm, setErrors }
-    ) => {
-      if (!values.email) setErrors({ email: "Field cannot be empty" });
+    onSubmit: async (values, { setSubmitting, resetForm, setErrors }) => {
+      if (!values.email) setErrors({ email: 'Field cannot be empty' });
       else {
         const response = await addMember({
           variables: {
@@ -70,23 +67,18 @@ export const InvitePeopleModal: React.FC<InvitePeopleModalProps> = ({
               variables: { teamId },
             });
 
-            const teamIdx = findIndex(meData?.me?.teams, [
-              "id",
-              teamId,
-            ]);
+            const teamIdx = findIndex(meData?.me?.teams, ['id', teamId]);
             if (
               meData?.me?.teams &&
               meData.me.teams[teamIdx]?.members &&
               addMember?.member
             ) {
-              const notAlreadyInTeam = meData.me.teams[
-                teamIdx
-              ].members.every(
+              const notAlreadyInTeam = meData.me.teams[teamIdx].members.every(
                 (member) => member.id !== addMember.member?.id
               );
               if (notAlreadyInTeam) {
                 cache.writeFragment({
-                  id: "Team:" + teamId,
+                  id: `Team:${teamId}`,
                   fragment: gql`
                     fragment Member on Team {
                       members

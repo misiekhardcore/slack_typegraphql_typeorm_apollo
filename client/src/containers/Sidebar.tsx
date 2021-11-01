@@ -1,11 +1,11 @@
-import React, { useState } from "react";
-import { useHistory } from "react-router";
-import { AddChannelModal } from "../components/AddChannelModal";
-import { Channels } from "../components/Channels";
-import { DirectMessageModal } from "../components/DirectMessageModal";
-import { InvitePeopleModal } from "../components/InvitePeopleModal";
-import { Teams } from "../components/Teams";
-import { Team } from "../generated/graphql";
+import React, { useState } from 'react';
+import { useHistory } from 'react-router';
+import { AddChannelModal } from '../components/AddChannelModal';
+import { Channels } from '../components/Channels';
+import { DirectMessageModal } from '../components/DirectMessageModal';
+import { InvitePeopleModal } from '../components/InvitePeopleModal';
+import { Teams } from '../components/Teams';
+import { Team } from '../generated/graphql';
 
 interface SidebarProps {
   teams: { id: number; letter: string }[];
@@ -13,11 +13,7 @@ interface SidebarProps {
   userId: number;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({
-  teams,
-  team,
-  userId,
-}) => {
+export const Sidebar: React.FC<SidebarProps> = ({ teams, team, userId }) => {
   const history = useHistory();
   const [state, setState] = useState({
     openAddChannelModal: false,
@@ -26,7 +22,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   });
 
   if (!(teams && team)) {
-    history.push("/login");
+    history.push('/login');
     return null;
   }
 
@@ -45,8 +41,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const handleDirectMessageModalClose = () =>
     setState({ ...state, openDirectMessageModal: false });
 
-  const handleDirectMessageModalOpen = () =>{
-    setState({ ...state, openDirectMessageModal: true });}
+  const handleDirectMessageModalOpen = () => {
+    setState({ ...state, openDirectMessageModal: true });
+  };
 
   return (
     <>

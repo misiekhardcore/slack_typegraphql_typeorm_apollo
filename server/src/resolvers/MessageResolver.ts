@@ -1,3 +1,4 @@
+import { AuthenticationError } from 'apollo-server-errors';
 import {
   Arg,
   Ctx,
@@ -12,44 +13,47 @@ import {
   Root,
   Subscription,
   UseMiddleware,
-} from "type-graphql";
-import { Channel } from "../entity/Channel";
-import { File } from "../entity/File";
-import { Message } from "../entity/Message";
-import { User } from "../entity/User";
-import { Context } from "../index";
-import { CreateMessageInput } from "../inputs/MessageInput";
-import { isTeamMember } from "../permissions";
-import { FileService } from "../services/file.service";
-import { MessageService } from "../services/message.service";
+} from 'type-graphql';
+import { Channel } from '../entity/Channel';
+import { File } from '../entity/File';
+import { Message } from '../entity/Message';
+import { User } from '../entity/User';
+import { Context } from '../index';
+import { CreateMessageInput } from '../inputs/MessageInput';
+import { isTeamMember } from '../permissions';
+import { FileService } from '../services/file.service';
+import { MessageService } from '../services/message.service';
 
 @Resolver(() => Message)
 export class MessageResolver implements ResolverInterface<Message> {
   private readonly messageService: MessageService;
+
   private readonly fileService: FileService;
+
   constructor() {
     this.messageService = new MessageService();
     this.fileService = new FileService();
   }
 
   @Query(() => [Message])
-  async getMessages(@Arg("channelId") channelId: number) {
-    return await this.messageService.getMany(channelId);
+  async getMessages(@Arg('channelId') channelId: number) {
+    return this.messageService.getMany(channelId);
   }
 
   @Query(() => Message)
-  async getMessage(@Arg("messageId") messageId: number) {
-    return await this.messageService.getOne(messageId);
+  async getMessage(@Arg('messageId') messageId: number) {
+    return this.messageService.getOne(messageId);
   }
 
   @Mutation(() => Message)
   @UseMiddleware(isTeamMember)
   async createMessage(
-    @Arg("messageInput") createMessageInput: CreateMessageInput,
+    @Arg('messageInput') createMessageInput: CreateMessageInput,
     @Ctx() { user }: Context,
-    @PubSub("NEW_MESSAGE") publish: Publisher<Message>
+    @PubSub('NEW_MESSAGE') publish: Publisher<Message>
   ): Promise<Message> {
-    let rawFile = await createMessageInput.file;
+    if (!user) throw new AuthenticationError('not authenticated');
+    const rawFile = await createMessageInput.file;
     let file: File | null = null;
     if (rawFile) {
       file = await this.fileService.create(rawFile);
@@ -57,7 +61,7 @@ export class MessageResolver implements ResolverInterface<Message> {
 
     const message = await this.messageService.create(
       createMessageInput,
-      user!.id,
+      user.id,
       file
     );
 
@@ -66,7 +70,7 @@ export class MessageResolver implements ResolverInterface<Message> {
   }
 
   @Subscription(() => Message, {
-    topics: "NEW_MESSAGE",
+    topics: 'NEW_MESSAGE',
     filter: async ({
       payload,
       args: { channelId },
@@ -77,7 +81,7 @@ export class MessageResolver implements ResolverInterface<Message> {
   @UseMiddleware(isTeamMember)
   newMessage(
     @Root() payload: Message,
-    @Arg("channelId") _channelId: number
+    @Arg('channelId') _channelId: number
   ): Message {
     return payload;
   }
@@ -85,17 +89,15 @@ export class MessageResolver implements ResolverInterface<Message> {
   @FieldResolver()
   async channel(@Root() message: Message) {
     return (
-      (await this.messageService.populateOne<Channel>(
-        message,
-        "channel"
-      )) || new Channel()
+      (await this.messageService.populateOne<Channel>(message, 'channel')) ||
+      new Channel()
     );
   }
 
   @FieldResolver()
   async user(@Root() message: Message) {
     return (
-      (await this.messageService.populateOne<User>(message, "user")) ||
+      (await this.messageService.populateOne<User>(message, 'user')) ||
       new User()
     );
   }
@@ -103,7 +105,7 @@ export class MessageResolver implements ResolverInterface<Message> {
   @FieldResolver()
   async file(@Root() message: Message) {
     return (
-      (await this.messageService.populateOne<File>(message, "file")) ||
+      (await this.messageService.populateOne<File>(message, 'file')) ||
       new File()
     );
   }

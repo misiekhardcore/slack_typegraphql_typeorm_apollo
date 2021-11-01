@@ -7,11 +7,11 @@ import {
   ManyToOne,
   PrimaryColumn,
   UpdateDateColumn,
-} from "typeorm";
-import { Team } from "./Team";
-import { User } from "./User";
+} from 'typeorm';
+import { Team } from './Team';
+import { User } from './User';
 
-@Entity({ name: "team_member" })
+@Entity({ name: 'team_member' })
 export class TeamMember extends BaseEntity {
   @PrimaryColumn()
   userId: number;
@@ -25,13 +25,13 @@ export class TeamMember extends BaseEntity {
   @ManyToOne(() => User, (user) => user.teamConnection, {
     primary: true,
   })
-  @JoinColumn({ name: "user_id" })
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
   @ManyToOne(() => Team, (team) => team.userConnection, {
     primary: true,
   })
-  @JoinColumn({ name: "team_id" })
+  @JoinColumn({ name: 'team_id' })
   team: Team;
 
   @CreateDateColumn()

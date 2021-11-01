@@ -1,6 +1,6 @@
 // import { ChannelMember } from "src/entity/ChannelMember";
-import { getRepository, Repository } from "typeorm";
-import { TeamMember } from "../entity/TeamMember";
+import { getRepository, Repository } from 'typeorm';
+import { TeamMember } from '../entity/TeamMember';
 
 interface CreateTeamMemberInput {
   teamId: number;
@@ -20,9 +20,7 @@ export class TeamMemberService {
    * @param {CreateTeamMemberInput} input
    * @returns {TeamMember} team member
    */
-  public async create(
-    input: CreateTeamMemberInput
-  ): Promise<TeamMember> {
+  public async create(input: CreateTeamMemberInput): Promise<TeamMember> {
     return this.teamMemberRepository.create(input).save();
   }
 
@@ -46,9 +44,7 @@ export class TeamMemberService {
    * @param {number} teamId id of the team
    * @returns {TeamMember | undefined} team member/owner
    */
-  public async getOwner(
-    teamId: number
-  ): Promise<TeamMember | undefined> {
+  public async getOwner(teamId: number): Promise<TeamMember | undefined> {
     return this.teamMemberRepository.findOne({
       where: { teamId, isAdmin: true },
     });

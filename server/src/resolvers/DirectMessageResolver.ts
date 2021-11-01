@@ -1,4 +1,4 @@
-import { AuthenticationError } from "apollo-server-errors";
+import { AuthenticationError } from 'apollo-server-errors';
 import {
   Arg,
   Ctx,
@@ -13,23 +13,23 @@ import {
   Root,
   Subscription,
   UseMiddleware,
-} from "type-graphql";
-import { DirectMessage } from "../entity/DirectMessage";
-import { File } from "../entity/File";
-import { Team } from "../entity/Team";
-import { User } from "../entity/User";
-import { Context } from "../index";
-import { CreateDirectMessageInput } from "../inputs/DirectMessageInput";
-import { isAbleToDirectMessage, isAuth } from "../permissions";
-import { DirectMessageService } from "../services/direct-message.service";
-import { FileService } from "../services/file.service";
+} from 'type-graphql';
+import { DirectMessage } from '../entity/DirectMessage';
+import { File } from '../entity/File';
+import { Team } from '../entity/Team';
+import { User } from '../entity/User';
+import { Context } from '../index';
+import { CreateDirectMessageInput } from '../inputs/DirectMessageInput';
+import { isAbleToDirectMessage, isAuth } from '../permissions';
+import { DirectMessageService } from '../services/direct-message.service';
+import { FileService } from '../services/file.service';
 
 @Resolver(() => DirectMessage)
-export class DirectMessageResolver
-  implements ResolverInterface<DirectMessage>
-{
+export class DirectMessageResolver implements ResolverInterface<DirectMessage> {
   private readonly directMessageService: DirectMessageService;
+
   private readonly fileService: FileService;
+
   constructor() {
     this.directMessageService = new DirectMessageService();
     this.fileService = new FileService();
@@ -38,37 +38,34 @@ export class DirectMessageResolver
   @Query(() => [DirectMessage])
   async getDirectMessages(
     @Ctx() { user }: Context,
-    @Arg("userToId") userToId: number,
-    @Arg("teamId") teamId: number
+    @Arg('userToId') userToId: number,
+    @Arg('teamId') teamId: number
   ) {
     if (!user) return [];
-    return await this.directMessageService.getMany(
-      user.id,
-      userToId,
-      teamId
-    );
+    return this.directMessageService.getMany(user.id, userToId, teamId);
   }
 
   @Query(() => DirectMessage)
-  async getDirectMessage(@Arg("messageId") messageId: number) {
-    return await this.directMessageService.getOne(messageId);
+  async getDirectMessage(@Arg('messageId') messageId: number) {
+    return this.directMessageService.getOne(messageId);
   }
 
   @Mutation(() => DirectMessage)
   @UseMiddleware(isAuth)
   async createDirectMessage(
-    @Arg("messageInput") createMessageInput: CreateDirectMessageInput,
+    @Arg('messageInput') createMessageInput: CreateDirectMessageInput,
     @Ctx() { user }: Context,
-    @PubSub("NEW_DIRECT_MESSAGE") publish: Publisher<DirectMessage>
+    @PubSub('NEW_DIRECT_MESSAGE') publish: Publisher<DirectMessage>
   ): Promise<DirectMessage> {
-    let rawFile = await createMessageInput.file;
+    if (!user) throw new AuthenticationError('not authenticated');
+    const rawFile = await createMessageInput.file;
     let file: File | null = null;
     if (rawFile) {
       file = await this.fileService.create(rawFile);
     }
     const message = await this.directMessageService.create(
       createMessageInput,
-      user!.id,
+      user.id,
       file
     );
 
@@ -77,7 +74,7 @@ export class DirectMessageResolver
   }
 
   @Subscription(() => DirectMessage, {
-    topics: "NEW_DIRECT_MESSAGE",
+    topics: 'NEW_DIRECT_MESSAGE',
     filter: async ({
       payload,
       args: { teamId, userToId },
@@ -87,7 +84,7 @@ export class DirectMessageResolver
       { teamId: number; userToId: number },
       Context
     >) => {
-      if (!user) throw new AuthenticationError("not authenticated");
+      if (!user) throw new AuthenticationError('not authenticated');
       return (
         (payload.teamId === teamId &&
           payload.userToId === userToId &&
@@ -101,8 +98,8 @@ export class DirectMessageResolver
   @UseMiddleware(isAbleToDirectMessage)
   newDirectMessage(
     @Root() payload: DirectMessage,
-    @Arg("userToId") _userToId: number,
-    @Arg("teamId") _teamId: number
+    @Arg('userToId') _userToId: number,
+    @Arg('teamId') _teamId: number
   ): DirectMessage {
     return payload;
   }
@@ -110,10 +107,8 @@ export class DirectMessageResolver
   @FieldResolver()
   async team(@Root() message: DirectMessage) {
     return (
-      (await this.directMessageService.populateOne<Team>(
-        message,
-        "team"
-      )) || new Team()
+      (await this.directMessageService.populateOne<Team>(message, 'team')) ||
+      new Team()
     );
   }
 
@@ -122,7 +117,7 @@ export class DirectMessageResolver
     return (
       (await this.directMessageService.populateOne<User>(
         message,
-        "userFrom"
+        'userFrom'
       )) || new User()
     );
   }
@@ -130,10 +125,8 @@ export class DirectMessageResolver
   @FieldResolver()
   async userTo(@Root() message: DirectMessage) {
     return (
-      (await this.directMessageService.populateOne<User>(
-        message,
-        "userTo"
-      )) || new User()
+      (await this.directMessageService.populateOne<User>(message, 'userTo')) ||
+      new User()
     );
   }
 }

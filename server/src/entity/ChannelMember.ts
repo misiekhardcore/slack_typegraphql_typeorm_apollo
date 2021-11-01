@@ -6,11 +6,11 @@ import {
   ManyToOne,
   PrimaryColumn,
   UpdateDateColumn,
-} from "typeorm";
-import { Channel } from "./Channel";
-import { User } from "./User";
+} from 'typeorm';
+import { Channel } from './Channel';
+import { User } from './User';
 
-@Entity({ name: "channel_user" })
+@Entity({ name: 'channel_user' })
 export class ChannelMember extends BaseEntity {
   @PrimaryColumn()
   userId: number;
@@ -21,13 +21,13 @@ export class ChannelMember extends BaseEntity {
   @ManyToOne(() => User, (user) => user.channelConnection, {
     primary: true,
   })
-  @JoinColumn({ name: "user_id" })
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
   @ManyToOne(() => Channel, (channel) => channel.userConnection, {
     primary: true,
   })
-  @JoinColumn({ name: "channel_id" })
+  @JoinColumn({ name: 'channel_id' })
   channel: Channel;
 
   @CreateDateColumn()

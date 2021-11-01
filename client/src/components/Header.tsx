@@ -1,6 +1,6 @@
-import React from "react";
-import styled from "styled-components";
-import { Header as He } from "semantic-ui-react";
+import React from 'react';
+import styled from 'styled-components';
+import { Header as He } from 'semantic-ui-react';
 
 export const HeaderWrapper = styled.div`
   width: 100%;

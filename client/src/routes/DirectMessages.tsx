@@ -1,17 +1,16 @@
-import { findIndex } from "lodash";
-import React from "react";
-import { Redirect } from "react-router";
-import { AppLayout } from "../components/AppLayout";
-import { Header } from "../components/Header";
-import { SendMessage } from "../components/SendMessage";
-import { DirectMessagesContainer } from "../containers/DirectMessagesContainer";
-import { Sidebar } from "../containers/Sidebar";
+import { findIndex } from 'lodash';
+import React from 'react';
+import { Redirect } from 'react-router';
+import { AppLayout } from '../components/AppLayout';
+import { Header } from '../components/Header';
+import { SendMessage } from '../components/SendMessage';
+import { DirectMessagesContainer } from '../containers/DirectMessagesContainer';
+import { Sidebar } from '../containers/Sidebar';
 import {
-  File,
   Team,
   useCreateDirectMessageMutation,
   useGetDirectModalQuery,
-} from "../generated/graphql";
+} from '../generated/graphql';
 
 interface DirectMessagesProps {
   match: { params: { teamId: string; userId: string } };
@@ -30,50 +29,50 @@ const DirectMessages: React.FC<DirectMessagesProps> = ({
   const { me, getUser } = data || {};
   const { teams, id } = me || {};
 
-  const teamIdInt = parseInt(teamId);
+  const teamIdInt = parseInt(teamId, 10);
 
   if (teamId && !teamIdInt) {
-    console.error("invalid teamid!");
+    console.error('invalid teamid!');
     return <Redirect to="/view-team" />;
   }
 
-  const userIdInt = parseInt(userId);
+  const userIdInt = parseInt(userId, 10);
 
   if (userId && !userIdInt) {
-    console.error("invalid userId!");
+    console.error('invalid userId!');
     return <Redirect to={`/view-team/${teamId}`} />;
   }
 
   if (!(loading || teams)) {
-    console.error("no teams!");
+    console.error('no teams!');
     return <Redirect to="/create-team" />;
   }
 
   if (!(loading || getUser)) {
-    console.error("no such user!");
+    console.error('no such user!');
     return <Redirect to={`/view-team/${teamId}`} />;
   }
 
   if (!teams) return null;
   if (!getUser) return null;
 
-  const teamIdx = teamId ? findIndex(teams, ["id", teamIdInt]) : 0;
+  const teamIdx = teamId ? findIndex(teams, ['id', teamIdInt]) : 0;
   const team = teams[teamIdx];
 
   if (!team) {
-    console.error("no team with that id!");
+    console.error('no team with that id!');
     return <Redirect to="/create-team" />;
   }
 
   if (!id) {
-    console.error("no user id!");
+    console.error('no user id!');
     return <Redirect to="/login" />;
   }
 
   if (loading || error) return null;
 
-  const onSubmit = async (message?: string, file?: File) =>
-    await createDirectMessage({
+  const onSubmit = async (message: string | null, file: File | null) =>
+    createDirectMessage({
       variables: {
         createDirectMessageInput: {
           teamId: team.id,
@@ -94,12 +93,9 @@ const DirectMessages: React.FC<DirectMessagesProps> = ({
         team={team as Team}
         userId={id}
       />
-      <Header title={"@" + getUser?.username} />
+      <Header title={`@${getUser?.username}`} />
       <DirectMessagesContainer teamId={+teamId} userToId={+userId} />
-      <SendMessage
-        placeholder={"@" + getUser?.username}
-        onSubmit={onSubmit}
-      />
+      <SendMessage placeholder={`@${getUser?.username}`} onSubmit={onSubmit} />
     </AppLayout>
   );
 };

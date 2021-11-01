@@ -8,20 +8,17 @@ import {
   ResolverInterface,
   Root,
   UseMiddleware,
-} from "type-graphql";
-import { Channel } from "../entity/Channel";
-import {
-  AddMemberResponse,
-  CreateTeamResponse,
-} from "../entity/Outputs";
-import { Team } from "../entity/Team";
-import { User } from "../entity/User";
-import { Context } from "../index";
-import { AddMemberInput, CreateTeamInput } from "../inputs/TeamInputs";
-import { isAuth, isTeamMember } from "../permissions";
-import { TeamMemberService } from "../services/team-member.service";
-import { TeamService } from "../services/team.service";
-import { UserService } from "../services/user.service";
+} from 'type-graphql';
+import { Channel } from '../entity/Channel';
+import { AddMemberResponse, CreateTeamResponse } from '../entity/Outputs';
+import { Team } from '../entity/Team';
+import { User } from '../entity/User';
+import { Context } from '../index';
+import { AddMemberInput, CreateTeamInput } from '../inputs/TeamInputs';
+import { isAuth, isTeamMember } from '../permissions';
+import { TeamMemberService } from '../services/team-member.service';
+import { TeamService } from '../services/team.service';
+import { UserService } from '../services/user.service';
 
 /**
  * Resolver for all Team related operations
@@ -29,8 +26,11 @@ import { UserService } from "../services/user.service";
 @Resolver(() => Team)
 export class TeamResolver implements ResolverInterface<Team> {
   private readonly teamService: TeamService;
+
   private readonly userService: UserService;
+
   private readonly teamMemberService: TeamMemberService;
+
   constructor() {
     this.teamService = new TeamService();
     this.userService = new UserService();
@@ -45,16 +45,13 @@ export class TeamResolver implements ResolverInterface<Team> {
   @Query(() => [Team])
   @UseMiddleware(isAuth)
   async getTeams(@Ctx() { user }: Context): Promise<Team[]> {
-    if (user) return await this.teamService.getMany(user.id);
+    if (user) return this.teamService.getMany(user.id);
     return [];
   }
 
   @Query(() => Team, { nullable: true })
   @UseMiddleware(isTeamMember)
-  async getTeam(
-    @Ctx() { user }: Context,
-    @Arg("teamId") teamId: number
-  ) {
+  async getTeam(@Ctx() { user }: Context, @Arg('teamId') teamId: number) {
     if (user) {
       const team = await this.teamService.getOne(teamId);
 
@@ -66,14 +63,14 @@ export class TeamResolver implements ResolverInterface<Team> {
   @Mutation(() => CreateTeamResponse)
   @UseMiddleware(isAuth)
   async createTeam(
-    @Arg("createTeamInput") createTeamInput: CreateTeamInput,
+    @Arg('createTeamInput') createTeamInput: CreateTeamInput,
     @Ctx() { user }: Context
   ): Promise<CreateTeamResponse> {
     try {
       if (!user)
         return {
           ok: false,
-          errors: [{ path: "user", msg: "" }],
+          errors: [{ path: 'user', msg: '' }],
         };
 
       const team = await this.teamService.create(createTeamInput);
@@ -87,7 +84,7 @@ export class TeamResolver implements ResolverInterface<Team> {
       if (!team)
         return {
           ok: false,
-          errors: [{ path: "team", msg: "" }],
+          errors: [{ path: 'team', msg: '' }],
         };
 
       return {
@@ -105,20 +102,17 @@ export class TeamResolver implements ResolverInterface<Team> {
   @Mutation(() => AddMemberResponse)
   @UseMiddleware(isAuth)
   async addMember(
-    @Arg("addMemberInput") { email, teamId }: AddMemberInput,
+    @Arg('addMemberInput') { email, teamId }: AddMemberInput,
     @Ctx() { user }: Context
   ): Promise<AddMemberResponse> {
     try {
       if (!user)
         return {
           ok: false,
-          errors: [{ path: "user", msg: "You must be logged in" }],
+          errors: [{ path: 'user', msg: 'You must be logged in' }],
         };
 
-      const memberPromise = this.teamMemberService.getOne(
-        user.id,
-        teamId
-      );
+      const memberPromise = this.teamMemberService.getOne(user.id, teamId);
       const teamPromise = this.teamService.getOne(teamId);
       const userToAddPromise = this.userService.getOneByEmail(email);
       const [member, team, userToAdd] = await Promise.all([
@@ -127,13 +121,20 @@ export class TeamResolver implements ResolverInterface<Team> {
         userToAddPromise,
       ]);
 
+      if (!team) {
+        return {
+          ok: false,
+          errors: [{ msg: 'Team not exist', path: 'email' }],
+        };
+      }
+
       if (!member?.admin) {
         return {
           ok: false,
           errors: [
             {
-              msg: "You cannot add members to the team",
-              path: "email",
+              msg: 'You cannot add members to the team',
+              path: 'email',
             },
           ],
         };
@@ -144,14 +145,14 @@ export class TeamResolver implements ResolverInterface<Team> {
           ok: false,
           errors: [
             {
-              msg: "Could not find user with this email",
-              path: "email",
+              msg: 'Could not find user with this email',
+              path: 'email',
             },
           ],
         };
       }
       await this.teamMemberService.create({
-        teamId: team!.id,
+        teamId: team.id,
         userId: userToAdd.id,
       });
 
@@ -177,9 +178,6 @@ export class TeamResolver implements ResolverInterface<Team> {
 
   @FieldResolver()
   async channels(@Root() team: Team) {
-    return await this.teamService.populateMany<Channel>(
-      team,
-      "channels"
-    );
+    return this.teamService.populateMany<Channel>(team, 'channels');
   }
 }

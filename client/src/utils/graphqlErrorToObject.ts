@@ -1,4 +1,4 @@
-import { ApolloError } from "@apollo/client";
+import { ApolloError } from '@apollo/client';
 
 export interface ErrorObject {
   path: string;
@@ -15,6 +15,7 @@ export const graphqlErrorToObject = (
   if (!graphQLErrors[0]) return [];
   const { extensions } = graphQLErrors[0];
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return extensions?.exception?.validationErrors?.map((a: any) => {
     const keys = Object.keys(a.constraints)[0];
     return { path: a.property, message: a.constraints[keys] };

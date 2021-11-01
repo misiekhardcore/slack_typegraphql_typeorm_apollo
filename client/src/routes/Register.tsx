@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { useHistory } from "react-router";
-import { Link } from "react-router-dom";
+import React, { useState } from 'react';
+import { useHistory } from 'react-router';
+import { Link } from 'react-router-dom';
 import {
   Button,
   Container,
@@ -8,20 +8,20 @@ import {
   FormInput,
   Header,
   Message,
-} from "semantic-ui-react";
-import { useRegisterMutation } from "../generated/graphql";
-import { graphqlErrorToObject } from "../utils/graphqlErrorToObject";
-import { isErrorField } from "../utils/isErrorField";
+} from 'semantic-ui-react';
+import { useRegisterMutation } from '../generated/graphql';
+import { graphqlErrorToObject } from '../utils/graphqlErrorToObject';
+import { isErrorField } from '../utils/isErrorField';
 
 const Register: React.FC = () => {
   const history = useHistory();
   const [state, setState] = useState({
-    username: "",
-    email: "",
-    password: "",
+    username: '',
+    email: '',
+    password: '',
   });
   const [register, { data, loading, error }] = useRegisterMutation({
-    errorPolicy: "all",
+    errorPolicy: 'all',
   });
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,7 +35,7 @@ const Register: React.FC = () => {
       variables: { userInput: state },
     });
   };
-  if (data?.register.ok) history.push("/login");
+  if (data?.register.ok) history.push('/login');
 
   return (
     <Container>
@@ -51,7 +51,7 @@ const Register: React.FC = () => {
       )}
       <Form onSubmit={onSubmit} loading={loading}>
         <FormInput
-          error={isErrorField(error, "username")}
+          error={isErrorField(error, 'username')}
           label="Username"
           onChange={onChange}
           name="username"
@@ -60,7 +60,7 @@ const Register: React.FC = () => {
           placeholder="Username..."
         />
         <FormInput
-          error={isErrorField(error, "email")}
+          error={isErrorField(error, 'email')}
           label="Email"
           onChange={onChange}
           name="email"
@@ -70,7 +70,7 @@ const Register: React.FC = () => {
           type="email"
         />
         <FormInput
-          error={isErrorField(error, "password")}
+          error={isErrorField(error, 'password')}
           label="Password"
           onChange={onChange}
           value={state.password}

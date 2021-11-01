@@ -1,14 +1,14 @@
-import DataLoader from "dataloader";
-import { In } from "typeorm";
-import { TeamMember } from "../entity/TeamMember";
-import { Team } from "src/entity/Team";
+import DataLoader from 'dataloader';
+import { In } from 'typeorm';
+import { Team } from 'src/entity/Team';
+import { TeamMember } from '../entity/TeamMember';
 
 const batchTeams = async (userIds: readonly number[]) => {
   const teamMembers = await TeamMember.find({
     join: {
-      alias: "teamMember",
+      alias: 'teamMember',
       innerJoinAndSelect: {
-        team: "teamMember.team",
+        team: 'teamMember.team',
       },
     },
     where: {
@@ -16,18 +16,18 @@ const batchTeams = async (userIds: readonly number[]) => {
     },
   });
 
-  let userIdToTeam: { [key: number]: Team[] } = {};
+  const userIdToTeam: { [key: number]: Team[] } = {};
 
   teamMembers.forEach((tm) => {
     if (tm.userId in userIdToTeam) {
       userIdToTeam[tm.userId].push({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ...(tm as any).team,
         admin: tm.admin,
       });
     } else {
-      userIdToTeam[tm.userId] = [
-        { ...(tm as any).team, admin: tm.admin },
-      ];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      userIdToTeam[tm.userId] = [{ ...(tm as any).team, admin: tm.admin }];
     }
   });
 

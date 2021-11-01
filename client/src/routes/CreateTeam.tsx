@@ -1,6 +1,6 @@
-import gql from "graphql-tag";
-import React, { useState } from "react";
-import { useHistory } from "react-router";
+import gql from 'graphql-tag';
+import React, { useState } from 'react';
+import { useHistory } from 'react-router';
 import {
   Button,
   Container,
@@ -8,21 +8,21 @@ import {
   FormInput,
   Header,
   Message,
-} from "semantic-ui-react";
+} from 'semantic-ui-react';
 import {
   MeDocument,
   MeQuery,
   useCreateTeamMutation,
-} from "../generated/graphql";
-import { graphqlErrorToObject } from "../utils/graphqlErrorToObject";
-import { isAuthError } from "../utils/isAuthError";
-import { isErrorField } from "../utils/isErrorField";
+} from '../generated/graphql';
+import { graphqlErrorToObject } from '../utils/graphqlErrorToObject';
+import { isAuthError } from '../utils/isAuthError';
+import { isErrorField } from '../utils/isErrorField';
 
 const CreateTeam: React.FC = () => {
   const history = useHistory();
-  const [state, setState] = useState({ name: "" });
+  const [state, setState] = useState({ name: '' });
   const [createTeam, { loading, error }] = useCreateTeamMutation({
-    errorPolicy: "all",
+    errorPolicy: 'all',
   });
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,7 +44,7 @@ const CreateTeam: React.FC = () => {
 
         if (data?.me?.teams && createTeam?.team) {
           cache.writeFragment({
-            id: "User:" + data.me.id,
+            id: `User:${data.me.id}`,
             fragment: gql`
               fragment Team on User {
                 teams
@@ -55,13 +55,12 @@ const CreateTeam: React.FC = () => {
             },
           });
         }
-
-        history.push(`/view-team/${createTeam!.team!.id}`);
+        if (createTeam?.team) history.push(`/view-team/${createTeam.team.id}`);
       },
     });
   };
 
-  if (isAuthError(error)) history.push("/login");
+  if (isAuthError(error)) history.push('/login');
 
   return (
     <Container>
@@ -77,7 +76,7 @@ const CreateTeam: React.FC = () => {
       )}
       <Form onSubmit={onSubmit} loading={loading}>
         <FormInput
-          error={isErrorField(error, "name")}
+          error={isErrorField(error, 'name')}
           label="Team name"
           onChange={onChange}
           name="name"

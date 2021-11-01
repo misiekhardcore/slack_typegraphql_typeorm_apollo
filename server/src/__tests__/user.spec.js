@@ -1,8 +1,8 @@
-import axios from "axios";
+import axios from 'axios';
 
-describe("User resolvers", () => {
-  test("getUsers", async () => {
-    const response = await axios.post("http://localhost:4000/graphql", {
+describe('User resolvers', () => {
+  test('getUsers', async () => {
+    const response = await axios.post('http://localhost:4000/graphql', {
       query: `
       query{
         getUsers{
@@ -21,8 +21,8 @@ describe("User resolvers", () => {
     });
   });
 
-  test("createUser", async () => {
-    const response = await axios.post("http://localhost:4000/graphql", {
+  test('createUser', async () => {
+    const response = await axios.post('http://localhost:4000/graphql', {
       query: `mutation RegisterMutation($userInput: CreateUserInput!) {
   register(userInput: $userInput) {
     ok
@@ -38,9 +38,9 @@ describe("User resolvers", () => {
 }`,
       variables: {
         userInput: {
-          password: "password",
-          email: "email@email.com",
-          username: "username",
+          password: 'password',
+          email: 'email@email.com',
+          username: 'username',
         },
       },
     });
@@ -52,29 +52,26 @@ describe("User resolvers", () => {
         register: {
           ok: true,
           user: {
-            email: "email@email.com",
-            username: "username",
+            email: 'email@email.com',
+            username: 'username',
           },
         },
       },
     });
 
-    const loginResponse = await axios.post(
-      "http://localhost:4000/graphql",
-      {
-        query: `mutation LoginMutation($userInput: LoginUserInput!) {
+    const loginResponse = await axios.post('http://localhost:4000/graphql', {
+      query: `mutation LoginMutation($userInput: LoginUserInput!) {
   login(userInput: $userInput) {
     ok
   }
 }`,
-        variables: {
-          userInput: {
-            email: "email@email.com",
-            password: "password",
-          },
+      variables: {
+        userInput: {
+          email: 'email@email.com',
+          password: 'password',
         },
-      }
-    );
+      },
+    });
 
     const {
       data: { token, refreshToken },

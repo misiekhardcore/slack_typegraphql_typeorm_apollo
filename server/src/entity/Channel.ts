@@ -1,4 +1,4 @@
-import { Field, Int, ObjectType } from "type-graphql";
+import { Field, Int, ObjectType } from 'type-graphql';
 import {
   BaseEntity,
   Column,
@@ -9,13 +9,13 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-} from "typeorm";
-import { ChannelMember } from "./ChannelMember";
-import { Message } from "./Message";
-import { Team } from "./Team";
-import { User } from "./User";
+} from 'typeorm';
+import { ChannelMember } from './ChannelMember';
+import { Message } from './Message';
+import { Team } from './Team';
+import { User } from './User';
 
-@Entity({ name: "channels" })
+@Entity({ name: 'channels' })
 @ObjectType()
 export class Channel extends BaseEntity {
   @Field(() => Int)
@@ -40,9 +40,10 @@ export class Channel extends BaseEntity {
 
   @Column()
   teamId: number;
+
   @Field(() => Team)
-  @ManyToOne(() => Team, { nullable: false, onDelete: "CASCADE" })
-  @JoinColumn({ name: "team_id" })
+  @ManyToOne(() => Team, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'team_id' })
   team: Team;
 
   @Field(() => [Message], { nullable: true })
@@ -50,7 +51,7 @@ export class Channel extends BaseEntity {
   messages: Message[] | null;
 
   @OneToMany(() => ChannelMember, (member) => member.user, {
-    onDelete: "CASCADE",
+    onDelete: 'CASCADE',
   })
   userConnection: ChannelMember[];
 

@@ -1,14 +1,14 @@
-import DataLoader from "dataloader";
-import { User } from "../entity/User";
-import { In } from "typeorm";
-import { ChannelMember } from "../entity/ChannelMember";
+import DataLoader from 'dataloader';
+import { In } from 'typeorm';
+import { User } from '../entity/User';
+import { ChannelMember } from '../entity/ChannelMember';
 
 const batchUsers = async (channelIds: readonly number[]) => {
   const userChannels = await ChannelMember.find({
     join: {
-      alias: "channelMember",
+      alias: 'channelMember',
       innerJoinAndSelect: {
-        user: "channelMember.user",
+        user: 'channelMember.user',
       },
     },
     where: {
@@ -16,18 +16,17 @@ const batchUsers = async (channelIds: readonly number[]) => {
     },
   });
 
-  let channelIdToUser: { [key: number]: User[] } = {};
+  const channelIdToUser: { [key: number]: User[] } = {};
 
   userChannels.forEach((uc) => {
     if (uc.channelId in channelIdToUser) {
-      channelIdToUser[uc.channelId].push((uc as any).user);
+      channelIdToUser[uc.channelId].push(uc.user);
     } else {
-      channelIdToUser[uc.channelId] = [(uc as any).user];
+      channelIdToUser[uc.channelId] = [uc.user];
     }
   });
 
   return channelIds.map((channelId) => channelIdToUser[channelId]);
 };
 
-export const createChannelUsersLoader = () =>
-  new DataLoader(batchUsers);
+export const createChannelUsersLoader = () => new DataLoader(batchUsers);

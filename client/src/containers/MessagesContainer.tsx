@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
-import { useDropzone } from "react-dropzone";
-import { Comment } from "semantic-ui-react";
-import { Messages } from "../components/Messages";
+import React, { useEffect } from 'react';
+import { useDropzone } from 'react-dropzone';
+import { Comment } from 'semantic-ui-react';
+import { Messages } from '../components/Messages';
 import {
   File,
   Message,
@@ -9,26 +9,27 @@ import {
   NewMessageSubscription,
   NewMessageSubscriptionVariables,
   useGetMessagesQuery,
-} from "../generated/graphql";
+} from '../generated/graphql';
 
 const media = ({ filename, mimetype, url }: File): JSX.Element => {
-  const type = mimetype.split("/")[0];
+  const type = mimetype.split('/')[0];
   console.log(type);
-  if (!url) return <p style={{ color: "red" }}>File URL broken</p>;
+  if (!url) return <p style={{ color: 'red' }}>File URL broken</p>;
   switch (type) {
-    case "image":
+    case 'image':
       return (
         <img
-          style={{ maxWidth: "100%" }}
+          style={{ maxWidth: '100%' }}
           src={`http://localhost:4000${url}`}
           alt={filename}
         />
       );
-    case "audio":
+    case 'audio':
       return (
         <audio controls>
           Your browser does not support <code>audio</code> element.
           <source src={`http://localhost:4000${url}`} type={mimetype} />
+          <track default kind="captions" label={filename} />
         </audio>
       );
     default:
@@ -66,12 +67,10 @@ interface MessagesContainerProps {
 export const MessagesContainer: React.FC<MessagesContainerProps> = ({
   channelId,
 }) => {
-  const { data, error, loading, subscribeToMore } = useGetMessagesQuery(
-    {
-      variables: { channelId },
-      fetchPolicy: "network-only",
-    }
-  );
+  const { data, error, loading, subscribeToMore } = useGetMessagesQuery({
+    variables: { channelId },
+    fetchPolicy: 'network-only',
+  });
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     noClick: true,
     onDrop: () => console.log(),
@@ -88,10 +87,7 @@ export const MessagesContainer: React.FC<MessagesContainerProps> = ({
         if (!subscriptionData?.data) return prev;
         return {
           ...prev,
-          getMessages: [
-            ...prev.getMessages,
-            subscriptionData.data!.newMessage,
-          ],
+          getMessages: [...prev.getMessages, subscriptionData.data.newMessage],
         };
       },
     });
@@ -102,11 +98,11 @@ export const MessagesContainer: React.FC<MessagesContainerProps> = ({
   return loading ? null : (
     <Messages
       {...getRootProps({
-        style: isDragActive ? { border: "2px dashed blue" } : undefined,
+        style: isDragActive ? { border: '2px dashed blue' } : undefined,
       })}
     >
       <input {...getInputProps()} />
-      <Comment.Group style={{ maxWidth: "100%" }}>
+      <Comment.Group style={{ maxWidth: '100%' }}>
         {data?.getMessages &&
           data.getMessages.map((mes) => message(mes as Message))}
       </Comment.Group>

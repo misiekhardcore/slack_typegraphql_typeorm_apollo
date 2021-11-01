@@ -1,7 +1,7 @@
-import { useFormik } from "formik";
-import gql from "graphql-tag";
-import { findIndex } from "lodash";
-import React, { useEffect, useRef } from "react";
+import { useFormik } from 'formik';
+import gql from 'graphql-tag';
+import { findIndex } from 'lodash';
+import React, { useEffect, useRef } from 'react';
 import {
   Button,
   Checkbox,
@@ -11,14 +11,14 @@ import {
   Input,
   Message,
   Modal,
-} from "semantic-ui-react";
+} from 'semantic-ui-react';
 import {
   MeDocument,
   MeQuery,
   useCreateChannelMutation,
-} from "../generated/graphql";
-import errorToFieldError from "../utils/errorToFieldError";
-import { MultiSelectUsers } from "./MultiSelectUsers";
+} from '../generated/graphql';
+import errorToFieldError from '../utils/errorToFieldError';
+import { MultiSelectUsers } from './MultiSelectUsers';
 
 interface AddChannelModalProps {
   teamId: number;
@@ -47,15 +47,12 @@ export const AddChannelModal: React.FC<AddChannelModalProps> = ({
     setFieldValue,
   } = useFormik({
     initialValues: {
-      channelName: "",
+      channelName: '',
       isPublic: true,
     },
-    onSubmit: async (
-      values,
-      { setSubmitting, resetForm, setErrors }
-    ) => {
+    onSubmit: async (values, { setSubmitting, resetForm, setErrors }) => {
       if (!values.channelName)
-        setErrors({ channelName: "Field cannot be empty" });
+        setErrors({ channelName: 'Field cannot be empty' });
       else {
         const response = await createChannel({
           variables: {
@@ -72,7 +69,7 @@ export const AddChannelModal: React.FC<AddChannelModalProps> = ({
               query: MeDocument,
             });
 
-            const teamIdx = findIndex(data?.me?.teams, ["id", teamId]);
+            const teamIdx = findIndex(data?.me?.teams, ['id', teamId]);
 
             if (
               data?.me?.teams &&
@@ -80,7 +77,7 @@ export const AddChannelModal: React.FC<AddChannelModalProps> = ({
               createChannel?.channel
             ) {
               cache.writeFragment({
-                id: "Team:" + teamId,
+                id: `Team:${teamId}`,
                 fragment: gql`
                   fragment Channel on Team {
                     channels
@@ -124,9 +121,7 @@ export const AddChannelModal: React.FC<AddChannelModalProps> = ({
       <Modal.Header>Add channel</Modal.Header>
       <Modal.Content>
         <Form onSubmit={handleSubmit}>
-          <FormField
-            error={touched.channelName && !!errors.channelName}
-          >
+          <FormField error={touched.channelName && !!errors.channelName}>
             <Input
               ref={inputRef}
               fluid
@@ -141,10 +136,10 @@ export const AddChannelModal: React.FC<AddChannelModalProps> = ({
           <FormField>
             <Checkbox
               checked={!values.isPublic}
-              value={values.isPublic + ""}
+              value={`${values.isPublic}`}
               name="isPublic"
               onChange={(_e, { checked }) =>
-                setFieldValue("isPublic", !checked)
+                setFieldValue('isPublic', !checked)
               }
               label="Make this channel private"
             />

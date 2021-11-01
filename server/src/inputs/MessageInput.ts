@@ -1,5 +1,5 @@
-import { Field, InputType } from "type-graphql";
-import { FileUpload, GraphQLUpload } from "graphql-upload";
+import { Field, InputType } from 'type-graphql';
+import { FileUpload, GraphQLUpload } from 'graphql-upload';
 
 @InputType()
 export class CreateMessageInput {

@@ -1,13 +1,11 @@
-import { File } from "../entity/File";
-import { getRepository, Repository } from "typeorm";
-import { Message } from "../entity/Message";
-import {
-  CreateMessageInput,
-  UpdateMessageInput,
-} from "../inputs/MessageInput";
+import { getRepository, Repository } from 'typeorm';
+import { File } from '../entity/File';
+import { Message } from '../entity/Message';
+import { CreateMessageInput, UpdateMessageInput } from '../inputs/MessageInput';
 
 export class MessageService {
   private readonly messageRepository: Repository<Message>;
+
   constructor() {
     this.messageRepository = getRepository(Message);
   }
@@ -37,15 +35,12 @@ export class MessageService {
   public async getMany(channelId: number): Promise<Message[]> {
     return this.messageRepository.find({
       where: { channelId },
-      order: { createdAt: "ASC" },
+      order: { createdAt: 'ASC' },
     });
   }
 
-  public async populateMany<T>(
-    message: Message,
-    field: string
-  ): Promise<T[]> {
-    return await this.messageRepository
+  public async populateMany<T>(message: Message, field: string): Promise<T[]> {
+    return this.messageRepository
       .createQueryBuilder()
       .relation(Message, field)
       .of(message)
@@ -56,7 +51,7 @@ export class MessageService {
     message: Message,
     field: string
   ): Promise<T | undefined> {
-    return await this.messageRepository
+    return this.messageRepository
       .createQueryBuilder()
       .relation(Message, field)
       .of(message)

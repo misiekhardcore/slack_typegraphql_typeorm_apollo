@@ -1,6 +1,6 @@
-import Downshift from "downshift";
-import React, { useEffect, useRef } from "react";
-import { useHistory } from "react-router";
+import Downshift from 'downshift';
+import React, { useEffect, useRef } from 'react';
+import { useHistory } from 'react-router';
 import {
   Button,
   Form,
@@ -8,9 +8,9 @@ import {
   FormGroup,
   Input,
   Modal,
-} from "semantic-ui-react";
-import styled from "styled-components";
-import { useGetTeamMembersQuery } from "../generated/graphql";
+} from 'semantic-ui-react';
+import styled from 'styled-components';
+import { useGetTeamMembersQuery } from '../generated/graphql';
 
 const MembersList = styled.ul`
   list-style: none;
@@ -59,7 +59,7 @@ export const DirectMessageModal: React.FC<DirectMessageModalProps> = ({
                 )[0].id;
                 history.push(`/view-team/user/${teamId}/${memberId}`);
               }}
-              itemToString={(item) => (item ? item.username : "")}
+              itemToString={(item) => (item ? item.username : '')}
             >
               {({
                 getInputProps,
@@ -84,8 +84,7 @@ export const DirectMessageModal: React.FC<DirectMessageModalProps> = ({
                       ? filteredMembers
                           .filter(
                             (item) =>
-                              !inputValue ||
-                              item.username.includes(inputValue)
+                              !inputValue || item.username.includes(inputValue)
                           )
                           .map((item, index) => (
                             <li
@@ -96,12 +95,10 @@ export const DirectMessageModal: React.FC<DirectMessageModalProps> = ({
                                 style: {
                                   backgroundColor:
                                     highlightedIndex === index
-                                      ? "lightgray"
-                                      : "white",
+                                      ? 'lightgray'
+                                      : 'white',
                                   fontWeight:
-                                    selectedItem === item
-                                      ? "bold"
-                                      : "normal",
+                                    selectedItem === item ? 'bold' : 'normal',
                                 },
                               })}
                             >

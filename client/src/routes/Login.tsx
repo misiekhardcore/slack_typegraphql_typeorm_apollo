@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { useHistory } from "react-router";
-import { Link } from "react-router-dom";
+import React, { useState } from 'react';
+import { useHistory } from 'react-router';
+import { Link } from 'react-router-dom';
 import {
   Button,
   Container,
@@ -8,16 +8,16 @@ import {
   FormInput,
   Header,
   Message,
-} from "semantic-ui-react";
-import { useLoginMutation } from "../generated/graphql";
-import { graphqlErrorToObject } from "../utils/graphqlErrorToObject";
-import { isErrorField } from "../utils/isErrorField";
+} from 'semantic-ui-react';
+import { useLoginMutation } from '../generated/graphql';
+import { graphqlErrorToObject } from '../utils/graphqlErrorToObject';
+import { isErrorField } from '../utils/isErrorField';
 
 const Login: React.FC = () => {
   const history = useHistory();
-  const [state, setState] = useState({ email: "", password: "" });
+  const [state, setState] = useState({ email: '', password: '' });
   const [login, { loading, data, error }] = useLoginMutation({
-    errorPolicy: "all",
+    errorPolicy: 'all',
   });
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,10 +32,9 @@ const Login: React.FC = () => {
 
   if (data?.login.ok) {
     const { token, refreshToken } = data.login;
-    if (token) localStorage.setItem("token", token);
-    if (refreshToken)
-      localStorage.setItem("refreshToken", refreshToken);
-    history.push("/view-team");
+    if (token) localStorage.setItem('token', token);
+    if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
+    history.push('/view-team');
   }
 
   return (
@@ -52,7 +51,7 @@ const Login: React.FC = () => {
       )}
       <Form onSubmit={onSubmit} loading={loading}>
         <FormInput
-          error={isErrorField(error, "email")}
+          error={isErrorField(error, 'email')}
           label="Email"
           onChange={onChange}
           name="email"
@@ -62,7 +61,7 @@ const Login: React.FC = () => {
           type="email"
         />
         <FormInput
-          error={isErrorField(error, "password")}
+          error={isErrorField(error, 'password')}
           label="Password"
           onChange={onChange}
           name="password"
@@ -73,7 +72,7 @@ const Login: React.FC = () => {
         />
         <Button type="submit">Login</Button>
       </Form>
-      <Link to="/register">Don't have an account yet? Register</Link>
+      <Link to="/register">Don&apos;t have an account yet? Register</Link>
     </Container>
   );
 };

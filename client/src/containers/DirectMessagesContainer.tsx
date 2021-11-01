@@ -1,13 +1,13 @@
-import React, { useEffect } from "react";
-import { Comment } from "semantic-ui-react";
-import { Messages } from "../components/Messages";
+import React, { useEffect } from 'react';
+import { Comment } from 'semantic-ui-react';
+import { Messages } from '../components/Messages';
 import {
   DirectMessage,
   NewDirectMessageDocument,
   NewDirectMessageSubscription,
   NewDirectMessageSubscriptionVariables,
   useGetDirectMessageQuery,
-} from "../generated/graphql";
+} from '../generated/graphql';
 
 const message = ({
   text,
@@ -26,10 +26,7 @@ const message = ({
       <Comment.Text>{text}</Comment.Text>
       {file && (
         <Comment.Text>
-          <img
-            src={`http://localhost:4000${file.url}`}
-            alt={file.filename}
-          />
+          <img src={`http://localhost:4000${file.url}`} alt={file.filename} />
         </Comment.Text>
       )}
       <Comment.Actions>
@@ -46,11 +43,10 @@ interface DirectMessagesContainerProps {
 
 export const DirectMessagesContainer: React.FC<DirectMessagesContainerProps> =
   ({ teamId, userToId }) => {
-    const { data, error, loading, subscribeToMore } =
-      useGetDirectMessageQuery({
-        variables: { userToId, teamId },
-        fetchPolicy: "network-only",
-      });
+    const { data, error, loading, subscribeToMore } = useGetDirectMessageQuery({
+      variables: { userToId, teamId },
+      fetchPolicy: 'network-only',
+    });
 
     useEffect(() => {
       const unsubscribe = subscribeToMore<
@@ -65,7 +61,7 @@ export const DirectMessagesContainer: React.FC<DirectMessagesContainerProps> =
             ...prev,
             getDirectMessages: [
               ...prev.getDirectMessages,
-              subscriptionData.data!.newDirectMessage,
+              subscriptionData.data.newDirectMessage,
             ],
           };
         },
@@ -78,9 +74,7 @@ export const DirectMessagesContainer: React.FC<DirectMessagesContainerProps> =
       <Messages>
         <Comment.Group>
           {data?.getDirectMessages &&
-            data.getDirectMessages.map((mes) =>
-              message(mes as DirectMessage)
-            )}
+            data.getDirectMessages.map((mes) => message(mes as DirectMessage))}
         </Comment.Group>
         {error && JSON.stringify(error)}
       </Messages>

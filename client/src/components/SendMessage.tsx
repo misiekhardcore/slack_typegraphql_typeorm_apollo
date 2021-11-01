@@ -1,9 +1,13 @@
-import { useFormik } from "formik";
-import React, { ChangeEvent, useState } from "react";
-import { useDropzone } from "react-dropzone";
-import { Button, Icon, Input } from "semantic-ui-react";
-import styled from "styled-components";
-import { File } from "../generated/graphql";
+import { FetchResult } from '@apollo/client';
+import { useFormik } from 'formik';
+import React, { ChangeEvent, useState } from 'react';
+import { useDropzone } from 'react-dropzone';
+import { Button, Icon, Input } from 'semantic-ui-react';
+import styled from 'styled-components';
+import {
+  CreateDirectMessageMutation,
+  CreateMessageMutation,
+} from '../generated/graphql';
 
 const SendMessageWrapper = styled.div`
   grid-column: 3;
@@ -35,7 +39,16 @@ const Dropzone = styled.div`
 `;
 
 interface SendMessageProps {
-  onSubmit: (message: string, file: any) => Promise<any>;
+  onSubmit: (
+    message: string | null,
+    file: File | null
+  ) => Promise<
+    FetchResult<
+      CreateDirectMessageMutation | CreateMessageMutation,
+      Record<string, any>,
+      Record<string, any>
+    >
+  >;
   placeholder: string;
 }
 
@@ -44,12 +57,10 @@ export const SendMessage: React.FC<SendMessageProps> = ({
   placeholder,
 }) => {
   const [pholder, setPlaceholder] = useState(`Message ${placeholder}`);
-  const [file, setFile] = useState<(File & { name: string }) | null>(
-    null
-  );
+  const [file, setFile] = useState<File | null>(null);
 
   const { getRootProps, getInputProps } = useDropzone({
-    onDrop: (files: any[]) => setFile(files[0]),
+    onDrop: (files: File[]) => setFile(files[0]),
   });
 
   const {
@@ -61,11 +72,11 @@ export const SendMessage: React.FC<SendMessageProps> = ({
     values,
     errors,
   } = useFormik({
-    initialValues: { message: "" },
+    initialValues: { message: '' },
     onSubmit: async (values, { setSubmitting, setErrors }) => {
       if (!values.message && !file) {
-        setErrors({ message: "Field cannot be empty" });
-        setPlaceholder("Field cannot be empty");
+        setErrors({ message: 'Field cannot be empty' });
+        setPlaceholder('Field cannot be empty');
       } else {
         await onSubmit(values.message, file);
         setSubmitting(false);
@@ -78,7 +89,7 @@ export const SendMessage: React.FC<SendMessageProps> = ({
     <SendMessageWrapper>
       <Dropzone
         {...getRootProps({
-          className: "dropzone",
+          className: 'dropzone',
         })}
       >
         <Button>
@@ -86,7 +97,7 @@ export const SendMessage: React.FC<SendMessageProps> = ({
           <Icon
             style={{ margin: 0 }}
             name="paperclip"
-            color={file ? "blue" : "grey"}
+            color={file ? 'blue' : 'grey'}
           />
         </Button>
       </Dropzone>
@@ -103,7 +114,7 @@ export const SendMessage: React.FC<SendMessageProps> = ({
         onBlur={handleBlur}
         value={values.message}
         onKeyDown={(e: KeyboardEvent) => {
-          if (e.code === "Enter" && !isSubmitting) {
+          if (e.code === 'Enter' && !isSubmitting) {
             handleSubmit();
           }
         }}

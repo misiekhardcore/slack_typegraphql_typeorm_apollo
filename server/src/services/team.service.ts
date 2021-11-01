@@ -1,26 +1,23 @@
-import {
-  Connection,
-  getConnection,
-  getRepository,
-  Repository,
-} from "typeorm";
-import { Channel } from "../entity/Channel";
-import { Team } from "../entity/Team";
-import { TeamMember } from "../entity/TeamMember";
-import { User } from "../entity/User";
-import { CreateTeamInput, UpdateTeamInput } from "../inputs/TeamInputs";
+import { Connection, getConnection, getRepository, Repository } from 'typeorm';
+import { Channel } from '../entity/Channel';
+import { Team } from '../entity/Team';
+import { TeamMember } from '../entity/TeamMember';
+import { User } from '../entity/User';
+import { CreateTeamInput, UpdateTeamInput } from '../inputs/TeamInputs';
 
 export class TeamService {
   private readonly teamRepository: Repository<Team>;
+
   private readonly getConnection: Connection;
+
   constructor() {
     this.teamRepository = getRepository(Team);
     this.getConnection = getConnection();
   }
 
   public async create(createTeamInput: CreateTeamInput): Promise<Team> {
-    return await this.getConnection.transaction(
-      "SERIALIZABLE",
+    return this.getConnection.transaction(
+      'SERIALIZABLE',
       async (transactionEntityManager) => {
         const team = await transactionEntityManager
           .create(Team, {
@@ -29,7 +26,7 @@ export class TeamService {
           .save();
         await transactionEntityManager
           .create(Channel, {
-            name: "general",
+            name: 'general',
             teamId: team.id,
             isPublic: true,
           })
@@ -38,14 +35,15 @@ export class TeamService {
       }
     );
   }
+
   public async update(updateTeamInput: UpdateTeamInput) {
     const { id, ...rest } = updateTeamInput;
     this.teamRepository.update({ id }, rest);
-    return await this.teamRepository.findOne(id);
+    return this.teamRepository.findOne(id);
   }
 
   public async getOne(teamId: number) {
-    return await this.teamRepository.findOne({
+    return this.teamRepository.findOne({
       where: { id: teamId },
     });
   }
@@ -56,26 +54,23 @@ export class TeamService {
    * @returns all teams owned by user or where user is member
    */
   public async getMany(userId: number) {
-    //SELECT * FROM teams LEFT JOIN team_member  ON team_member.team_id=teams.id LEFT JOIN users ON users.id=team_member.user_id WHERE users.id = $1
-    return await this.teamRepository
-      .createQueryBuilder("teams")
+    // SELECT * FROM teams LEFT JOIN team_member  ON team_member.team_id=teams.id LEFT JOIN users ON users.id=team_member.user_id WHERE users.id = $1
+    return this.teamRepository
+      .createQueryBuilder('teams')
       .leftJoinAndSelect(
         TeamMember,
-        "team_member",
-        "team_member.team_id=teams.id"
+        'team_member',
+        'team_member.team_id=teams.id'
       )
-      .leftJoinAndSelect(User, "users", "users.id=team_member.user_id")
-      .where("users.id = :userId", {
+      .leftJoinAndSelect(User, 'users', 'users.id=team_member.user_id')
+      .where('users.id = :userId', {
         userId,
       })
       .getMany();
   }
 
-  public async populateMany<T>(
-    team: Team,
-    field: string
-  ): Promise<T[]> {
-    return await this.teamRepository
+  public async populateMany<T>(team: Team, field: string): Promise<T[]> {
+    return this.teamRepository
       .createQueryBuilder()
       .relation(Team, field)
       .of(team)
@@ -86,7 +81,7 @@ export class TeamService {
     team: Team,
     field: string
   ): Promise<T | undefined> {
-    return await this.teamRepository
+    return this.teamRepository
       .createQueryBuilder()
       .relation(Team, field)
       .of(team)

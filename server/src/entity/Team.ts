@@ -1,4 +1,4 @@
-import { Field, Int, ObjectType } from "type-graphql";
+import { Field, Int, ObjectType } from 'type-graphql';
 import {
   BaseEntity,
   Column,
@@ -7,12 +7,12 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-} from "typeorm";
-import { Channel } from "./Channel";
-import { TeamMember } from "./TeamMember";
-import { User } from "./User";
+} from 'typeorm';
+import { Channel } from './Channel';
+import { TeamMember } from './TeamMember';
+import { User } from './User';
 
-@Entity({ name: "teams" })
+@Entity({ name: 'teams' })
 @ObjectType()
 export class Team extends BaseEntity {
   @Field(() => Int)
@@ -28,7 +28,7 @@ export class Team extends BaseEntity {
 
   @OneToMany(() => TeamMember, (member) => member.team, {
     nullable: false,
-    onDelete: "CASCADE",
+    onDelete: 'CASCADE',
   })
   userConnection: TeamMember[];
 

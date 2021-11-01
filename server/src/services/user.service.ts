@@ -1,18 +1,20 @@
-import { TeamMember } from "../entity/TeamMember";
-import { getRepository, Repository } from "typeorm";
-import { User } from "../entity/User";
-import { CreateUserInput, UpdateUserInput } from "../inputs/UserInputs";
+import { getRepository, Repository } from 'typeorm';
+import { TeamMember } from '../entity/TeamMember';
+import { User } from '../entity/User';
+import { CreateUserInput, UpdateUserInput } from '../inputs/UserInputs';
 
 export class UserService {
   private readonly userRepository: Repository<User>;
+
   private readonly teamMemberRepository: Repository<TeamMember>;
+
   constructor() {
     this.userRepository = getRepository(User);
     this.teamMemberRepository = getRepository(TeamMember);
   }
 
   public async create(createUserInput: CreateUserInput): Promise<User> {
-    return await this.userRepository.create(createUserInput).save();
+    return this.userRepository.create(createUserInput).save();
   }
 
   public async update(
@@ -20,35 +22,32 @@ export class UserService {
   ): Promise<User | undefined> {
     const { id, ...rest } = updateUserInput;
     this.userRepository.update({ id }, rest);
-    return await this.userRepository.findOne(id);
+    return this.userRepository.findOne(id);
   }
 
   public async getOneById(id: number): Promise<User | undefined> {
-    return await this.userRepository.findOne(id);
+    return this.userRepository.findOne(id);
   }
 
   public async getOneByEmail(email: string): Promise<User | undefined> {
-    return await this.userRepository.findOne({ email });
+    return this.userRepository.findOne({ email });
   }
 
   public async getMany(): Promise<User[]> {
-    return await this.userRepository.find();
+    return this.userRepository.find();
   }
 
   public async getMember(
     teamId: number,
     userId: number
   ): Promise<TeamMember | undefined> {
-    return await this.teamMemberRepository.findOne({
+    return this.teamMemberRepository.findOne({
       where: { teamId, userId },
     });
   }
 
-  public async populateMany<T>(
-    user: User,
-    field: string
-  ): Promise<T[]> {
-    return await this.userRepository
+  public async populateMany<T>(user: User, field: string): Promise<T[]> {
+    return this.userRepository
       .createQueryBuilder()
       .relation(User, field)
       .of(user)
@@ -59,7 +58,7 @@ export class UserService {
     user: User,
     field: string
   ): Promise<T | undefined> {
-    return await this.userRepository
+    return this.userRepository
       .createQueryBuilder()
       .relation(User, field)
       .of(user)

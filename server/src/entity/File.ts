@@ -1,12 +1,7 @@
-import { Field, ObjectType } from "type-graphql";
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  PrimaryGeneratedColumn,
-} from "typeorm";
+import { Field, ObjectType } from 'type-graphql';
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({ name: "files" })
+@Entity({ name: 'files' })
 @ObjectType()
 export class File extends BaseEntity {
   @PrimaryGeneratedColumn()
