@@ -1,9 +1,9 @@
-import { Field, InputType } from 'type-graphql';
+import { Field, InputType, Int } from 'type-graphql';
 import { FileUpload, GraphQLUpload } from 'graphql-upload';
 
 @InputType()
 export class CreateMessageInput {
-  @Field(() => Number)
+  @Field(() => Int)
   channelId: number;
 
   @Field(() => String, { nullable: true })
@@ -15,7 +15,7 @@ export class CreateMessageInput {
 
 @InputType()
 export class UpdateMessageInput {
-  @Field(() => Number)
+  @Field(() => Int)
   id: number;
 
   @Field(() => String)

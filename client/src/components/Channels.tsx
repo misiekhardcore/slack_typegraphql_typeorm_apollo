@@ -84,7 +84,7 @@ export const Channels: React.FC<ChannelsProps> = ({
   onAddChannelClick,
   onInvitePeople,
 }) => {
-  const { channels, name, id, members, admin } = team || {};
+  const { channels, name, id, members, owner, admin } = team || {};
 
   const allPeople = (members || []).filter((user) => user.id !== userId);
 
@@ -92,7 +92,7 @@ export const Channels: React.FC<ChannelsProps> = ({
     <ChannelsWrapper>
       <PushLeft>
         <TeamNameHeader>{name}</TeamNameHeader>
-        {members[0].username}
+        {owner.username}
       </PushLeft>
       <SideBarList>
         <SideBarListHeader>

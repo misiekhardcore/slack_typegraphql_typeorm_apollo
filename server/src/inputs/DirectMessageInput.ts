@@ -1,12 +1,12 @@
 import { FileUpload, GraphQLUpload } from 'graphql-upload';
-import { Field, InputType } from 'type-graphql';
+import { Field, InputType, Int } from 'type-graphql';
 
 @InputType()
 export class CreateDirectMessageInput {
-  @Field(() => Number)
+  @Field(() => Int)
   teamId: number;
 
-  @Field(() => Number)
+  @Field(() => Int)
   userToId: number;
 
   @Field(() => String, { nullable: true })
@@ -18,7 +18,7 @@ export class CreateDirectMessageInput {
 
 @InputType()
 export class UpdateDirectMessageInput {
-  @Field(() => Number)
+  @Field(() => Int)
   id: number;
 
   @Field(() => String)

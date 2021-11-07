@@ -66,7 +66,7 @@ const ViewTeam: React.FC<ViewTeamProps> = ({
   const channelIdx = channelId
     ? findIndex(team.channels, ['id', channelIdInt])
     : 0;
-  const channel = team?.channels[channelIdx] || {};
+  const channel = team.channels[channelIdx] || {};
 
   if (loading || error) return null;
 

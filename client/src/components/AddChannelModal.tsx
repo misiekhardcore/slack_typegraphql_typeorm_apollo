@@ -23,11 +23,13 @@ import { MultiSelectUsers } from './MultiSelectUsers';
 interface AddChannelModalProps {
   teamId: number;
   open: boolean;
+  userId: number;
   onClose: () => void;
 }
 
 export const AddChannelModal: React.FC<AddChannelModalProps> = ({
   teamId,
+  userId,
   open,
   onClose,
 }) => {
@@ -49,6 +51,7 @@ export const AddChannelModal: React.FC<AddChannelModalProps> = ({
     initialValues: {
       channelName: '',
       isPublic: true,
+      members: [],
     },
     onSubmit: async (values, { setSubmitting, resetForm, setErrors }) => {
       if (!values.channelName)
@@ -60,6 +63,7 @@ export const AddChannelModal: React.FC<AddChannelModalProps> = ({
               name: values.channelName,
               teamId,
               isPublic: values.isPublic,
+              membersIds: values.members,
             },
           },
           update: (cache, { data: data2 }) => {
@@ -136,7 +140,7 @@ export const AddChannelModal: React.FC<AddChannelModalProps> = ({
           <FormField>
             <Checkbox
               checked={!values.isPublic}
-              value={`${values.isPublic}`}
+              // value={`${values.isPublic}`}
               name="isPublic"
               onChange={(_e, { checked }) =>
                 setFieldValue('isPublic', !checked)
@@ -146,7 +150,15 @@ export const AddChannelModal: React.FC<AddChannelModalProps> = ({
           </FormField>
           {!values.isPublic && (
             <FormField>
-              <MultiSelectUsers teamId={teamId} />
+              <MultiSelectUsers
+                userId={userId}
+                placeholder="Select members to invite"
+                value={values.members}
+                handleChange={(_e, { value }) =>
+                  setFieldValue('members', value)
+                }
+                teamId={teamId}
+              />
             </FormField>
           )}
           {touched.channelName && errors.channelName ? (

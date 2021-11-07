@@ -6,6 +6,9 @@ query me {
       id
       name
       admin
+      owner {
+        username
+      }
       channels {
         id
         isPublic

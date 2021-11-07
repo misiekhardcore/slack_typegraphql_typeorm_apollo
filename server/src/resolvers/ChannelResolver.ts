@@ -36,8 +36,9 @@ export class ChannelResolver implements ResolverInterface<Channel> {
   }
 
   @Query(() => [Channel], { nullable: true })
-  async getChannels() {
-    return this.channelService.getMany();
+  async getChannels(@Arg('teamId') teamId: number, @Ctx() { user }: Context) {
+    if (!user) return null;
+    return this.channelService.getMany(teamId, user.id);
   }
 
   @Query(() => Channel, { nullable: true })
@@ -79,7 +80,10 @@ export class ChannelResolver implements ResolverInterface<Channel> {
           ],
         };
 
-      const channel = await this.channelService.create(createChannelInput);
+      const channel = await this.channelService.create(
+        createChannelInput,
+        user.id
+      );
 
       return { ok: true, channel };
     } catch (error) {

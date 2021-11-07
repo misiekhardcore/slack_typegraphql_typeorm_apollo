@@ -1,5 +1,6 @@
 // import { ChannelMember } from "src/entity/ChannelMember";
 import { getRepository, Repository } from 'typeorm';
+import { User } from '../entity/User';
 import { TeamMember } from '../entity/TeamMember';
 
 interface CreateTeamMemberInput {
@@ -44,9 +45,17 @@ export class TeamMemberService {
    * @param {number} teamId id of the team
    * @returns {TeamMember | undefined} team member/owner
    */
-  public async getOwner(teamId: number): Promise<TeamMember | undefined> {
-    return this.teamMemberRepository.findOne({
-      where: { teamId, isAdmin: true },
-    });
+  public async getOwner(teamId: number): Promise<User | undefined> {
+    return (
+      await this.teamMemberRepository.findOne({
+        join: {
+          alias: 'teamMember',
+          innerJoinAndSelect: {
+            user: 'teamMember.user',
+          },
+        },
+        where: { teamId, admin: true },
+      })
+    )?.user;
   }
 }

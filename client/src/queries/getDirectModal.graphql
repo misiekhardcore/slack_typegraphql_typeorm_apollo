@@ -10,6 +10,9 @@ query getDirectModal($userId: Float!) {
       id
       name
       admin
+      owner {
+        username
+      }
       channels {
         id
         isPublic

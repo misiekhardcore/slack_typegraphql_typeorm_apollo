@@ -14,6 +14,7 @@ import {
   Subscription,
   UseMiddleware,
 } from 'type-graphql';
+import { ChannelService } from '../services/channel.service';
 import { Channel } from '../entity/Channel';
 import { File } from '../entity/File';
 import { Message } from '../entity/Message';
@@ -23,6 +24,7 @@ import { CreateMessageInput } from '../inputs/MessageInput';
 import { isTeamMember } from '../permissions';
 import { FileService } from '../services/file.service';
 import { MessageService } from '../services/message.service';
+import { ChannelMemberService } from '../services/channel-member.service';
 
 @Resolver(() => Message)
 export class MessageResolver implements ResolverInterface<Message> {
@@ -30,17 +32,35 @@ export class MessageResolver implements ResolverInterface<Message> {
 
   private readonly fileService: FileService;
 
+  private readonly channelService: ChannelService;
+
+  private readonly channelMemberService: ChannelMemberService;
+
   constructor() {
     this.messageService = new MessageService();
     this.fileService = new FileService();
+    this.channelService = new ChannelService();
+    this.channelMemberService = new ChannelMemberService();
   }
 
-  @Query(() => [Message])
-  async getMessages(@Arg('channelId') channelId: number) {
+  @Query(() => [Message], { nullable: true })
+  async getMessages(
+    @Arg('channelId') channelId: number,
+    @Ctx() { user }: Context
+  ) {
+    if (!user) return null;
+
+    const channel = await this.channelService.getOne(channelId);
+
+    if (!channel?.isPublic) {
+      const member = this.channelMemberService.getOne(user.id, channelId);
+      if (!member) throw new AuthenticationError('Not authenticated');
+    }
+
     return this.messageService.getMany(channelId);
   }
 
-  @Query(() => Message)
+  @Query(() => Message, { nullable: true })
   async getMessage(@Arg('messageId') messageId: number) {
     return this.messageService.getOne(messageId);
   }
@@ -102,11 +122,10 @@ export class MessageResolver implements ResolverInterface<Message> {
     );
   }
 
-  @FieldResolver()
+  @FieldResolver({ nullable: true })
   async file(@Root() message: Message) {
     return (
-      (await this.messageService.populateOne<File>(message, 'file')) ||
-      new File()
+      (await this.messageService.populateOne<File>(message, 'file')) || null
     );
   }
 }

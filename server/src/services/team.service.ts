@@ -20,9 +20,7 @@ export class TeamService {
       'SERIALIZABLE',
       async (transactionEntityManager) => {
         const team = await transactionEntityManager
-          .create(Team, {
-            ...createTeamInput,
-          })
+          .create(Team, createTeamInput)
           .save();
         await transactionEntityManager
           .create(Channel, {

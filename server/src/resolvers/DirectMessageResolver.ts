@@ -35,13 +35,14 @@ export class DirectMessageResolver implements ResolverInterface<DirectMessage> {
     this.fileService = new FileService();
   }
 
-  @Query(() => [DirectMessage])
+  @Query(() => [DirectMessage], { nullable: true })
   async getDirectMessages(
     @Ctx() { user }: Context,
     @Arg('userToId') userToId: number,
     @Arg('teamId') teamId: number
   ) {
-    if (!user) return [];
+    if (!user) return null;
+
     return this.directMessageService.getMany(user.id, userToId, teamId);
   }
 
@@ -127,6 +128,14 @@ export class DirectMessageResolver implements ResolverInterface<DirectMessage> {
     return (
       (await this.directMessageService.populateOne<User>(message, 'userTo')) ||
       new User()
+    );
+  }
+
+  @FieldResolver({ nullable: true })
+  async file(@Root() message: DirectMessage) {
+    return (
+      (await this.directMessageService.populateOne<File>(message, 'file')) ||
+      null
     );
   }
 }

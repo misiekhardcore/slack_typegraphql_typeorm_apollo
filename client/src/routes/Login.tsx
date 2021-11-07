@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router';
+import { Redirect } from 'react-router';
 import { Link } from 'react-router-dom';
 import {
   Button,
@@ -14,7 +14,6 @@ import { graphqlErrorToObject } from '../utils/graphqlErrorToObject';
 import { isErrorField } from '../utils/isErrorField';
 
 const Login: React.FC = () => {
-  const history = useHistory();
   const [state, setState] = useState({ email: '', password: '' });
   const [login, { loading, data, error }] = useLoginMutation({
     errorPolicy: 'all',
@@ -34,7 +33,7 @@ const Login: React.FC = () => {
     const { token, refreshToken } = data.login;
     if (token) localStorage.setItem('token', token);
     if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
-    history.push('/view-team');
+    return <Redirect to="/view-team" />;
   }
 
   return (

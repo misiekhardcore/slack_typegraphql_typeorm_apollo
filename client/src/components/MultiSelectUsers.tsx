@@ -1,26 +1,25 @@
-import Downshift from 'downshift';
 import React from 'react';
-import { useHistory } from 'react-router';
-import { Input } from 'semantic-ui-react';
-import styled from 'styled-components';
+import { Dropdown, DropdownProps } from 'semantic-ui-react';
 import { useGetTeamMembersQuery } from '../generated/graphql';
-
-const MembersList = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  height: 100px;
-  overflow-y: auto;
-`;
 
 interface MultiSelectUsersProps {
   teamId: number;
+  placeholder: string;
+  value: string | number | boolean | (string | number | boolean)[] | undefined;
+  userId: number;
+  handleChange: (
+    event: React.SyntheticEvent<HTMLElement, Event>,
+    data: DropdownProps
+  ) => void;
 }
 
 export const MultiSelectUsers: React.FC<MultiSelectUsersProps> = ({
   teamId,
+  placeholder,
+  value,
+  userId,
+  handleChange,
 }) => {
-  const history = useHistory();
   const { loading, error, data } = useGetTeamMembersQuery({
     variables: { teamId },
   });
@@ -28,62 +27,22 @@ export const MultiSelectUsers: React.FC<MultiSelectUsersProps> = ({
   if (loading || error || !data?.getTeam?.members) return null;
 
   const { members } = data.getTeam;
-  const filteredMembers = members.filter((m) => m.id !== 1);
+  const filteredMembers = members.filter((m) => m.id !== userId);
 
   return (
-    <Downshift
-      onChange={(selection) => {
-        const memberId = members.filter(
-          ({ username }) => username === selection.username
-        )[0].id;
-        history.push(`/view-team/user/${teamId}/${memberId}`);
-      }}
-      itemToString={(item) => (item ? item.username : '')}
-    >
-      {({
-        getInputProps,
-        getItemProps,
-        getMenuProps,
-        isOpen,
-        inputValue,
-        highlightedIndex,
-        selectedItem,
-        getRootProps,
-      }) => (
-        <div>
-          <div
-            {...getRootProps(undefined, {
-              suppressRefError: true,
-            })}
-          >
-            <Input {...getInputProps()} />
-          </div>
-          <MembersList {...getMenuProps()}>
-            {isOpen
-              ? filteredMembers
-                  .filter(
-                    (item) => !inputValue || item.username.includes(inputValue)
-                  )
-                  .map((item, index) => (
-                    <li
-                      {...getItemProps({
-                        key: item.username,
-                        index,
-                        item,
-                        style: {
-                          backgroundColor:
-                            highlightedIndex === index ? 'lightgray' : 'white',
-                          fontWeight: selectedItem === item ? 'bold' : 'normal',
-                        },
-                      })}
-                    >
-                      {item.username}
-                    </li>
-                  ))
-              : null}
-          </MembersList>
-        </div>
-      )}
-    </Downshift>
+    <Dropdown
+      value={value}
+      onChange={handleChange}
+      placeholder={placeholder}
+      fluid
+      multiple
+      search
+      selection
+      options={filteredMembers.map((m) => ({
+        key: m.id,
+        value: m.id,
+        text: m.username,
+      }))}
+    />
   );
 };

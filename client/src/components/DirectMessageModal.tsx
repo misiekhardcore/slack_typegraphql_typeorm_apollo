@@ -22,12 +22,14 @@ const MembersList = styled.ul`
 
 interface DirectMessageModalProps {
   teamId: number;
+  userId: number;
   open: boolean;
   onClose: () => void;
 }
 
 export const DirectMessageModal: React.FC<DirectMessageModalProps> = ({
   teamId,
+  userId,
   open,
   onClose,
 }) => {
@@ -44,7 +46,7 @@ export const DirectMessageModal: React.FC<DirectMessageModalProps> = ({
   if (loading || error || !data?.getTeam?.members) return null;
 
   const { members } = data.getTeam;
-  const filteredMembers = members.filter((m) => m.id !== 1);
+  const filteredMembers = members.filter((m) => m.id !== userId);
 
   return (
     <Modal open={open} onClose={onClose} closeOnDimmerClick>

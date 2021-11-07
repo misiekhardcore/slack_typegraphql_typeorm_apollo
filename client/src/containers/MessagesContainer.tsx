@@ -13,7 +13,6 @@ import {
 
 const media = ({ filename, mimetype, url }: File): JSX.Element => {
   const type = mimetype.split('/')[0];
-  console.log(type);
   if (!url) return <p style={{ color: 'red' }}>File URL broken</p>;
   switch (type) {
     case 'image':

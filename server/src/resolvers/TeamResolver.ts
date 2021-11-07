@@ -9,7 +9,7 @@ import {
   Root,
   UseMiddleware,
 } from 'type-graphql';
-import { Channel } from '../entity/Channel';
+import { ChannelService } from '../services/channel.service';
 import { AddMemberResponse, CreateTeamResponse } from '../entity/Outputs';
 import { Team } from '../entity/Team';
 import { User } from '../entity/User';
@@ -29,11 +29,14 @@ export class TeamResolver implements ResolverInterface<Team> {
 
   private readonly userService: UserService;
 
+  private readonly channelService: ChannelService;
+
   private readonly teamMemberService: TeamMemberService;
 
   constructor() {
     this.teamService = new TeamService();
     this.userService = new UserService();
+    this.channelService = new ChannelService();
     this.teamMemberService = new TeamMemberService();
   }
 
@@ -177,7 +180,13 @@ export class TeamResolver implements ResolverInterface<Team> {
   }
 
   @FieldResolver()
-  async channels(@Root() team: Team) {
-    return this.teamService.populateMany<Channel>(team, 'channels');
+  async channels(@Root() team: Team, @Ctx() { user }: Context) {
+    if (!user) return [];
+    return this.channelService.getMany(team.id, user.id);
+  }
+
+  @FieldResolver()
+  async owner(@Root() team: Team): Promise<User> {
+    return (await this.teamMemberService.getOwner(team.id)) || new User();
   }
 }

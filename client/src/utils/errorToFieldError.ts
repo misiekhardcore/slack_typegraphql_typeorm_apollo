@@ -1,6 +1,8 @@
 import { ListError } from '../generated/graphql';
 
-export default function errorToFieldError(errors: ListError[]) {
+export default function errorToFieldError(errors: ListError[]): {
+  [key: string]: string[];
+} {
   if (!errors || errors.length === 0) return {};
   return errors.reduce((acc: { [k: string]: string[] }, error) => {
     if (error.path in acc) {

@@ -1,5 +1,6 @@
 import {
   BaseEntity,
+  Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
@@ -10,13 +11,16 @@ import {
 import { Channel } from './Channel';
 import { User } from './User';
 
-@Entity({ name: 'channel_user' })
+@Entity({ name: 'channel_member' })
 export class ChannelMember extends BaseEntity {
   @PrimaryColumn()
   userId: number;
 
   @PrimaryColumn()
   channelId: number;
+
+  @Column({ default: false })
+  admin: boolean;
 
   @ManyToOne(() => User, (user) => user.channelConnection, {
     primary: true,

@@ -21,7 +21,7 @@ export class AddMemberInput {
 
 @InputType()
 export class UpdateTeamInput {
-  @Field(() => Number)
+  @Field(() => Int)
   id: number;
 
   @Field(() => String, { nullable: true })

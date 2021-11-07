@@ -66,7 +66,10 @@ export interface Context {
       return null;
     }
 
-    const [newToken, newRefreshToken] = user.createTokens(secret1, secret2);
+    const [newToken, newRefreshToken] = user.createTokens(
+      secret1,
+      refreshSecret
+    );
 
     return {
       token: newToken,

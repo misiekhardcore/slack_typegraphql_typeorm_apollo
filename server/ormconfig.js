@@ -4,7 +4,7 @@ module.exports = [
     type: 'postgres',
     url: 'postgres://postgres:postgres@localhost:5432/testslack',
     synchronize: true, // switch this to false once you have the initial tables created and use migrations instead
-    logging: true,
+    logging: false,
     // entities: ["dist/entity/**/*.js"],
     // migrations: ["dist/migration/**/*.js"],
     // subscribers: ["dist/subscriber/**/*.js"],
@@ -27,7 +27,7 @@ module.exports = [
     type: 'postgres',
     url: 'postgres://postgres:postgres@localhost:5432/slack',
     synchronize: true, // switch this to false once you have the initial tables created and use migrations instead
-    logging: true,
+    logging: false,
     // entities: ["dist/entity/**/*.js"],
     // migrations: ["dist/migration/**/*.js"],
     // subscribers: ["dist/subscriber/**/*.js"],

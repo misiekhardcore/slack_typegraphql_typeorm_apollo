@@ -45,7 +45,9 @@ interface SendMessageProps {
   ) => Promise<
     FetchResult<
       CreateDirectMessageMutation | CreateMessageMutation,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       Record<string, any>,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       Record<string, any>
     >
   >;

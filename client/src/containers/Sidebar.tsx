@@ -49,7 +49,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ teams, team, userId }) => {
     <>
       <Teams key="team-sidebar" teams={teams} />
       <Channels
-        key="channel-sidebar"
         team={team}
         userId={userId}
         onAddChannelClick={handleAddChannelModalOpen}
@@ -58,11 +57,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ teams, team, userId }) => {
       />
       <AddChannelModal
         teamId={team.id}
+        userId={userId}
         open={state.openAddChannelModal}
         onClose={handleAddChannelModalClose}
       />
       <DirectMessageModal
         teamId={team.id}
+        userId={userId}
         open={state.openDirectMessageModal}
         onClose={handleDirectMessageModalClose}
       />
