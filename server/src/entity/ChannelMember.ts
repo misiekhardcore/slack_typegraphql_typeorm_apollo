@@ -24,12 +24,14 @@ export class ChannelMember extends BaseEntity {
 
   @ManyToOne(() => User, (user) => user.channelConnection, {
     primary: true,
+    onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'user_id' })
   user: User;
 
   @ManyToOne(() => Channel, (channel) => channel.userConnection, {
     primary: true,
+    onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'channel_id' })
   channel: Channel;

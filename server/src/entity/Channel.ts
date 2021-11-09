@@ -54,9 +54,7 @@ export class Channel extends BaseEntity {
   @OneToMany(() => Message, (message) => message.channel)
   messages: Message[] | null;
 
-  @OneToMany(() => ChannelMember, (member) => member.channel, {
-    onDelete: 'CASCADE',
-  })
+  @OneToMany(() => ChannelMember, (member) => member.channel)
   userConnection: ChannelMember[];
 
   @Field(() => [User])

@@ -70,9 +70,7 @@ export class User extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => TeamMember, (member) => member.user, {
-    cascade: true,
-  })
+  @OneToMany(() => TeamMember, (member) => member.user)
   teamConnection: TeamMember[];
 
   @Field(() => [Team], { nullable: true })

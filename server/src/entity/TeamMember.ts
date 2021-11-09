@@ -24,12 +24,14 @@ export class TeamMember extends BaseEntity {
 
   @ManyToOne(() => User, (user) => user.teamConnection, {
     primary: true,
+    onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'user_id' })
   user: User;
 
   @ManyToOne(() => Team, (team) => team.userConnection, {
     primary: true,
+    onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'team_id' })
   team: Team;
