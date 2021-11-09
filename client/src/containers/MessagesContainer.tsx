@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Button, Comment } from 'semantic-ui-react';
-import { Messages } from '../components/Messages';
+import styled from 'styled-components';
 import {
   File,
   Message,
@@ -10,6 +10,25 @@ import {
   NewMessageSubscriptionVariables,
   useGetMessagesQuery,
 } from '../generated/graphql';
+
+const Messages = styled.div`
+  padding: 1.5rem;
+  grid-column: 3;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column-reverse;
+  overflow-y: auto;
+`;
+
+const EndInfo = styled.p`
+  width: 100%;
+  padding: 1rem;
+  color: gray;
+  text-align: center;
+  font-size: 1.5rem;
+  margin: 0;
+  font-style: italic;
+`;
 
 const media = ({ filename, mimetype, url }: File): JSX.Element => {
   const type = mimetype.split('/')[0];
@@ -66,15 +85,18 @@ interface MessagesContainerProps {
 export const MessagesContainer: React.FC<MessagesContainerProps> = ({
   channelId,
 }) => {
-  const { data, error, subscribeToMore, fetchMore } = useGetMessagesQuery({
-    variables: { channelId },
-    fetchPolicy: 'network-only',
-  });
+  const { data, loading, error, subscribeToMore, fetchMore } =
+    useGetMessagesQuery({
+      variables: { channelId },
+      notifyOnNetworkStatusChange: true,
+    });
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     noClick: true,
     onDrop: () => console.log(),
   });
+
+  const ref = useRef<HTMLDivElement>(null);
 
   const [hasMoreToLoad, setHasMoreToLoad] = useState(true);
 
@@ -103,6 +125,17 @@ export const MessagesContainer: React.FC<MessagesContainerProps> = ({
     });
   };
 
+  const handleScroll = () => {
+    if (
+      !loading &&
+      ref.current?.getBoundingClientRect().top &&
+      hasMoreToLoad &&
+      (getMessages || []).length >= 35 &&
+      ref.current?.getBoundingClientRect().top > 0
+    )
+      onLoadMore();
+  };
+
   useEffect(() => {
     const unsubscribe = subscribeToMore<
       NewMessageSubscription,
@@ -127,12 +160,20 @@ export const MessagesContainer: React.FC<MessagesContainerProps> = ({
 
   return (
     <Messages
+      onScroll={handleScroll}
       {...getRootProps({
         style: isDragActive ? { border: '2px dashed blue' } : undefined,
       })}
     >
       <input {...getInputProps()} />
-      <Comment.Group id="comments" style={{ maxWidth: '100%' }}>
+      <Comment.Group style={{ maxWidth: '100%', margin: 0 }}>
+        <div ref={ref} />
+        {!hasMoreToLoad && (getMessages || []).length > 0 && (
+          <EndInfo>~~~That&apos;s the end of that story~~~</EndInfo>
+        )}
+        {!hasMoreToLoad && (getMessages || []).length === 0 && (
+          <EndInfo>~~~You haven&apos;t spoken yet~~~</EndInfo>
+        )}
         {hasMoreToLoad && (getMessages || []).length >= 35 && (
           <Button fluid onClick={onLoadMore}>
             Load more
