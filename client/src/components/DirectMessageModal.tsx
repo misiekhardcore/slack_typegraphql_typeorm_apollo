@@ -2,6 +2,7 @@ import { useFormik } from 'formik';
 import gql from 'graphql-tag';
 import { findIndex } from 'lodash';
 import React, { useEffect, useRef } from 'react';
+import { useHistory } from 'react-router';
 import {
   Button,
   Form,
@@ -33,6 +34,8 @@ export const DirectMessageModal: React.FC<DirectMessageModalProps> = ({
   onClose,
 }) => {
   const inputRef = useRef<Input | null>(null);
+
+  const history = useHistory();
 
   const [createDMChannel] = useCreateDmChannelMutation();
 
@@ -99,18 +102,18 @@ export const DirectMessageModal: React.FC<DirectMessageModalProps> = ({
         },
       });
 
-      const { ok, errors } = response.data?.createDMChannel || {};
+      const { ok, channel, errors } = response.data?.createDMChannel || {};
 
       if (ok) {
         onClose();
         resetForm();
+        setSubmitting(false);
+        history.push(`/view-team/${teamId}/${channel?.id}`);
       }
       if (errors) {
         setErrors(errorToFieldError(errors));
+        setSubmitting(false);
       }
-      setSubmitting(false);
-
-      setSubmitting(false);
     },
   });
 
