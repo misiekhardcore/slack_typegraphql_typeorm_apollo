@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   OneToOne,
@@ -55,6 +56,7 @@ export class Message extends BaseEntity {
 
   @Field(() => String)
   @CreateDateColumn()
+  @Index()
   createdAt: Date;
 
   @Field(() => String)

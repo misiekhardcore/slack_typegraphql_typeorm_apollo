@@ -1,4 +1,4 @@
-import { getRepository, Repository } from 'typeorm';
+import { FindManyOptions, getRepository, LessThan, Repository } from 'typeorm';
 import { File } from '../entity/File';
 import { Message } from '../entity/Message';
 import { CreateMessageInput, UpdateMessageInput } from '../inputs/MessageInput';
@@ -32,13 +32,21 @@ export class MessageService {
     return this.messageRepository.findOne(id);
   }
 
-  public async getMany(channelId: number, offset?: number): Promise<Message[]> {
-    return this.messageRepository.find({
+  public async getMany(channelId: number, cursor?: string): Promise<Message[]> {
+    const options: FindManyOptions<Message> | undefined = {
       where: { channelId },
       order: { createdAt: 'DESC' },
       take: 35,
-      skip: offset,
-    });
+    };
+
+    if (cursor) {
+      options.where = {
+        channelId,
+        createdAt: LessThan(cursor),
+      };
+    }
+
+    return this.messageRepository.find(options);
   }
 
   public async populateMany<T>(message: Message, field: string): Promise<T[]> {

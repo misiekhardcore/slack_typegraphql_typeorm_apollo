@@ -81,11 +81,17 @@ export const MessagesContainer: React.FC<MessagesContainerProps> = ({
   const { getMessages } = data || {};
 
   const onLoadMore = () => {
+    let cursor: string | undefined;
+    if (getMessages?.length)
+      cursor = new Date(
+        +getMessages[getMessages?.length - 1].createdAt
+      ).toLocaleString();
     fetchMore({
-      variables: { channelId, offset: getMessages?.length },
+      variables: { channelId, cursor },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult?.getMessages) return prev;
         if (fetchMoreResult.getMessages.length < 35) setHasMoreToLoad(false);
+        // document.querySelector('#comments')?.scrollTop = 0;
         return {
           ...prev,
           getMessages: [
@@ -126,7 +132,7 @@ export const MessagesContainer: React.FC<MessagesContainerProps> = ({
       })}
     >
       <input {...getInputProps()} />
-      <Comment.Group style={{ maxWidth: '100%' }}>
+      <Comment.Group id="comments" style={{ maxWidth: '100%' }}>
         {hasMoreToLoad && (
           <Button fluid onClick={onLoadMore}>
             Load more

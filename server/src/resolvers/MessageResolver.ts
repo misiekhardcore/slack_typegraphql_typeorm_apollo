@@ -47,7 +47,7 @@ export class MessageResolver implements ResolverInterface<Message> {
   async getMessages(
     @Arg('channelId') channelId: number,
     @Ctx() { user }: Context,
-    @Arg('offset', { nullable: true }) offset?: number
+    @Arg('cursor', { nullable: true }) cursor?: string
   ) {
     if (!user) return null;
 
@@ -58,7 +58,7 @@ export class MessageResolver implements ResolverInterface<Message> {
       if (!member) throw new AuthenticationError('Not authenticated');
     }
 
-    return this.messageService.getMany(channelId, offset);
+    return this.messageService.getMany(channelId, cursor);
   }
 
   @Query(() => Message, { nullable: true })

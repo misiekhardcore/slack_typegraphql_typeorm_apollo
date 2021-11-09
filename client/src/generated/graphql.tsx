@@ -210,7 +210,7 @@ export type QueryGetMessageArgs = {
 
 export type QueryGetMessagesArgs = {
   channelId: Scalars['Float'];
-  offset?: Maybe<Scalars['Float']>;
+  cursor?: Maybe<Scalars['String']>;
 };
 
 
@@ -322,7 +322,7 @@ export type GetDirectModalQuery = { __typename?: 'Query', getUser?: { __typename
 
 export type GetMessagesQueryVariables = Exact<{
   channelId: Scalars['Float'];
-  offset?: Maybe<Scalars['Float']>;
+  cursor?: Maybe<Scalars['String']>;
 }>;
 
 
@@ -712,8 +712,8 @@ export type GetDirectModalQueryHookResult = ReturnType<typeof useGetDirectModalQ
 export type GetDirectModalLazyQueryHookResult = ReturnType<typeof useGetDirectModalLazyQuery>;
 export type GetDirectModalQueryResult = Apollo.QueryResult<GetDirectModalQuery, GetDirectModalQueryVariables>;
 export const GetMessagesDocument = gql`
-    query getMessages($channelId: Float!, $offset: Float) {
-  getMessages(channelId: $channelId, offset: $offset) {
+    query getMessages($channelId: Float!, $cursor: String) {
+  getMessages(channelId: $channelId, cursor: $cursor) {
     id
     text
     user {
@@ -745,7 +745,7 @@ export const GetMessagesDocument = gql`
  * const { data, loading, error } = useGetMessagesQuery({
  *   variables: {
  *      channelId: // value for 'channelId'
- *      offset: // value for 'offset'
+ *      cursor: // value for 'cursor'
  *   },
  * });
  */
