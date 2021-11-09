@@ -133,7 +133,7 @@ export const MessagesContainer: React.FC<MessagesContainerProps> = ({
     >
       <input {...getInputProps()} />
       <Comment.Group id="comments" style={{ maxWidth: '100%' }}>
-        {hasMoreToLoad && (
+        {hasMoreToLoad && (getMessages || []).length >= 35 && (
           <Button fluid onClick={onLoadMore}>
             Load more
           </Button>
