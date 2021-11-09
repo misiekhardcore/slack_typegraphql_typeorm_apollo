@@ -1,12 +1,11 @@
-mutation createChannel(
-  $createChannelChannelInput: CreateChannelInput!
-) {
+mutation createChannel($createChannelChannelInput: CreateChannelInput!) {
   createChannel(channelInput: $createChannelChannelInput) {
     ok
     channel {
       id
       name
       isPublic
+      isDm
     }
     errors {
       msg

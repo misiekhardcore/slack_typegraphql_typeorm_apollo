@@ -5,6 +5,7 @@ query getTeams {
     channels {
       id
       isPublic
+      isDm
       name
     }
     members {

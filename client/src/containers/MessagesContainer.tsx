@@ -66,7 +66,7 @@ interface MessagesContainerProps {
 export const MessagesContainer: React.FC<MessagesContainerProps> = ({
   channelId,
 }) => {
-  const { data, error, loading, subscribeToMore } = useGetMessagesQuery({
+  const { data, error, subscribeToMore } = useGetMessagesQuery({
     variables: { channelId },
     fetchPolicy: 'network-only',
   });
@@ -86,7 +86,10 @@ export const MessagesContainer: React.FC<MessagesContainerProps> = ({
         if (!subscriptionData?.data) return prev;
         return {
           ...prev,
-          getMessages: [...prev.getMessages, subscriptionData.data.newMessage],
+          getMessages: [
+            ...(prev.getMessages || []),
+            subscriptionData.data.newMessage,
+          ],
         };
       },
     });
@@ -94,7 +97,7 @@ export const MessagesContainer: React.FC<MessagesContainerProps> = ({
     return unsubscribe;
   }, [channelId, subscribeToMore]);
 
-  return loading ? null : (
+  return (
     <Messages
       {...getRootProps({
         style: isDragActive ? { border: '2px dashed blue' } : undefined,

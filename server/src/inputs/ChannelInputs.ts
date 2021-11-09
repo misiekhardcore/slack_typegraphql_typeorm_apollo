@@ -11,6 +11,9 @@ export class CreateChannelInput {
   @Field(() => Boolean, { defaultValue: false })
   isPublic?: boolean;
 
+  @Field(() => Boolean, { defaultValue: false })
+  isDm?: boolean;
+
   @Field(() => [Int], { nullable: true })
   membersIds?: number[];
 }

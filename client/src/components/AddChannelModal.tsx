@@ -151,6 +151,7 @@ export const AddChannelModal: React.FC<AddChannelModalProps> = ({
           {!values.isPublic && (
             <FormField>
               <MultiSelectUsers
+                handleBlur={handleBlur}
                 userId={userId}
                 placeholder="Select members to invite"
                 value={values.members}

@@ -12,6 +12,7 @@ query me {
       channels {
         id
         isPublic
+        isDm
         name
       }
       members {

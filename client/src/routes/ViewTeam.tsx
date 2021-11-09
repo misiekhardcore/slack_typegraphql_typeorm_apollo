@@ -68,7 +68,7 @@ const ViewTeam: React.FC<ViewTeamProps> = ({
     : 0;
   const channel = team.channels[channelIdx] || {};
 
-  if (loading || error) return null;
+  if (error) return <pre>{JSON.stringify(error, null, 2)}</pre>;
 
   const onSubmit = async (message: string | null, file: File | null) =>
     createMessage({

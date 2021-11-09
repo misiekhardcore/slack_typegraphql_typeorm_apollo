@@ -1,24 +1,23 @@
-import Downshift from 'downshift';
+import { useFormik } from 'formik';
+import gql from 'graphql-tag';
+import { findIndex } from 'lodash';
 import React, { useEffect, useRef } from 'react';
-import { useHistory } from 'react-router';
 import {
   Button,
   Form,
   FormField,
   FormGroup,
   Input,
+  Message,
   Modal,
 } from 'semantic-ui-react';
-import styled from 'styled-components';
-import { useGetTeamMembersQuery } from '../generated/graphql';
-
-const MembersList = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  height: 100px;
-  overflow-y: auto;
-`;
+import {
+  MeDocument,
+  MeQuery,
+  useCreateDmChannelMutation,
+} from '../generated/graphql';
+import errorToFieldError from '../utils/errorToFieldError';
+import { MultiSelectUsers } from './MultiSelectUsers';
 
 interface DirectMessageModalProps {
   teamId: number;
@@ -34,95 +33,122 @@ export const DirectMessageModal: React.FC<DirectMessageModalProps> = ({
   onClose,
 }) => {
   const inputRef = useRef<Input | null>(null);
-  const history = useHistory();
-  const { loading, error, data } = useGetTeamMembersQuery({
-    variables: { teamId },
-  });
+
+  const [createDMChannel] = useCreateDmChannelMutation();
 
   useEffect(() => {
     if (open && inputRef) inputRef.current?.focus();
   }, [open]);
 
-  if (loading || error || !data?.getTeam?.members) return null;
+  const {
+    isSubmitting,
+    handleSubmit,
+    handleBlur,
+    resetForm,
+    values,
+    errors,
+    touched,
+    setFieldValue,
+    setErrors,
+  } = useFormik({
+    initialValues: {
+      members: [],
+    },
+    onSubmit: async (values, { setSubmitting, resetForm }) => {
+      if (!values.members.length) {
+        setErrors({ members: 'Please select at least one member to chat' });
+      }
 
-  const { members } = data.getTeam;
-  const filteredMembers = members.filter((m) => m.id !== userId);
+      const response = await createDMChannel({
+        variables: {
+          createChannelChannelInput: {
+            name: '',
+            teamId,
+            membersIds: values.members,
+          },
+        },
+        update: (cache, { data: data2 }) => {
+          const { createDMChannel } = data2 || {};
+
+          const data = cache.readQuery<MeQuery>({
+            query: MeDocument,
+          });
+
+          const teamIdx = findIndex(data?.me?.teams, ['id', teamId]);
+
+          if (
+            data?.me?.teams &&
+            data?.me?.teams[teamIdx]?.channels &&
+            createDMChannel?.channel
+          ) {
+            cache.writeFragment({
+              id: `Team:${teamId}`,
+              fragment: gql`
+                fragment Channel on Team {
+                  channels
+                }
+              `,
+              data: {
+                channels: [
+                  ...data.me.teams[teamIdx].channels,
+                  createDMChannel.channel,
+                ],
+              },
+            });
+          }
+        },
+      });
+
+      const { ok, errors } = response.data?.createDMChannel || {};
+
+      if (ok) {
+        onClose();
+        resetForm();
+      }
+      if (errors) {
+        setErrors(errorToFieldError(errors));
+      }
+      setSubmitting(false);
+
+      setSubmitting(false);
+    },
+  });
 
   return (
     <Modal open={open} onClose={onClose} closeOnDimmerClick>
       <Modal.Header>Find user to chat</Modal.Header>
       <Modal.Content>
-        <Form>
-          <FormField>
-            <Downshift
-              onChange={(selection) => {
-                const memberId = members.filter(
-                  ({ username }) => username === selection.username
-                )[0].id;
-                history.push(`/view-team/user/${teamId}/${memberId}`);
-              }}
-              itemToString={(item) => (item ? item.username : '')}
-            >
-              {({
-                getInputProps,
-                getItemProps,
-                getMenuProps,
-                isOpen,
-                inputValue,
-                highlightedIndex,
-                selectedItem,
-                getRootProps,
-              }) => (
-                <div>
-                  <div
-                    {...getRootProps(undefined, {
-                      suppressRefError: true,
-                    })}
-                  >
-                    <Input {...getInputProps()} />
-                  </div>
-                  <MembersList {...getMenuProps()}>
-                    {isOpen
-                      ? filteredMembers
-                          .filter(
-                            (item) =>
-                              !inputValue || item.username.includes(inputValue)
-                          )
-                          .map((item, index) => (
-                            <li
-                              {...getItemProps({
-                                key: item.username,
-                                index,
-                                item,
-                                style: {
-                                  backgroundColor:
-                                    highlightedIndex === index
-                                      ? 'lightgray'
-                                      : 'white',
-                                  fontWeight:
-                                    selectedItem === item ? 'bold' : 'normal',
-                                },
-                              })}
-                            >
-                              {item.username}
-                            </li>
-                          ))
-                      : null}
-                  </MembersList>
-                </div>
-              )}
-            </Downshift>
+        <Form onSubmit={handleSubmit}>
+          <FormField error={touched.members && !!errors.members}>
+            <MultiSelectUsers
+              handleBlur={handleBlur}
+              userId={userId}
+              placeholder="Select members to message"
+              value={values.members}
+              handleChange={(_e, { value }) => setFieldValue('members', value)}
+              teamId={teamId}
+            />
           </FormField>
-          <FormGroup widths="one">
+          {touched.members && errors.members ? (
+            <Message negative content={errors.members} />
+          ) : null}
+          <FormGroup widths="equal">
             <FormField>
               <Button
+                disabled={isSubmitting}
                 type="button"
                 onClick={() => {
+                  resetForm();
                   onClose();
                 }}
                 fluid
               >
                 Cancel
+              </Button>
+            </FormField>
+            <FormField>
+              <Button disabled={isSubmitting} type="submit" fluid>
+                Start Messaging
               </Button>
             </FormField>
           </FormGroup>

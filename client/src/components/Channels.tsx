@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Icon as Icona } from 'semantic-ui-react';
 import styled from 'styled-components';
-import { Channel, Team, User } from '../generated/graphql';
+import { Channel, Team } from '../generated/graphql';
 
 const ChannelsWrapper = styled.div`
   grid-column: 2;
@@ -60,18 +60,17 @@ const channel = ({ id, name }: Channel, teamId: number): JSX.Element => (
   </Link>
 );
 
-const user = ({ id, username }: User, teamId: number): JSX.Element => (
-  <Link key={`user-${id}`} to={`/view-team/user/${teamId}/${id}`}>
+const dmchannel = ({ id, name }: Channel, teamId: number): JSX.Element => (
+  <Link key={`user-${id}`} to={`/view-team/${teamId}/${id}`}>
     <SideBarListItem>
       <Bubble on />
-      {username}
+      {name}
     </SideBarListItem>
   </Link>
 );
 
 interface ChannelsProps {
   team: Team;
-  userId: number;
   onAddChannelClick: () => void;
   onDirectMessageClick: () => void;
   onInvitePeople: () => void;
@@ -79,14 +78,19 @@ interface ChannelsProps {
 
 export const Channels: React.FC<ChannelsProps> = ({
   team,
-  userId,
   onDirectMessageClick,
   onAddChannelClick,
   onInvitePeople,
 }) => {
-  const { channels, name, id, members, owner, admin } = team || {};
+  const { channels, name, id, owner, admin } = team || {};
 
-  const allPeople = (members || []).filter((user) => user.id !== userId);
+  const dmChannels: Channel[] = [];
+
+  const normalChannels: Channel[] = [];
+
+  channels.forEach((c) =>
+    c.isDm ? dmChannels.push(c) : normalChannels.push(c)
+  );
 
   return (
     <ChannelsWrapper>
@@ -99,14 +103,14 @@ export const Channels: React.FC<ChannelsProps> = ({
           Channels
           {admin && <Icon onClick={onAddChannelClick} name="add circle" />}
         </SideBarListHeader>
-        {channels.map((chan) => channel(chan, id))}
+        {normalChannels.map((c) => channel(c, id))}
       </SideBarList>
       <SideBarList>
         <SideBarListHeader>
           Direct Messages
           <Icon onClick={onDirectMessageClick} name="add circle" />
         </SideBarListHeader>
-        {allPeople.map((us) => user(us, id))}
+        {dmChannels.map((c) => dmchannel(c, id))}
         {admin && (
           <SideBarListItem style={{ marginTop: '0.5rem' }}>
             <a href="#invite-people" onClick={onInvitePeople}>

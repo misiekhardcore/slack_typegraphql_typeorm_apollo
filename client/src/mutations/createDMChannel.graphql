@@ -1,0 +1,15 @@
+mutation createDMChannel($createChannelChannelInput: CreateChannelInput!) {
+  createDMChannel(channelInput: $createChannelChannelInput) {
+    ok
+    channel {
+      id
+      name
+      isPublic
+      isDm
+    }
+    errors {
+      msg
+      path
+    }
+  }
+}

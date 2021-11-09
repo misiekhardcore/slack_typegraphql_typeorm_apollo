@@ -1,4 +1,4 @@
-import { getRepository, Repository } from 'typeorm';
+import { getRepository, In, Repository } from 'typeorm';
 import { TeamMember } from '../entity/TeamMember';
 import { User } from '../entity/User';
 import { CreateUserInput, UpdateUserInput } from '../inputs/UserInputs';
@@ -35,6 +35,10 @@ export class UserService {
 
   public async getMany(): Promise<User[]> {
     return this.userRepository.find();
+  }
+
+  public async getManyByIds(ids: number[]): Promise<User[]> {
+    return this.userRepository.find({ where: { id: In(ids) } });
   }
 
   public async getMember(

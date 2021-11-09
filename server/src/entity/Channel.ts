@@ -30,6 +30,10 @@ export class Channel extends BaseEntity {
   @Column({ default: true })
   isPublic: boolean;
 
+  @Field(() => Boolean)
+  @Column({ default: false })
+  isDm: boolean;
+
   @Field(() => String)
   @CreateDateColumn()
   createdAt: Date;

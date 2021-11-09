@@ -16,7 +16,7 @@ import { Team } from '../entity/Team';
 import { User } from '../entity/User';
 import { Context } from '../index';
 import { CreateChannelInput } from '../inputs/ChannelInputs';
-import { isAuth } from '../permissions';
+import { isAuth, isTeamMember } from '../permissions';
 import { ChannelService } from '../services/channel.service';
 import { TeamMemberService } from '../services/team-member.service';
 import { TeamService } from '../services/team.service';
@@ -67,9 +67,9 @@ export class ChannelResolver implements ResolverInterface<Channel> {
           errors: [{ msg: 'Team not found', path: 'team' }],
         };
 
-      const member = await this.teamMemberService.getOne(user.id, team.id);
+      const owner = await this.teamMemberService.getOwner(team.id);
 
-      if (!member?.admin)
+      if (owner?.id !== user.id)
         return {
           ok: false,
           errors: [
@@ -92,6 +92,43 @@ export class ChannelResolver implements ResolverInterface<Channel> {
         errors: error,
       };
     }
+  }
+
+  @Mutation(() => CreateChannelResponse)
+  @UseMiddleware(isAuth)
+  @UseMiddleware(isTeamMember)
+  async createDMChannel(
+    @Arg('channelInput') createChannelInput: CreateChannelInput,
+    @Ctx() { user }: Context
+  ): Promise<CreateChannelResponse> {
+    const team = await this.teamService.getOne(createChannelInput.teamId);
+
+    if (!user)
+      return {
+        ok: false,
+        errors: [{ path: 'user', msg: '' }],
+      };
+
+    if (!team)
+      return {
+        ok: false,
+        errors: [{ msg: 'Team not found', path: 'team' }],
+      };
+
+    let channel = await this.channelService.getOneDM(
+      team.id,
+      createChannelInput.membersIds || [],
+      user.id
+    );
+
+    if (!channel) {
+      channel = await this.channelService.createDM(
+        { ...createChannelInput, isDm: true, isPublic: false },
+        user.id
+      );
+    }
+
+    return { ok: true, channel };
   }
 
   @FieldResolver()

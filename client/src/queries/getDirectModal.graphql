@@ -17,6 +17,7 @@ query getDirectModal($userId: Float!) {
         id
         isPublic
         name
+        isDm
       }
       members {
         username

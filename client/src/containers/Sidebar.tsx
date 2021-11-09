@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router';
+import { Redirect } from 'react-router';
 import { AddChannelModal } from '../components/AddChannelModal';
 import { Channels } from '../components/Channels';
 import { DirectMessageModal } from '../components/DirectMessageModal';
@@ -13,8 +13,11 @@ interface SidebarProps {
   userId: number;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ teams, team, userId }) => {
-  const history = useHistory();
+export const Sidebar: React.FC<SidebarProps> = ({
+  teams = [],
+  team,
+  userId,
+}) => {
   const [state, setState] = useState({
     openAddChannelModal: false,
     openInvitePeopleModal: false,
@@ -22,8 +25,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ teams, team, userId }) => {
   });
 
   if (!(teams && team)) {
-    history.push('/login');
-    return null;
+    return <Redirect to="/login" />;
   }
 
   const handleAddChannelModalClose = () =>
@@ -50,7 +52,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ teams, team, userId }) => {
       <Teams key="team-sidebar" teams={teams} />
       <Channels
         team={team}
-        userId={userId}
         onAddChannelClick={handleAddChannelModalOpen}
         onDirectMessageClick={handleDirectMessageModalOpen}
         onInvitePeople={handleInvitePeopleModalOpen}

@@ -7,6 +7,7 @@ interface MultiSelectUsersProps {
   placeholder: string;
   value: string | number | boolean | (string | number | boolean)[] | undefined;
   userId: number;
+  handleBlur: (e: React.FocusEvent<unknown, Element>) => void;
   handleChange: (
     event: React.SyntheticEvent<HTMLElement, Event>,
     data: DropdownProps
@@ -18,6 +19,7 @@ export const MultiSelectUsers: React.FC<MultiSelectUsersProps> = ({
   placeholder,
   value,
   userId,
+  handleBlur,
   handleChange,
 }) => {
   const { loading, error, data } = useGetTeamMembersQuery({
@@ -31,6 +33,8 @@ export const MultiSelectUsers: React.FC<MultiSelectUsersProps> = ({
 
   return (
     <Dropdown
+      onBlur={handleBlur}
+      name="members"
       value={value}
       onChange={handleChange}
       placeholder={placeholder}
