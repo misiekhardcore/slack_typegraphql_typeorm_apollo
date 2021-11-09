@@ -32,10 +32,12 @@ export class MessageService {
     return this.messageRepository.findOne(id);
   }
 
-  public async getMany(channelId: number): Promise<Message[]> {
+  public async getMany(channelId: number, offset?: number): Promise<Message[]> {
     return this.messageRepository.find({
       where: { channelId },
-      order: { createdAt: 'ASC' },
+      order: { createdAt: 'DESC' },
+      take: 35,
+      skip: offset,
     });
   }
 

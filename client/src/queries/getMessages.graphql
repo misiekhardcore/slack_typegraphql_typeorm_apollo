@@ -1,5 +1,5 @@
-query getMessages($channelId: Float!) {
-  getMessages(channelId: $channelId) {
+query getMessages($channelId: Float!, $offset: Float) {
+  getMessages(channelId: $channelId, offset: $offset) {
     id
     text
     user {

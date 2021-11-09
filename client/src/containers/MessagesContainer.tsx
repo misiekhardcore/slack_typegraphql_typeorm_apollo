@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Comment } from 'semantic-ui-react';
+import { Button, Comment } from 'semantic-ui-react';
 import { Messages } from '../components/Messages';
 import {
   File,
@@ -66,14 +66,36 @@ interface MessagesContainerProps {
 export const MessagesContainer: React.FC<MessagesContainerProps> = ({
   channelId,
 }) => {
-  const { data, error, subscribeToMore } = useGetMessagesQuery({
+  const { data, error, subscribeToMore, fetchMore } = useGetMessagesQuery({
     variables: { channelId },
     fetchPolicy: 'network-only',
   });
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     noClick: true,
     onDrop: () => console.log(),
   });
+
+  const [hasMoreToLoad, setHasMoreToLoad] = useState(true);
+
+  const { getMessages } = data || {};
+
+  const onLoadMore = () => {
+    fetchMore({
+      variables: { channelId, offset: getMessages?.length },
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (!fetchMoreResult?.getMessages) return prev;
+        if (fetchMoreResult.getMessages.length < 35) setHasMoreToLoad(false);
+        return {
+          ...prev,
+          getMessages: [
+            ...(prev.getMessages || []),
+            ...fetchMoreResult.getMessages,
+          ],
+        };
+      },
+    });
+  };
 
   useEffect(() => {
     const unsubscribe = subscribeToMore<
@@ -87,8 +109,8 @@ export const MessagesContainer: React.FC<MessagesContainerProps> = ({
         return {
           ...prev,
           getMessages: [
-            ...(prev.getMessages || []),
             subscriptionData.data.newMessage,
+            ...(prev.getMessages || []),
           ],
         };
       },
@@ -105,8 +127,13 @@ export const MessagesContainer: React.FC<MessagesContainerProps> = ({
     >
       <input {...getInputProps()} />
       <Comment.Group style={{ maxWidth: '100%' }}>
-        {data?.getMessages &&
-          data.getMessages.map((mes) => message(mes as Message))}
+        {hasMoreToLoad && (
+          <Button fluid onClick={onLoadMore}>
+            Load more
+          </Button>
+        )}
+        {getMessages &&
+          [...getMessages].reverse().map((mes) => message(mes as Message))}
       </Comment.Group>
       {error && JSON.stringify(error)}
     </Messages>
