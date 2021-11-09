@@ -12,7 +12,9 @@ const isAuthenticated = (): boolean => {
   const refreshToken = localStorage.getItem('refreshToken') || '';
   try {
     decode(token);
-    decode(refreshToken);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { exp } = decode<any>(refreshToken);
+    if (exp < Date.now() / 1000) return false;
   } catch (error) {
     return false;
   }
