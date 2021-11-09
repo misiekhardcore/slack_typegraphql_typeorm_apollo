@@ -1,8 +1,0 @@
-mutation createDirectMessage(
-  $createDirectMessageInput: CreateDirectMessageInput!
-) {
-  createDirectMessage(messageInput: $createDirectMessageInput) {
-    id
-    text
-  }
-}

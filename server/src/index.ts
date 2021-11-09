@@ -19,7 +19,6 @@ import { createMemberTeamsLoader } from './loaders/memberTeamsLoader';
 import { createTeamMembersLoader } from './loaders/teamMembersLoader';
 import { createUserChannelsLoader } from './loaders/userChannelsLoader';
 import { ChannelResolver } from './resolvers/ChannelResolver';
-import { DirectMessageResolver } from './resolvers/DirectMessageResolver';
 import { MessageResolver } from './resolvers/MessageResolver';
 import { TeamResolver } from './resolvers/TeamResolver';
 import { UserResolver } from './resolvers/UserResolver';
@@ -156,13 +155,7 @@ export interface Context {
   });
 
   const schema = await buildSchema({
-    resolvers: [
-      UserResolver,
-      TeamResolver,
-      ChannelResolver,
-      MessageResolver,
-      DirectMessageResolver,
-    ],
+    resolvers: [UserResolver, TeamResolver, ChannelResolver, MessageResolver],
     validate: true,
   });
 
