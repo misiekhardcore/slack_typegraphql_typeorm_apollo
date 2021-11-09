@@ -4,10 +4,7 @@ import React, { ChangeEvent, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Button, Icon, Input } from 'semantic-ui-react';
 import styled from 'styled-components';
-import {
-  CreateDirectMessageMutation,
-  CreateMessageMutation,
-} from '../generated/graphql';
+import { CreateMessageMutation } from '../generated/graphql';
 
 const SendMessageWrapper = styled.div`
   grid-column: 3;
@@ -44,7 +41,7 @@ interface SendMessageProps {
     file: File | null
   ) => Promise<
     FetchResult<
-      CreateDirectMessageMutation | CreateMessageMutation,
+      CreateMessageMutation,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       Record<string, any>,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
