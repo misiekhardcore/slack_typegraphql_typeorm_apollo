@@ -12,6 +12,7 @@ import {
 import { useLoginMutation } from '../generated/graphql';
 import { graphqlErrorToObject } from '../utils/graphqlErrorToObject';
 import { isErrorField } from '../utils/isErrorField';
+import { wsClient } from '../apollo';
 
 const Login: React.FC = () => {
   const [state, setState] = useState({ email: '', password: '' });
@@ -33,6 +34,7 @@ const Login: React.FC = () => {
     const { token, refreshToken } = data.login;
     if (token) localStorage.setItem('token', token);
     if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
+    wsClient.close();
     return <Redirect to="/view-team" />;
   }
 
