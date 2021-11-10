@@ -24,6 +24,9 @@ import { MessageResolver } from './resolvers/MessageResolver';
 import { TeamResolver } from './resolvers/TeamResolver';
 import { UserResolver } from './resolvers/UserResolver';
 import { checkToken, extractTokens } from './utils/token';
+import { createTeamChannelsLoader } from './loaders/teamChannelsLoader';
+import { Message } from './entity/Message';
+import { createChannelMessagesLoader } from './loaders/channelMessages';
 
 config();
 
@@ -34,6 +37,8 @@ export interface Context {
   channelUsersLoader: DataLaoder<number, User[], number>;
   memberTeamsLoader: DataLaoder<number, Team[], number>;
   teamMembersLoader: DataLaoder<number, User[], number>;
+  teamChannelsLoader: (userId: number) => DataLaoder<number, Channel[], number>;
+  channelMessagesLoader: DataLaoder<number, Message[], number>;
   user: { id: number } | null;
   jwtSecret1: string;
   jwtSecret2: string;
@@ -83,6 +88,8 @@ export interface Context {
         channelUsersLoader: createChannelUsersLoader(),
         teamMembersLoader: createTeamMembersLoader(),
         memberTeamsLoader: createMemberTeamsLoader(),
+        teamChannelsLoader: createTeamChannelsLoader(),
+        channelMessagesLoader: createChannelMessagesLoader(),
         user: (await extractTokens(req, res)) || null,
         jwtSecret1: process.env.SECRET1 || '',
         jwtSecret2: process.env.SECRET2 || '',

@@ -140,8 +140,11 @@ export class ChannelResolver implements ResolverInterface<Channel> {
   }
 
   @FieldResolver()
-  async messages(@Root() channel: Channel): Promise<Message[]> {
-    return this.channelService.populateMany<Message>(channel, 'messages');
+  async messages(
+    @Root() channel: Channel,
+    @Ctx() { channelMessagesLoader }: Context
+  ): Promise<Message[]> {
+    return channelMessagesLoader.load(channel.id);
   }
 
   @FieldResolver()
