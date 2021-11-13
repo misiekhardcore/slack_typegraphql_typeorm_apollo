@@ -37,5 +37,5 @@
     "no-use-before-define": "off",
     "@typescript-eslint/no-use-before-define": ["error"]
   },
-  "ignorePatterns": ["**/__test__/**/*.*", "**/__tests__/**/*.*"]
+  "ignorePatterns": ["**/__test__/**/*.*", "**/__tests__/**/*.*","dist/*"]
 }

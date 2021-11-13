@@ -42,6 +42,7 @@ export interface Context {
   user: { id: number } | null;
   jwtSecret1: string;
   jwtSecret2: string;
+  serverUrl: string;
 }
 (async () => {
   const app = express();
@@ -93,6 +94,7 @@ export interface Context {
         user: (await extractTokens(req, res)) || null,
         jwtSecret1: process.env.SECRET1 || '',
         jwtSecret2: process.env.SECRET2 || '',
+        serverUrl: `${req.protocol}://${req.get('host')}`,
       };
     },
   });
@@ -136,6 +138,6 @@ export interface Context {
         server,
       }
     );
-    console.log(`server started at http://localhost:${port}/graphql`);
+    console.log('server started');
   });
 })();

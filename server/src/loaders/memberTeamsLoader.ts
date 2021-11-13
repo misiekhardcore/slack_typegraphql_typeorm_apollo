@@ -1,6 +1,6 @@
 import DataLoader from 'dataloader';
 import { In } from 'typeorm';
-import { Team } from 'src/entity/Team';
+import { Team } from '../entity/Team';
 import { TeamMember } from '../entity/TeamMember';
 
 const batchTeams = async (userIds: readonly number[]) => {

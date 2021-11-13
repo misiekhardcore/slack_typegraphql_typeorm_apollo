@@ -2,7 +2,8 @@
   "name": "server",
   "version": "0.0.1",
   "devDependencies": {
-    "@babel/core": "^7.15.8",
+    "@babel/cli": "^7.16.0",
+    "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.15.8",
     "@babel/preset-typescript": "^7.15.0",
     "@types/axios": "^0.14.0",
@@ -13,6 +14,7 @@
     "@types/jest": "^27.0.2",
     "@types/jsonwebtoken": "^8.5.4",
     "@types/node": "^16.4.14",
+    "@types/ws": "^8.2.0",
     "@typescript-eslint/eslint-plugin": "^5.3.0",
     "@typescript-eslint/parser": "^5.3.0",
     "axios": "^0.24.0",
@@ -57,8 +59,9 @@
   },
   "scripts": {
     "start": "ts-node-dev src/index.ts",
+    "serve": "node dist/index.js",
     "test-server": "./reset_test_db.sh; TEST_DB=testslack ts-node-dev src/index.ts",
-    "build": "tsc",
+    "build": "rm -rf dist && tsc",
     "test": "jest"
   },
   "jest": {

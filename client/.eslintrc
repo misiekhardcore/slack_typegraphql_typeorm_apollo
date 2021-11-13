@@ -40,6 +40,7 @@
   "ignorePatterns": [
     "**/__test__/**/*.*",
     "**/__tests__/**/*.*",
-    "src/generated/*.*"
+    "src/generated/*.*",
+    "build"
   ]
 }

@@ -1,4 +1,3 @@
-// import { ChannelMember } from "src/entity/ChannelMember";
 import { getRepository, Repository } from 'typeorm';
 import { User } from '../entity/User';
 import { TeamMember } from '../entity/TeamMember';

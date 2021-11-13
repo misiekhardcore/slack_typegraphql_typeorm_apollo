@@ -4,5 +4,6 @@ declare namespace NodeJS {
     SECRET2: string;
     REDIS_DOMAIN: string;
     REDIS_PORT: string;
+    PSQL_URL:string;
   }
 }

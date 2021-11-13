@@ -38,7 +38,7 @@ const media = ({ filename, mimetype, url }: File): JSX.Element => {
       return (
         <img
           style={{ maxWidth: '100%' }}
-          src={`http://localhost:4000${url}`}
+          src={`${process.env.REACT_APP_SERVER_URL}${url}`}
           alt={filename}
         />
       );
@@ -46,7 +46,10 @@ const media = ({ filename, mimetype, url }: File): JSX.Element => {
       return (
         <audio controls>
           Your browser does not support <code>audio</code> element.
-          <source src={`http://localhost:4000${url}`} type={mimetype} />
+          <source
+            src={`${process.env.REACT_APP_SERVER_URL}${url}`}
+            type={mimetype}
+          />
           <track default kind="captions" label={filename} />
         </audio>
       );

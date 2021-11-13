@@ -6,7 +6,7 @@ import { createUploadLink } from 'apollo-upload-client';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 
 const httpLink = createUploadLink({
-  uri: 'http://localhost:4000/graphql',
+  uri: `${process.env.REACT_APP_SERVER_URL}/graphql`,
   credentials: 'same-origin',
 });
 
@@ -44,14 +44,17 @@ const afterwareLink = new ApolloLink((operation, forward) => {
 
 const httpLinkWithMiddlewares = afterwareLink.concat(authLink.concat(httpLink));
 
-export const wsClient = new SubscriptionClient('ws://localhost:4000/graphql', {
-  reconnect: true,
-  lazy: true,
-  connectionParams: () => ({
-    token: localStorage.getItem('token'),
-    refreshToken: localStorage.getItem('refreshToken'),
-  }),
-});
+export const wsClient = new SubscriptionClient(
+  `${process.env.REACT_APP_SERVER_WS}/graphql`,
+  {
+    reconnect: true,
+    lazy: true,
+    connectionParams: () => ({
+      token: localStorage.getItem('token'),
+      refreshToken: localStorage.getItem('refreshToken'),
+    }),
+  }
+);
 
 const wsLink = new WebSocketLink(wsClient);
 
